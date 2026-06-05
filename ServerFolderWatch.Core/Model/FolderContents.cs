@@ -25,16 +25,16 @@ public class FolderContents
     public static FolderContents Empty { get; } = new();
 
     public static FolderContents FromFolder(string folderPath, IConfiguration configuration,
-        IDirectory directoryWrapper, IPath pathWrapper)
+        IFileSystem fileSystem)
     {
         return new FolderContents
         {
-            Subfolders = directoryWrapper.EnumerateDirectories(folderPath)
-                .Select(pathWrapper.GetDirectoryName).OfType<string>()
+            Subfolders = fileSystem.Directory.EnumerateDirectories(folderPath)
+                .Select(fileSystem.Path.GetDirectoryName).OfType<string>()
                 .Select(x => new Directory(x)).ToList(),
             
-            VersionedFiles = directoryWrapper.EnumerateFiles(folderPath)
-                .Select(pathWrapper.GetFileName).OfType<string>()
+            VersionedFiles = fileSystem.Directory.EnumerateFiles(folderPath)
+                .Select(fileSystem.Path.GetFileName).OfType<string>()
                 .Where(x => !x.Equals(configuration.SidecarFileName))
                 .Select(x => new File(x)).ToList()
         };

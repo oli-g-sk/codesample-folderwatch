@@ -1,22 +1,16 @@
 using System.IO.Abstractions;
-using System.Net;
-using System.Text.Json;
-using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using ServerFolderWatch.Core.Model;
 using File = ServerFolderWatch.Core.Model.File;
-using JsonSerializer = System.Text.Json.JsonSerializer;
 
-namespace ServerFolderWatch.Core;
+namespace ServerFolderWatch.Core.Service;
 
-public class FileSystemChangedService(IPath path, IDirectory directory, IFile file,
+public class FileSystemDiffService(IFileSystem fileSystem,
+    IPersistenceService persistenceService,
     IConfiguration configuration, ILoggerFactory loggerFactory)
-    : IFileSystemChangeService
+    : IFileSystemDiffService
 {
-    private readonly ILogger<FileSystemChangedService> logger = loggerFactory.CreateLogger<FileSystemChangedService>();
-    
-    private string GetSidecarFilePath(string currentPath) => path.Combine(currentPath, configuration.SidecarFileName);
+    private readonly ILogger<FileSystemDiffService> logger = loggerFactory.CreateLogger<FileSystemDiffService>();
     
     public FolderContents? PreviousContents { get; private set; }
     
@@ -35,7 +29,7 @@ public class FileSystemChangedService(IPath path, IDirectory directory, IFile fi
     {
         logger.LogTrace("Analyzing {FolderPath}", folderPath);
         
-        bool wasAlreadyMonitored = file.Exists(GetSidecarFilePath(folderPath));
+        bool wasAlreadyMonitored = persistenceService.IsFolderAlreadyMonitored(folderPath);
 
         if (wasAlreadyMonitored)
         {
@@ -44,11 +38,10 @@ public class FileSystemChangedService(IPath path, IDirectory directory, IFile fi
         else
         {
             logger.LogInformation("Setting up folder {FolderPath} for monitoring", folderPath);
-            
-            var sidecarFilePath = GetSidecarFilePath(folderPath);
-            file.Create(sidecarFilePath).Close();
 
-            foreach (var subfolder in directory.GetDirectories(folderPath))
+            persistenceService.InitializeFolder(folderPath);
+            
+            foreach (var subfolder in fileSystem.Directory.GetDirectories(folderPath))
                 await Analyze(subfolder);
         }
 
@@ -63,37 +56,17 @@ public class FileSystemChangedService(IPath path, IDirectory directory, IFile fi
 
     private FolderContents GetContentsFromFolder(string folderPath)
     {
-        return FolderContents.FromFolder(folderPath, configuration, directory, path);
+        return FolderContents.FromFolder(folderPath, configuration, fileSystem);
     }
 
     private FolderContents GetContentsFromSidecarFile(string folderPath)
     {
-        try
-        {
-            var sidecarFileContents = JsonConvert.DeserializeObject<FolderContents>
-                (file.ReadAllText(GetSidecarFilePath(folderPath)), new JsonSerializerSettings()
-                {
-                    ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor,
-                });
-
-            return sidecarFileContents ?? FolderContents.Empty;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error reading sidecar file in {FolderPath}: {Error}", folderPath, ex.Message);
-        }
-        
-        return FolderContents.Empty;
+        return persistenceService.LoadSnapshot(folderPath).Result;
     }
     
     private void SaveSidecarFile(string folderPath)
     {
-        var json = JsonSerializer.Serialize(CurrentContents, new JsonSerializerOptions()
-        {
-            WriteIndented = true,
-        });
-
-        file.WriteAllText(GetSidecarFilePath(folderPath), json);       
+        persistenceService.SaveSnapshot(folderPath, CurrentContents);
     }
     
     private void DetectChanges(string folderPath)
@@ -143,8 +116,8 @@ public class FileSystemChangedService(IPath path, IDirectory directory, IFile fi
         if (PreviousContents == null)
             return false;
         
-        var fullPath = path.Combine(folderPath, fileEntry.Name);
-        var modified = file.GetLastWriteTime(fullPath);
+        var fullPath = fileSystem.Path.Combine(folderPath, fileEntry.Name);
+        var modified = fileSystem.File.GetLastWriteTime(fullPath);
 
         // TODO other ways to detect changes? (size, MD5, etc.)
         return modified > PreviousContents.LastAnalyzed;
