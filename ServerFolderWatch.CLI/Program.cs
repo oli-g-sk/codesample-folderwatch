@@ -10,6 +10,8 @@ class Program
     
     static void Main(string[] args)
     {
+        using ILoggerFactory loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
+        
         var fileSystem = new FileSystem();
         
         var fileSystemChangedService = new FileSystemChangedService(
@@ -17,7 +19,7 @@ class Program
             new DirectoryWrapper(fileSystem),
             new FileWrapper(fileSystem),
             new Configuration(),
-            new Logger<FileSystemChangedService>(new LoggerFactory())
+            loggerFactory
         );
         
         Console.WriteLine("Enter path (defaults to C:\\Temp):");

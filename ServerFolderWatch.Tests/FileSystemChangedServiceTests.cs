@@ -23,7 +23,7 @@ public class FileSystemChangedServiceTests
     public FileSystemChangedServiceTests()
     {
         sut = new FileSystemChangedService(pathMock.Object, directoryMock.Object, fileMock.Object,
-            configurationMock.Object, new Mock<ILogger<FileSystemChangedService>>().Object);
+            configurationMock.Object, new Mock<ILoggerFactory>().Object);
         
         configurationMock.SetupGet(x => x.SidecarFileName)
             .Returns(SidecarFileName);

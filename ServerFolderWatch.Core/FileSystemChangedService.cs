@@ -9,10 +9,10 @@ using File = ServerFolderWatch.Core.Model.File;
 namespace ServerFolderWatch.Core;
 
 public class FileSystemChangedService(IPath path, IDirectory directory, IFile file,
-    IConfiguration configuration, ILogger<FileSystemChangedService> logger)
+    IConfiguration configuration, ILoggerFactory loggerFactory)
     : IFileSystemChangeService
 {
-    private readonly ILogger<FileSystemChangedService> logger = logger;
+    private readonly ILogger<FileSystemChangedService> logger = loggerFactory.CreateLogger<FileSystemChangedService>();
     
     private string GetSidecarFilePath(string currentPath) => path.Combine(currentPath, configuration.SidecarFileName);
     
@@ -31,6 +31,8 @@ public class FileSystemChangedService(IPath path, IDirectory directory, IFile fi
     
     public async Task<bool> Analyze(string folderPath)
     {
+        logger.LogTrace("Analyzing {FolderPath}", folderPath);
+        
         bool wasAlreadyMonitored = file.Exists(GetSidecarFilePath(folderPath));
 
         if (wasAlreadyMonitored)
@@ -39,6 +41,8 @@ public class FileSystemChangedService(IPath path, IDirectory directory, IFile fi
         }
         else
         {
+            logger.LogInformation("Setting up folder {FolderPath} for monitoring", folderPath);
+            
             var sidecarFilePath = GetSidecarFilePath(folderPath);
             file.Create(sidecarFilePath).Close();
 
@@ -114,6 +118,17 @@ public class FileSystemChangedService(IPath path, IDirectory directory, IFile fi
                 ModifiedEntries.Add(currentEntry);
             }
         }
+        
+        if (!AddedEntries.Any() && !DeletedEntries.Any() && !ModifiedEntries.Any())
+            logger.LogInformation("No changes detected in {FolderPath}", folderPath);
+        else
+        
+        if (AddedEntries.Any())
+            logger.LogInformation("Items added in {FolderPath}: {AddedFiles}", folderPath, AddedEntries.Count);
+        if (DeletedEntries.Any())
+            logger.LogInformation("Items deleted in {FolderPath}: {DeletedFiles}", folderPath, DeletedEntries.Count);
+        if (ModifiedEntries.Any())
+            logger.LogInformation("Items modified in {FolderPath}: {ModifiedFiles}", folderPath, ModifiedEntries.Count);       
     }
 
     private bool FileHasChanged(File fileEntry, string folderPath)
