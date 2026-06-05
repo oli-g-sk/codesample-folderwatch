@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerFolderWatch.CLI", "Se
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerFolderWatch.Tests", "ServerFolderWatch.Tests\ServerFolderWatch.Tests.csproj", "{69DFFCEF-2D55-4626-97C7-AF8B1F8FAFA1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerFolderWatch.Server", "ServerFolderWatch.Server\ServerFolderWatch.Server.csproj", "{53AECE7B-38A3-40D4-86DD-91858AAF2AA1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{69DFFCEF-2D55-4626-97C7-AF8B1F8FAFA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{69DFFCEF-2D55-4626-97C7-AF8B1F8FAFA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{69DFFCEF-2D55-4626-97C7-AF8B1F8FAFA1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53AECE7B-38A3-40D4-86DD-91858AAF2AA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53AECE7B-38A3-40D4-86DD-91858AAF2AA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53AECE7B-38A3-40D4-86DD-91858AAF2AA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53AECE7B-38A3-40D4-86DD-91858AAF2AA1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
