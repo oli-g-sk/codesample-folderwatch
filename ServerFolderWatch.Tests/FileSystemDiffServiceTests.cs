@@ -19,17 +19,26 @@ public class FileSystemDiffServiceTests
     private readonly Mock<IFile> fileMock = new();
     private readonly Mock<IConfiguration> configurationMock = new();
     
+    private readonly Mock<IPersistenceService> persistenceServiceMock = new();
+    
     private FileSystemDiffService sut;
     
     public FileSystemDiffServiceTests()
     {
-        sut = new FileSystemDiffService(pathMock.Object, directoryMock.Object, fileMock.Object,
-            configurationMock.Object, new Mock<ILoggerFactory>().Object);
+        persistenceServiceMock = new Mock<IPersistenceService>();
+        
+        var fileSystemMock = new Mock<IFileSystem>();
+        fileSystemMock.SetupGet(x => x.Directory).Returns(directoryMock.Object);
+        fileSystemMock.SetupGet(x => x.Path).Returns(pathMock.Object);
+        fileSystemMock.SetupGet(x => x.File).Returns(fileMock.Object);
         
         configurationMock.SetupGet(x => x.SidecarFileName)
             .Returns(SidecarFileName);
         pathMock.Setup(x => x.Combine(It.IsAny<string>(), It.IsAny<string>()))
             .Returns(SidecarFilePath);
+        
+        sut = new FileSystemDiffService(fileSystemMock.Object,
+            persistenceServiceMock.Object, configurationMock.Object, new Mock<ILoggerFactory>().Object);
     }
     
     [Theory]

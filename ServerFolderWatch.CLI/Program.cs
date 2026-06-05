@@ -26,9 +26,7 @@ class Program
         var persistenceService = new SidecarFilePersistenceService(fileWrapper, pathWrapper, configuration, loggerFactory);
         
         var fileSystemChangedService = new FileSystemDiffService(
-            new PathWrapper(fileSystemWrapper),
-            new DirectoryWrapper(fileSystemWrapper),
-            new FileWrapper(fileSystemWrapper),
+            new FileSystem(),
             persistenceService,
             configuration,
             loggerFactory

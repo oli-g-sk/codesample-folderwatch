@@ -5,7 +5,7 @@ using File = ServerFolderWatch.Core.Model.File;
 
 namespace ServerFolderWatch.Core.Service;
 
-public class FileSystemDiffService(IPath path, IDirectory directory, IFile file,
+public class FileSystemDiffService(IFileSystem fileSystem,
     IPersistenceService persistenceService,
     IConfiguration configuration, ILoggerFactory loggerFactory)
     : IFileSystemDiffService
@@ -41,7 +41,7 @@ public class FileSystemDiffService(IPath path, IDirectory directory, IFile file,
 
             persistenceService.Initialize(folderPath);
             
-            foreach (var subfolder in directory.GetDirectories(folderPath))
+            foreach (var subfolder in fileSystem.Directory.GetDirectories(folderPath))
                 await Analyze(subfolder);
         }
 
@@ -56,7 +56,7 @@ public class FileSystemDiffService(IPath path, IDirectory directory, IFile file,
 
     private FolderContents GetContentsFromFolder(string folderPath)
     {
-        return FolderContents.FromFolder(folderPath, configuration, directory, path);
+        return FolderContents.FromFolder(folderPath, configuration, fileSystem);
     }
 
     private FolderContents GetContentsFromSidecarFile(string folderPath)
@@ -116,8 +116,8 @@ public class FileSystemDiffService(IPath path, IDirectory directory, IFile file,
         if (PreviousContents == null)
             return false;
         
-        var fullPath = path.Combine(folderPath, fileEntry.Name);
-        var modified = file.GetLastWriteTime(fullPath);
+        var fullPath = fileSystem.Path.Combine(folderPath, fileEntry.Name);
+        var modified = fileSystem.File.GetLastWriteTime(fullPath);
 
         // TODO other ways to detect changes? (size, MD5, etc.)
         return modified > PreviousContents.LastAnalyzed;
