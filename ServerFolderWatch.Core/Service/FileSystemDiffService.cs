@@ -8,11 +8,11 @@ using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace ServerFolderWatch.Core.Service;
 
-public class FileSystemChangedService(IPath path, IDirectory directory, IFile file,
+public class FileSystemDiffService(IPath path, IDirectory directory, IFile file,
     IConfiguration configuration, ILoggerFactory loggerFactory)
-    : IFileSystemChangeService
+    : IFileSystemDiffService
 {
-    private readonly ILogger<FileSystemChangedService> logger = loggerFactory.CreateLogger<FileSystemChangedService>();
+    private readonly ILogger<FileSystemDiffService> logger = loggerFactory.CreateLogger<FileSystemDiffService>();
     
     private string GetSidecarFilePath(string currentPath) => path.Combine(currentPath, configuration.SidecarFileName);
     

@@ -21,7 +21,7 @@ class Program
         
         var fileSystem = new FileSystem();
         
-        var fileSystemChangedService = new FileSystemChangedService(
+        var fileSystemChangedService = new FileSystemDiffService(
             new PathWrapper(fileSystem),
             new DirectoryWrapper(fileSystem),
             new FileWrapper(fileSystem),

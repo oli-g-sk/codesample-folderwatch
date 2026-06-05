@@ -6,7 +6,7 @@ using ServerFolderWatch.Core.Service;
 
 namespace ServerFolderWatch.Tests;
 
-public class FileSystemChangedServiceTests
+public class FileSystemDiffServiceTests
 {
     private const string FolderName = "foo";
     private const string SubFolderName = "subFolder";
@@ -19,11 +19,11 @@ public class FileSystemChangedServiceTests
     private readonly Mock<IFile> fileMock = new();
     private readonly Mock<IConfiguration> configurationMock = new();
     
-    private FileSystemChangedService sut;
+    private FileSystemDiffService sut;
     
-    public FileSystemChangedServiceTests()
+    public FileSystemDiffServiceTests()
     {
-        sut = new FileSystemChangedService(pathMock.Object, directoryMock.Object, fileMock.Object,
+        sut = new FileSystemDiffService(pathMock.Object, directoryMock.Object, fileMock.Object,
             configurationMock.Object, new Mock<ILoggerFactory>().Object);
         
         configurationMock.SetupGet(x => x.SidecarFileName)
