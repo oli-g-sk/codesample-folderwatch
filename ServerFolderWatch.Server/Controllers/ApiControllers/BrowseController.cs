@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,7 +9,7 @@ using ServerFolderWatch.Core.Service;
 using ServerFolderWatch.Server.DTOs;
 using File = ServerFolderWatch.Core.Model.File;
 
-namespace ServerFolderWatch.Server.Controllers;
+namespace ServerFolderWatch.Server.Controllers.ApiControllers;
 
 [ApiController]
 [Route("api/browse")]
@@ -33,8 +32,6 @@ public class BrowseController(IBrowseService browseService,
         }
 
         diffService.Analyze(fullPath).Wait();
-
-        // TODO add path validation and throw 500 if invalid
 
         var currentFiles = diffService.CurrentEntries;
         
