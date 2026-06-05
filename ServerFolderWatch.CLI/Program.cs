@@ -1,4 +1,5 @@
 ﻿using System.IO.Abstractions;
+using Microsoft.Extensions.Logging;
 using ServerFolderWatch.Core;
 
 namespace ServerFolderWatch.CLI;
@@ -15,7 +16,8 @@ class Program
             new PathWrapper(fileSystem),
             new DirectoryWrapper(fileSystem),
             new FileWrapper(fileSystem),
-            new Configuration()
+            new Configuration(),
+            new Logger<FileSystemChangedService>(new LoggerFactory())
         );
         
         Console.WriteLine("Enter path (defaults to C:\\Temp):");

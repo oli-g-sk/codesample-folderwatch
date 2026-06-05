@@ -2,14 +2,18 @@ using System.IO.Abstractions;
 using System.Net;
 using System.Text.Json;
 using System.Xml.Linq;
+using Microsoft.Extensions.Logging;
 using ServerFolderWatch.Core.Model;
 using File = ServerFolderWatch.Core.Model.File;
 
 namespace ServerFolderWatch.Core;
 
-public class FileSystemChangedService(IPath path, IDirectory directory, IFile file, IConfiguration configuration)
+public class FileSystemChangedService(IPath path, IDirectory directory, IFile file,
+    IConfiguration configuration, ILogger<FileSystemChangedService> logger)
     : IFileSystemChangeService
 {
+    private readonly ILogger<FileSystemChangedService> logger = logger;
+    
     private string SidecarFile => path.Combine(monitoredPath, configuration.SidecarFileName);
     
     private string monitoredPath;

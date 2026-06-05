@@ -1,4 +1,5 @@
 ﻿using System.IO.Abstractions;
+using Microsoft.Extensions.Logging;
 using Moq;
 using ServerFolderWatch.Core;
 
@@ -21,8 +22,8 @@ public class FileSystemChangedServiceTests
     
     public FileSystemChangedServiceTests()
     {
-        sut = new FileSystemChangedService(pathMock.Object,
-            directoryMock.Object, fileMock.Object, configurationMock.Object);
+        sut = new FileSystemChangedService(pathMock.Object, directoryMock.Object, fileMock.Object,
+            configurationMock.Object, new Mock<ILogger<FileSystemChangedService>>().Object);
         
         configurationMock.SetupGet(x => x.SidecarFileName)
             .Returns(SidecarFileName);
