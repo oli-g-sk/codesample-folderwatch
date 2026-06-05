@@ -61,7 +61,7 @@ public class FileSystemChangedService(IPath path, IDirectory directory, IFile fi
 
     private FolderContents GetContentsFromFolder(string folderPath)
     {
-        return FolderContents.FromFolder(folderPath, directory, path);
+        return FolderContents.FromFolder(folderPath, configuration, directory, path);
     }
 
     private FolderContents GetContentsFromSidecarFile(string folderPath)

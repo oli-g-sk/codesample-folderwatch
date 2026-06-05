@@ -24,16 +24,18 @@ public class FolderContents
     // TODO remove - confusing - equals empty folder
     public static FolderContents Empty { get; } = new();
 
-    public static FolderContents FromFolder(string folderPath, IDirectory directory, IPath path)
+    public static FolderContents FromFolder(string folderPath, IConfiguration configuration,
+        IDirectory directoryWrapper, IPath pathWrapper)
     {
         return new FolderContents
         {
-            Subfolders = directory.EnumerateDirectories(folderPath)
-                .Select(path.GetDirectoryName).OfType<string>()
+            Subfolders = directoryWrapper.EnumerateDirectories(folderPath)
+                .Select(pathWrapper.GetDirectoryName).OfType<string>()
                 .Select(x => new Directory(x)).ToList(),
             
-            VersionedFiles = directory.EnumerateFiles(folderPath)
-                .Select(path.GetFileName).OfType<string>()
+            VersionedFiles = directoryWrapper.EnumerateFiles(folderPath)
+                .Select(pathWrapper.GetFileName).OfType<string>()
+                .Where(x => !x.Equals(configuration.SidecarFileName))
                 .Select(x => new File(x)).ToList()
         };
     }
