@@ -1,20 +1,16 @@
 using System.IO.Abstractions;
-using System.Text.Json;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using ServerFolderWatch.Core.Model;
 using File = ServerFolderWatch.Core.Model.File;
-using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace ServerFolderWatch.Core.Service;
 
 public class FileSystemDiffService(IPath path, IDirectory directory, IFile file,
+    IPersistenceService persistenceService,
     IConfiguration configuration, ILoggerFactory loggerFactory)
     : IFileSystemDiffService
 {
     private readonly ILogger<FileSystemDiffService> logger = loggerFactory.CreateLogger<FileSystemDiffService>();
-    
-    private string GetSidecarFilePath(string currentPath) => path.Combine(currentPath, configuration.SidecarFileName);
     
     public FolderContents? PreviousContents { get; private set; }
     
@@ -33,7 +29,7 @@ public class FileSystemDiffService(IPath path, IDirectory directory, IFile file,
     {
         logger.LogTrace("Analyzing {FolderPath}", folderPath);
         
-        bool wasAlreadyMonitored = file.Exists(GetSidecarFilePath(folderPath));
+        bool wasAlreadyMonitored = persistenceService.WasAlreadyMonitored(folderPath);
 
         if (wasAlreadyMonitored)
         {
@@ -42,10 +38,9 @@ public class FileSystemDiffService(IPath path, IDirectory directory, IFile file,
         else
         {
             logger.LogInformation("Setting up folder {FolderPath} for monitoring", folderPath);
-            
-            var sidecarFilePath = GetSidecarFilePath(folderPath);
-            file.Create(sidecarFilePath).Close();
 
+            persistenceService.Initialize(folderPath);
+            
             foreach (var subfolder in directory.GetDirectories(folderPath))
                 await Analyze(subfolder);
         }
@@ -66,32 +61,12 @@ public class FileSystemDiffService(IPath path, IDirectory directory, IFile file,
 
     private FolderContents GetContentsFromSidecarFile(string folderPath)
     {
-        try
-        {
-            var sidecarFileContents = JsonConvert.DeserializeObject<FolderContents>
-                (file.ReadAllText(GetSidecarFilePath(folderPath)), new JsonSerializerSettings()
-                {
-                    ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor,
-                });
-
-            return sidecarFileContents ?? FolderContents.Empty;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error reading sidecar file in {FolderPath}: {Error}", folderPath, ex.Message);
-        }
-        
-        return FolderContents.Empty;
+        return persistenceService.Load(folderPath).Result;
     }
     
     private void SaveSidecarFile(string folderPath)
     {
-        var json = JsonSerializer.Serialize(CurrentContents, new JsonSerializerOptions()
-        {
-            WriteIndented = true,
-        });
-
-        file.WriteAllText(GetSidecarFilePath(folderPath), json);       
+        persistenceService.Save(folderPath, CurrentContents);
     }
     
     private void DetectChanges(string folderPath)

@@ -1,6 +1,5 @@
 ﻿using System.IO.Abstractions;
 using Microsoft.Extensions.Logging;
-using ServerFolderWatch.Core;
 using ServerFolderWatch.Core.Service;
 
 namespace ServerFolderWatch.CLI;
@@ -19,13 +18,19 @@ class Program
 #endif
         });
         
-        var fileSystem = new FileSystem();
+        var fileSystemWrapper = new FileSystem();
+        var fileWrapper = new FileWrapper(fileSystemWrapper);
+        var pathWrapper = new PathWrapper(fileSystemWrapper);
+        var configuration = new Configuration();
+        
+        var persistenceService = new SidecarFilePersistenceService(fileWrapper, pathWrapper, configuration, loggerFactory);
         
         var fileSystemChangedService = new FileSystemDiffService(
-            new PathWrapper(fileSystem),
-            new DirectoryWrapper(fileSystem),
-            new FileWrapper(fileSystem),
-            new Configuration(),
+            new PathWrapper(fileSystemWrapper),
+            new DirectoryWrapper(fileSystemWrapper),
+            new FileWrapper(fileSystemWrapper),
+            persistenceService,
+            configuration,
             loggerFactory
         );
         
