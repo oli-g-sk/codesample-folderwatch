@@ -12,28 +12,20 @@ public class FileSystemChangedService(IPath path, IDirectory directory, IFile fi
 
     public async Task<bool> Setup(string monitoredPath)
     {
-        bool wasAlreadyMonitored = false;
         string sidecarFile = path.Combine(monitoredPath, configuration.SidecarFileName);
+        bool wasAlreadyMonitored = file.Exists(sidecarFile);
 
-        if (!file.Exists(sidecarFile))
+        if (!wasAlreadyMonitored)
         {
             file.Create(sidecarFile);
+            
+            foreach (var subfolder in directory.GetDirectories(monitoredPath))
+                await Setup(subfolder);
         }
         else
-        {
-            wasAlreadyMonitored = true;
             UpdateSidecarFile(monitoredPath);
-        }
-
-        foreach (var subfolder in directory.GetDirectories(monitoredPath))
-            await Setup(subfolder);
 
         return wasAlreadyMonitored;
-    }
-
-    private void UpdateSidecarFile(string monitoredPath)
-    {
-        throw new NotImplementedException();
     }
 
     public List<string> GetAddedEntries()
