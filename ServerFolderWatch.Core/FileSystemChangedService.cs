@@ -101,27 +101,28 @@ public class FileSystemChangedService(IPath path, IDirectory directory, IFile fi
         if (PreviousContents is null)
             return;
 
-        var current = CurrentContents.GetAllEntries();
-        var previous = PreviousContents.GetAllEntries();
-        var combined = current.Union(previous);
+        var currentEntries = CurrentContents.GetAllEntries();
+        var previousEntries = PreviousContents.GetAllEntries();
+        var combined = currentEntries.Union(previousEntries);
         
         foreach (var entry in combined)
         {
-            if (current.Contains(entry) && !previous.Contains(entry))
+            if (currentEntries.Contains(entry) && !previousEntries.Contains(entry))
                 AddedEntries.Add(entry);
-            else if (previous.Contains(entry) && !current.Contains(entry))
+            else if (previousEntries.Contains(entry) && !currentEntries.Contains(entry))
                 DeletedEntries.Add(entry);
             
             else if (entry is File)
             {
-                var previousEntry = previous.First(_ => true) as File;
-                var currentEntry = current.First(_ => true) as File;
+                var previousEntry = previousEntries.First(x => x.Equals(entry)) as File;
+                var currentEntry = currentEntries.First(x => x.Equals(entry)) as File;
                 currentEntry!.Version = previousEntry!.Version;
 
                 if (FileHasChanged(currentEntry, folderPath))
+                {
+                    ModifiedEntries.Add(currentEntry);
                     currentEntry!.Version++;
-                
-                ModifiedEntries.Add(currentEntry);
+                }
             }
         }
         
