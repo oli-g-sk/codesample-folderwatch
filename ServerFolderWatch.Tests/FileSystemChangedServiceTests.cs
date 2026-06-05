@@ -6,9 +6,11 @@ namespace ServerFolderWatch.Tests;
 
 public class FileSystemChangedServiceTests
 {
-    private const string Folder = "foo";
+    private const string FolderName = "foo";
+    private const string SubFolderName = "subFolder";
     private const string SidecarFileName = "bar.txt";
-    private static string SidecarFilePath => CombinePaths(Folder, SidecarFileName);
+    private static string SidecarFilePath => CombinePaths(FolderName, SidecarFileName);
+    private static string SubFolderPath => CombinePaths(FolderName, SubFolderName);
     
     private readonly Mock<IPath> pathMock = new();
     private readonly Mock<IDirectory> directoryMock = new();
@@ -62,35 +64,53 @@ public class FileSystemChangedServiceTests
     }
 
     [Fact]
-    public async Task Setup_RunsRecursively()
+    public async Task Setup_NewFolder_RunsRecursively()
     {
+        // mock there's no sidecar file in folder
         fileMock.Setup(x => x.Exists(SidecarFilePath)).Returns(false);
         
-        const string subFolderName = "subFolder";
-        var subFolderPath = CombinePaths(Folder, subFolderName);
-        
-        // mock that subfolder exists
-        directoryMock.Setup(x => x.Exists(subFolderName)).Returns(true);
-        directoryMock.Setup(x => x.Exists(subFolderPath)).Returns(true);
-        
-        // mock that subfolder is listed
-        directoryMock.Setup(x => x.GetDirectories(Folder)).Returns(new[] {subFolderName});
-        directoryMock.Setup(x => x.GetDirectories(subFolderPath)).Returns(Array.Empty<string>());
-        directoryMock.Setup(x => x.EnumerateDirectories(Folder)).Returns(new[] { subFolderName });
-        directoryMock.Setup(x => x.EnumerateDirectories(subFolderPath)).Returns(new[] {subFolderPath});
+        SetupSubfolder();
         
         // mock there's no sidecar file in subfolder
-        var subSidecarFilePath = CombinePaths(subFolderPath, SidecarFileName);
+        var subSidecarFilePath = CombinePaths(SubFolderPath, SidecarFileName);
         fileMock.Setup(x => x.Exists(subSidecarFilePath)).Returns(false);
         
-        // add sub-sidecar file path to mock
-        pathMock.Setup(x => x.Combine(subFolderName, SidecarFileName))
+        // setup path combining for subfolder sidecar file
+        pathMock.Setup(x => x.Combine(SubFolderName, SidecarFileName))
             .Returns(subSidecarFilePath);
         
-        _ = await sut.Setup(Folder);
+        _ = await sut.Setup(FolderName);
         
         // verify a sidecar file was created in subfolder
         fileMock.Verify(x => x.Create(subSidecarFilePath), Times.Once);
+    }
+
+    [Fact]
+    public async Task Setup_ExistingFolder_DoesNotRunRecursively()
+    {
+        // mock there's already a sidecar file in folder
+        fileMock.Setup(x => x.Exists(SidecarFilePath)).Returns(true);
+        
+        SetupSubfolder();
+        
+        _ = await sut.Setup(FolderName);
+        
+        // verify subfolders weren't even enumerated
+        directoryMock.Verify(x => x.GetDirectories(FolderName), Times.Never);
+        directoryMock.Verify(x => x.EnumerateDirectories(FolderName), Times.Never);
+    }
+
+    private void SetupSubfolder()
+    {
+        // mock that subfolder exists
+        directoryMock.Setup(x => x.Exists(SubFolderName)).Returns(true);
+        directoryMock.Setup(x => x.Exists(SubFolderPath)).Returns(true);
+        
+        // mock that subfolder is listed
+        directoryMock.Setup(x => x.GetDirectories(FolderName)).Returns(new[] {SubFolderName});
+        directoryMock.Setup(x => x.GetDirectories(SubFolderPath)).Returns(Array.Empty<string>());
+        directoryMock.Setup(x => x.EnumerateDirectories(FolderName)).Returns(new[] { SubFolderName });
+        directoryMock.Setup(x => x.EnumerateDirectories(SubFolderPath)).Returns(new[] {SubFolderPath});
     }
 
     private static string CombinePaths(string part1, string part2)
