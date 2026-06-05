@@ -1,15 +1,11 @@
 using System.IO.Abstractions;
+using System.Text.Json;
 
 namespace ServerFolderWatch.Core;
 
 public class FileSystemChangedService(IPath path, IDirectory directory, IFile file, IConfiguration configuration)
     : IFileSystemChangeService
 {
-    private readonly IPath path = path;
-    private readonly IDirectory directory = directory;
-    private readonly IFile file = file;
-    private readonly IConfiguration configuration = configuration;
-
     public async Task<bool> Setup(string monitoredPath)
     {
         string sidecarFile = path.Combine(monitoredPath, configuration.SidecarFileName);
@@ -43,14 +39,42 @@ public class FileSystemChangedService(IPath path, IDirectory directory, IFile fi
         throw new NotImplementedException();
     }
     
-    private bool IsSetupInFolder(string monitoredPath)
+    private void UpdateSidecarFile(string monitoredPath)
     {
-        return file.Exists(path.Combine(monitoredPath, configuration.SidecarFileName));
+        string sidecarFile = path.Combine(monitoredPath, configuration.SidecarFileName);
+        
+        try
+        {
+            var previousContents = JsonSerializer.Deserialize<FolderContents>(file.ReadAllText(sidecarFile))
+                ?? new FolderContents();
+
+            SyncSubfolders(monitoredPath, previousContents);
+        }
+        catch (Exception ex)
+        {
+            // TODO log
+        }
     }
 
-    private async Task SetupRecursively(string rootPath)
+    private void SyncSubfolders(string folderPath, FolderContents previousContents)
     {
-        // TODO
-        await Task.CompletedTask;
+        var currentSubfolders = directory.EnumerateDirectories(folderPath)
+            .Select(Path.GetDirectoryName)
+            .ToList();
+        
+        foreach (var subfolder in currentSubfolders)
+        {
+            if (string.IsNullOrEmpty(subfolder))
+                continue;
+            
+            if (!previousContents.Subfolders.Contains(subfolder))
+                previousContents.Subfolders.Add(subfolder);
+        }
+
+        foreach (var subfolder in previousContents.Subfolders)
+        {
+            if (!currentSubfolders.Contains(subfolder))
+                previousContents.Subfolders.Remove(subfolder);
+        }
     }
 }
