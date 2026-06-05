@@ -11,6 +11,9 @@ builder.Services.AddSingleton<IFileSystem, FileSystem>();
 builder.Services.AddSingleton<IConfiguration, Configuration>();
 builder.Services.AddSingleton<IBrowseService, BrowseService>();
 builder.Services.AddSingleton<IPersistenceService, SidecarFilePersistenceService>();
+
+// TODO make scoped and provide path parameter in ctor?
+//  otherwise it's unreliable and calling properties can throw NREs
 builder.Services.AddSingleton<IFileSystemDiffService, FileSystemDiffService>();
 
 builder.Services.AddControllers()
