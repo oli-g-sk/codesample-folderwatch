@@ -1,6 +1,3 @@
-using System.IO.Abstractions;
-using Newtonsoft.Json;
-
 namespace ServerFolderWatch.Core.Model;
 
 public class FolderContents
@@ -17,8 +14,6 @@ public class FolderContents
     
     public IList<FileSystemEntry> GetAllEntries() => Subfolders.OfType<FileSystemEntry>()
         .Concat(VersionedFiles)
-        .DistinctBy(x => x.Name)
-        .OrderBy(x => x.Name)
         .ToList();
 
     // TODO remove - confusing - equals empty folder
