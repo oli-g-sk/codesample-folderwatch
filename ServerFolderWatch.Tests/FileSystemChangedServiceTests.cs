@@ -83,7 +83,11 @@ public class FileSystemChangedServiceTests
         var subSidecarFilePath = CombinePaths(subFolderPath, SidecarFileName);
         fileMock.Setup(x => x.Exists(subSidecarFilePath)).Returns(false);
         
-        _ = await sut.Setup("foo");
+        // add sub-sidecar file path to mock
+        pathMock.Setup(x => x.Combine(subFolderName, SidecarFileName))
+            .Returns(subSidecarFilePath);
+        
+        _ = await sut.Setup(Folder);
         
         // verify a sidecar file was created in subfolder
         fileMock.Verify(x => x.Create(subSidecarFilePath), Times.Once);

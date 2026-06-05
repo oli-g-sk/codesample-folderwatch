@@ -12,18 +12,28 @@ public class FileSystemChangedService(IPath path, IDirectory directory, IFile fi
 
     public async Task<bool> Setup(string monitoredPath)
     {
-        if (IsSetupInFolder(monitoredPath))
+        bool wasAlreadyMonitored = false;
+        string sidecarFile = path.Combine(monitoredPath, configuration.SidecarFileName);
+
+        if (!file.Exists(sidecarFile))
         {
-            // TODO add bool option to force recursion even if already set up
-            return true;
+            file.Create(sidecarFile);
+        }
+        else
+        {
+            wasAlreadyMonitored = true;
+            UpdateSidecarFile(monitoredPath);
         }
 
-        // TODO add hidden attributes
-        file.Create(path.Combine(monitoredPath, configuration.SidecarFileName));
+        foreach (var subfolder in directory.GetDirectories(monitoredPath))
+            await Setup(subfolder);
 
-        await SetupRecursively(monitoredPath);
+        return wasAlreadyMonitored;
+    }
 
-        return false;
+    private void UpdateSidecarFile(string monitoredPath)
+    {
+        throw new NotImplementedException();
     }
 
     public List<string> GetAddedEntries()
