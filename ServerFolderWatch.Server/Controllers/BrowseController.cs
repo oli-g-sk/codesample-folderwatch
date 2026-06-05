@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
@@ -10,22 +11,31 @@ namespace ServerFolderWatch.Server.Controllers;
 
 [ApiController]
 [Route("api/browse")]
-public class BrowseController(IBrowseService browseService, IConfiguration configuration) : ControllerBase
+public class BrowseController(IBrowseService browseService,
+    IFileSystemDiffService diffService,
+    IConfiguration configuration) : ControllerBase
 {
-    public IActionResult Index()
+    public IActionResult Browse([FromQuery(Name = "folder")] string path)
     {
-        var contents = browseService.ListContents(configuration.RootPublicPath);
+        if (string.IsNullOrWhiteSpace(path))
+            path = configuration.RootPublicPath;
+
+        diffService.Analyze(path).Wait();
+
+        // TODO add path validation and throw 500 if invalid
+
+        var currentFiles = diffService.CurrentEntries;
+        
         return Ok(new
         {
-            LastAnalyzed = contents.LastAnalyzed,
-            Entries = MapEntries(contents)
+            LastAnalyzed = diffService.LastAnalyzed,
+            Entries = MapEntries(currentFiles)
         });
     }
 
-    private IEnumerable<FileSystemEntryDto> MapEntries(FolderContents folderContents)
+    private static IEnumerable<FileSystemEntryDto> MapEntries(IEnumerable<FileSystemEntry> fileSystemEntries)
     {
-        var ordered = folderContents.GetAllEntries()
-            .Order();
+        var ordered = fileSystemEntries.Order();
         
         return ordered.Select(entry => new FileSystemEntryDto(
                 entry.Name,
