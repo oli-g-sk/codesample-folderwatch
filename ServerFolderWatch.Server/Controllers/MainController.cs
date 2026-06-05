@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ServerFolderWatch.Server.Controllers;
@@ -15,7 +16,7 @@ public class MainController : ControllerBase
         var health = new
         {
             status = "Running",
-            time = DateTimeOffset.Now
+            time = DateTime.Now
         };
         
         return Ok(health);
