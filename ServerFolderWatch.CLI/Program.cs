@@ -14,7 +14,8 @@ class Program
         var fileSystemChangedService = new FileSystemChangedService(
             new PathWrapper(fileSystem),
             new DirectoryWrapper(fileSystem),
-            new FileWrapper(fileSystem)
+            new FileWrapper(fileSystem),
+            new Configuration()
         );
         
         Console.WriteLine("Enter path (defaults to C:\\Temp):");
