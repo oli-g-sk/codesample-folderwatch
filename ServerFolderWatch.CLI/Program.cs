@@ -6,8 +6,6 @@ namespace ServerFolderWatch.CLI;
 
 class Program
 {
-    private static readonly string DefaultPath = @"C:\Temp";
-    
     static void Main(string[] args)
     {
         using ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
@@ -41,7 +39,7 @@ class Program
         if (path is null)
         {
             Console.WriteLine("Invalid path. Using default.");
-            path = DefaultPath;
+            path = configuration.DefaultPath;
         }
 
         // TODO await
