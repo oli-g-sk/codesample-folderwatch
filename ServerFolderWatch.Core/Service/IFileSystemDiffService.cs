@@ -15,6 +15,22 @@ public interface IFileSystemDiffService
     /// Whether file system changes were already being tracked for this folder.
     /// </returns>
     Task<bool> Analyze(string monitoredPath);
+
+    DateTime LastAnalyzed { get; }
+    
+    /// <summary>
+    /// Existing entries (subfolders or files) currently in the folder last set
+    /// by <see cref="Analyze(string)"/>.
+    /// </summary>
+    IList<FileSystemEntry> CurrentEntries { get; }
+    
+    /// <summary>
+    /// All entries (subfolders or files) that are or were in this folder.
+    /// This includes those that were since removed, but the last call to
+    /// <see cref="Analyze(string)"/> still remembered a trace of them.
+    /// This method is the source of truth for the purpose of highlighting changes.
+    /// </summary>
+    IList<FileSystemEntry> AllEntries { get; }
     
     ICollection<FileSystemEntry> AddedEntries { get; }
     

@@ -18,6 +18,14 @@ public class FileSystemDiffService(IFileSystem fileSystem,
     
     public FolderContents CurrentContents { get; private set; }
     
+    public IList<FileSystemEntry> CurrentEntries => CurrentContents.GetAllEntries().Order().ToList();
+    
+    public IList<FileSystemEntry> AllEntries => CurrentContents.GetAllEntries()
+        .Union(PreviousContents?.GetAllEntries() ?? Enumerable.Empty<FileSystemEntry>())
+        .ToList();
+    
+    public DateTime LastAnalyzed => CurrentContents.LastAnalyzed;
+    
     // TODO add tests
     public ICollection<FileSystemEntry> AddedEntries { get; } = new List<FileSystemEntry>();
     
@@ -29,6 +37,10 @@ public class FileSystemDiffService(IFileSystem fileSystem,
     
     public async Task<bool> Analyze(string folderPath)
     {
+        AddedEntries.Clear();
+        ModifiedEntries.Clear();
+        DeletedEntries.Clear();
+        
         logger.LogTrace("Analyzing {FolderPath}", folderPath);
         
         bool wasAlreadyMonitored = persistenceService.IsFolderAlreadyMonitored(folderPath);
