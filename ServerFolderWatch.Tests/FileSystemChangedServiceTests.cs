@@ -32,11 +32,21 @@ public class FileSystemChangedServiceTests
     [InlineData(false)]
     public async Task Setup_ReturnsCorrectValue(bool sidecarFileExists)
     {
-        string sidecarFile = "sidecar.txt";
+        const string sidecarFile = "sidecar.txt";
+        configurationMock.SetupGet(x => x.SidecarFileName)
+            .Returns(sidecarFile);
 
+        const string folder = "myFolder";
         directoryMock.Setup(x => x.Exists(It.IsAny<string>()))
             .Returns(true);
+
+        const string combinedPath = $"filesystem://{folder}/{sidecarFile}";
+        pathMock.Setup(x => x.Combine(It.IsAny<string>(), It.IsAny<string>()))
+            .Returns(combinedPath);
+
         fileMock.Setup(x => x.Exists(sidecarFile))
+            .Returns(sidecarFileExists);
+        fileMock.Setup(x => x.Exists(combinedPath))
             .Returns(sidecarFileExists);
         
         bool actual = await sut.Setup("foo");

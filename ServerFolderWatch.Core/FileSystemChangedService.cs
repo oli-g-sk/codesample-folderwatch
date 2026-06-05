@@ -10,9 +10,13 @@ public class FileSystemChangedService(IPath path, IDirectory directory, IFile fi
     private readonly IFile file = file;
     private readonly IConfiguration configuration = configuration;
 
-    public Task<bool> Setup(string monitoredPath)
+    public async Task<bool> Setup(string monitoredPath)
     {
-        throw new NotImplementedException();
+        if (IsSetupInFolder(monitoredPath))
+            return true;
+        
+        await SetupRecursively(monitoredPath);
+        return false;
     }
 
     public List<string> GetAddedEntries()
@@ -28,5 +32,16 @@ public class FileSystemChangedService(IPath path, IDirectory directory, IFile fi
     public List<string> GetDeletedEntries()
     {
         throw new NotImplementedException();
+    }
+    
+    private bool IsSetupInFolder(string monitoredPath)
+    {
+        return file.Exists(path.Combine(monitoredPath, configuration.SidecarFileName));
+    }
+
+    private async Task SetupRecursively(string rootPath)
+    {
+        // TODO
+        await Task.CompletedTask;
     }
 }
