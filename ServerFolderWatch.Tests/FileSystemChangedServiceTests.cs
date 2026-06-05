@@ -6,6 +6,10 @@ namespace ServerFolderWatch.Tests;
 
 public class FileSystemChangedServiceTests
 {
+    private const string Folder = "foo";
+    private const string SidecarFileName = "bar.txt";
+    private static string SidecarFilePath => $"filesystem://{Folder}/{SidecarFileName}";
+    
     private readonly Mock<IPath> pathMock = new();
     private readonly Mock<IDirectory> directoryMock = new();
     private readonly Mock<IFile> fileMock = new();
@@ -17,6 +21,11 @@ public class FileSystemChangedServiceTests
     {
         sut = new FileSystemChangedService(pathMock.Object,
             directoryMock.Object, fileMock.Object, configurationMock.Object);
+        
+        configurationMock.SetupGet(x => x.SidecarFileName)
+            .Returns(SidecarFileName);
+        pathMock.Setup(x => x.Combine(It.IsAny<string>(), It.IsAny<string>()))
+            .Returns(SidecarFilePath);
     }
 
     [Fact]
@@ -32,21 +41,11 @@ public class FileSystemChangedServiceTests
     [InlineData(false)]
     public async Task Setup_ReturnsCorrectValue(bool sidecarFileExists)
     {
-        const string sidecarFile = "sidecar.txt";
-        configurationMock.SetupGet(x => x.SidecarFileName)
-            .Returns(sidecarFile);
-
         const string folder = "myFolder";
         directoryMock.Setup(x => x.Exists(It.IsAny<string>()))
             .Returns(true);
-
-        const string combinedPath = $"filesystem://{folder}/{sidecarFile}";
-        pathMock.Setup(x => x.Combine(It.IsAny<string>(), It.IsAny<string>()))
-            .Returns(combinedPath);
-
-        fileMock.Setup(x => x.Exists(sidecarFile))
-            .Returns(sidecarFileExists);
-        fileMock.Setup(x => x.Exists(combinedPath))
+        
+        fileMock.Setup(x => x.Exists(SidecarFilePath))
             .Returns(sidecarFileExists);
         
         bool actual = await sut.Setup("foo");
@@ -54,18 +53,15 @@ public class FileSystemChangedServiceTests
     }
     
     [Fact]
-    public void Setup_ThrowsIfAlreadySetup()
+    public void Setup_CreatesSidecarFile()
     {
         
     }
-    
-    [Fact]
-    public void Setup_CreatesSidecarFile()
-    {
-    }
 
     [Fact]
-    public void Setup_ReadsConfiguration()
+    public async Task Setup_ReadsConfiguration()
     {
+        _ = await sut.Setup("foo");
+        configurationMock.VerifyGet(x => x.SidecarFileName, Times.AtLeastOnce);
     }
 }
