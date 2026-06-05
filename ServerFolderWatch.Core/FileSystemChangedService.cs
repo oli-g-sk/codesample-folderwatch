@@ -3,8 +3,10 @@ using System.Net;
 using System.Text.Json;
 using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using ServerFolderWatch.Core.Model;
 using File = ServerFolderWatch.Core.Model.File;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace ServerFolderWatch.Core;
 
@@ -68,13 +70,17 @@ public class FileSystemChangedService(IPath path, IDirectory directory, IFile fi
     {
         try
         {
-            var sidecarFileContents = JsonSerializer.Deserialize<FolderContents>
-                (file.ReadAllText(GetSidecarFilePath(folderPath)));
+            var sidecarFileContents = JsonConvert.DeserializeObject<FolderContents>
+                (file.ReadAllText(GetSidecarFilePath(folderPath)), new JsonSerializerSettings()
+                {
+                    ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor,
+                });
+
             return sidecarFileContents ?? FolderContents.Empty;
         }
         catch (Exception ex)
         {
-            // TODO log
+            logger.LogError(ex, "Error reading sidecar file in {FolderPath}: {Error}", folderPath, ex.Message);
         }
         
         return FolderContents.Empty;

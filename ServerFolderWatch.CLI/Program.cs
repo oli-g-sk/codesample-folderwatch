@@ -10,7 +10,13 @@ class Program
     
     static void Main(string[] args)
     {
-        using ILoggerFactory loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
+        using ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
+        {
+            builder.AddConsole();
+#if DEBUG
+            builder.SetMinimumLevel(LogLevel.Trace);
+#endif
+        });
         
         var fileSystem = new FileSystem();
         
