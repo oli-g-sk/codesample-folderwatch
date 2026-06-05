@@ -29,7 +29,7 @@ public class FileSystemDiffService(IFileSystem fileSystem,
     {
         logger.LogTrace("Analyzing {FolderPath}", folderPath);
         
-        bool wasAlreadyMonitored = persistenceService.WasAlreadyMonitored(folderPath);
+        bool wasAlreadyMonitored = persistenceService.IsFolderAlreadyMonitored(folderPath);
 
         if (wasAlreadyMonitored)
         {
@@ -39,7 +39,7 @@ public class FileSystemDiffService(IFileSystem fileSystem,
         {
             logger.LogInformation("Setting up folder {FolderPath} for monitoring", folderPath);
 
-            persistenceService.Initialize(folderPath);
+            persistenceService.InitializeFolder(folderPath);
             
             foreach (var subfolder in fileSystem.Directory.GetDirectories(folderPath))
                 await Analyze(subfolder);
@@ -61,12 +61,12 @@ public class FileSystemDiffService(IFileSystem fileSystem,
 
     private FolderContents GetContentsFromSidecarFile(string folderPath)
     {
-        return persistenceService.Load(folderPath).Result;
+        return persistenceService.LoadSnapshot(folderPath).Result;
     }
     
     private void SaveSidecarFile(string folderPath)
     {
-        persistenceService.Save(folderPath, CurrentContents);
+        persistenceService.SaveSnapshot(folderPath, CurrentContents);
     }
     
     private void DetectChanges(string folderPath)

@@ -4,11 +4,11 @@ namespace ServerFolderWatch.Core.Service;
 
 public interface IPersistenceService
 {
-    public bool WasAlreadyMonitored(string folderPath);
+    void InitializeFolder(string folderPath);
     
-    void Initialize(string folderPath);
+    public bool IsFolderAlreadyMonitored(string folderPath);
     
-    Task<FolderContents> Load(string folderPath);
+    Task<FolderContents> LoadSnapshot(string folderPath);
     
-    Task Save(string folderPath, FolderContents contents);
+    Task SaveSnapshot(string folderPath, FolderContents contents);
 }

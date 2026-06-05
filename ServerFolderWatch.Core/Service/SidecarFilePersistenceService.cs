@@ -13,18 +13,18 @@ public class SidecarFilePersistenceService(IFile file, IPath path,IConfiguration
     
     private string GetSidecarFilePath(string currentPath) => path.Combine(currentPath, configuration.SidecarFileName);
     
-    public bool WasAlreadyMonitored(string folderPath)
+    public bool IsFolderAlreadyMonitored(string folderPath)
     {
         return file.Exists(GetSidecarFilePath(folderPath));
     }
     
-    public void Initialize(string folderPath)
+    public void InitializeFolder(string folderPath)
     {
         var filePath = GetSidecarFilePath(folderPath);
         file.Create(filePath).Close();
     }
     
-    public Task<FolderContents> Load(string folderPath)
+    public Task<FolderContents> LoadSnapshot(string folderPath)
     {
         try
         {
@@ -44,7 +44,7 @@ public class SidecarFilePersistenceService(IFile file, IPath path,IConfiguration
         return Task.FromResult(FolderContents.Empty);
     }
 
-    public Task Save(string folderPath, FolderContents contents)
+    public Task SaveSnapshot(string folderPath, FolderContents contents)
     {
         var json = JsonConvert.SerializeObject(contents, Formatting.Indented);
         var filePath = GetSidecarFilePath(folderPath);
