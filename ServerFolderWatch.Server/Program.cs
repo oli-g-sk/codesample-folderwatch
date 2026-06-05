@@ -1,13 +1,6 @@
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddControllers();
+
 var app = builder.Build();
-
-app.MapGet("/", () => "Hello World!");
-
-app.MapGet("/api/health", () => Results.Ok(new
-{
-    status = "ok",
-    app = "MyWebApp",
-    time = DateTimeOffset.UtcNow
-}));
-
+app.MapControllers();
 app.Run();
