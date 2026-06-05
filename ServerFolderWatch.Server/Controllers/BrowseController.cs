@@ -19,6 +19,9 @@ public class BrowseController(IBrowseService browseService,
     {
         if (string.IsNullOrWhiteSpace(path))
             path = configuration.RootPublicPath;
+        
+        if (!browseService.IsPathValid(path))
+            return BadRequest("Path does not exist or is not accessible.");
 
         diffService.Analyze(path).Wait();
 

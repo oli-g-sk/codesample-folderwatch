@@ -8,6 +8,16 @@ namespace ServerFolderWatch.Core.Service;
 public class BrowseService(IConfiguration configuration, IFileSystem fileSystem)
     : IBrowseService
 {
+    public bool IsPathValid(string path)
+    {
+        // disallow absolute paths
+        if (fileSystem.Path.IsPathRooted(path))
+            return false;
+
+        // TODO check if path "tries to exit" the root public folder
+        return fileSystem.Directory.Exists(path);
+    }
+    
     public FolderContents ListContents(string folderPath)
     {
         return new FolderContents
