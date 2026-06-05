@@ -22,14 +22,8 @@ public class BrowseController(IBrowseService browseService,
     [Route("api/browse")]
     public IActionResult Browse([FromQuery(Name = "folder")] string? path)
     {
-        var fullPath = Path.Combine(configuration.RootPublicPath, path ?? string.Empty);
-
-        if (!browseService.IsPathValidAndBrowsable(fullPath))
-        {
-            const string message = "Path does not exist or is not accessible.";
-            logger.LogWarning("{Error} Path: {Path}", message, fullPath);
-            return BadRequest(message);
-        }
+        if (!ValidateRequest(path, out var fullPath, out var error))
+            return BadRequest(error);
 
         var currentContent = browseService.ListContents(fullPath);
         
@@ -44,19 +38,11 @@ public class BrowseController(IBrowseService browseService,
     [Route("api/diff")]
     public IActionResult Diff([FromQuery(Name = "folder")] string? path)
     {
-        var fullPath = Path.Combine(configuration.RootPublicPath, path ?? string.Empty);
-
-        if (!browseService.IsPathValidAndBrowsable(fullPath))
-        {
-            const string message = "Path does not exist or is not accessible.";
-            logger.LogWarning("{Error} Path: {Path}", message, fullPath);
-            return BadRequest(message);
-        }
+        if (!ValidateRequest(path, out var fullPath, out var error))
+            return BadRequest(error);
 
         diffService.Analyze(fullPath).Wait();
 
-        var currentFiles = diffService.CurrentEntries;
-        
         return Ok(new
         {
             LastAnalyzed = diffService.LastAnalyzed,
@@ -104,5 +90,21 @@ public class BrowseController(IBrowseService browseService,
                 return FileSystemEntityDiffOperation.Modified;
             return FileSystemEntityDiffOperation.Unchanged;
         }
+    }
+
+    // TODO find a common pattern to handle validation like this
+    private bool ValidateRequest(string? path, out string fullPath, out string? error)
+    {
+        fullPath = Path.Combine(configuration.RootPublicPath, path ?? string.Empty);
+
+        if (!browseService.IsPathValidAndBrowsable(fullPath))
+        {
+            error = "Path does not exist or is not accessible.";
+            logger.LogWarning("{Error} Path: {Path}", error, fullPath);
+            return false;
+        }
+
+        error = null;
+        return true;       
     }
 }

@@ -6,4 +6,5 @@ public enum FileSystemEntityDiffOperation
     Added,
     Removed,
     Modified,
+    Renamed // TODO add support for rename
 }
