@@ -13,9 +13,16 @@ public class FileSystemChangedService(IPath path, IDirectory directory, IFile fi
     public async Task<bool> Setup(string monitoredPath)
     {
         if (IsSetupInFolder(monitoredPath))
+        {
+            // TODO add bool option to force recursion even if already set up
             return true;
-        
+        }
+
+        // TODO add hidden attributes
+        file.Create(path.Combine(monitoredPath, configuration.SidecarFileName));
+
         await SetupRecursively(monitoredPath);
+
         return false;
     }
 
