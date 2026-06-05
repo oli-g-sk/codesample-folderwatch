@@ -1,6 +1,6 @@
 using ServerFolderWatch.Core.Model;
 
-namespace ServerFolderWatch.Core;
+namespace ServerFolderWatch.Core.Service;
 
 public interface IFileSystemChangeService
 {

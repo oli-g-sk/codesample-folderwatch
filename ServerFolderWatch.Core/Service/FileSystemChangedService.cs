@@ -1,14 +1,12 @@
 using System.IO.Abstractions;
-using System.Net;
 using System.Text.Json;
-using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using ServerFolderWatch.Core.Model;
 using File = ServerFolderWatch.Core.Model.File;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
-namespace ServerFolderWatch.Core;
+namespace ServerFolderWatch.Core.Service;
 
 public class FileSystemChangedService(IPath path, IDirectory directory, IFile file,
     IConfiguration configuration, ILoggerFactory loggerFactory)

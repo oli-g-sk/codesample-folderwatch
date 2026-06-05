@@ -1,6 +1,7 @@
 ﻿using System.IO.Abstractions;
 using Microsoft.Extensions.Logging;
 using ServerFolderWatch.Core;
+using ServerFolderWatch.Core.Service;
 
 namespace ServerFolderWatch.CLI;
 
