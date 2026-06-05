@@ -13,9 +13,9 @@ public interface IFileSystemChangeService
     /// </returns>
     Task<bool> Setup(string monitoredPath);
     
-    List<string> GetAddedEntries();
+    List<string> AddedEntries { get; }
     
-    List<string> GetModifiedEntries();
+    List<(string, int)> ModifiedEntries { get; }
     
-    List<string> GetDeletedEntries();
+    List<string> DeletedEntries { get; }
 }

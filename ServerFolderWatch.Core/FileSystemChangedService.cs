@@ -6,75 +6,64 @@ namespace ServerFolderWatch.Core;
 public class FileSystemChangedService(IPath path, IDirectory directory, IFile file, IConfiguration configuration)
     : IFileSystemChangeService
 {
-    public async Task<bool> Setup(string monitoredPath)
+    private string monitoredPath;
+    private FolderContents previousContents;
+    private FolderContents currentContents;
+    
+    private string SidecarFile => path.Combine(monitoredPath, configuration.SidecarFileName);
+    
+    public async Task<bool> Setup(string folderPath)
     {
-        string sidecarFile = path.Combine(monitoredPath, configuration.SidecarFileName);
-        bool wasAlreadyMonitored = file.Exists(sidecarFile);
+        monitoredPath = folderPath; // TODO move to ctor
+        
+        bool wasAlreadyMonitored = file.Exists(SidecarFile);
 
-        if (!wasAlreadyMonitored)
+        if (wasAlreadyMonitored)
         {
-            file.Create(sidecarFile);
-            
+            previousContents = GetContentsFromSidecarFile();
+        }
+        else
+        {
+            file.Create(SidecarFile);
+
             foreach (var subfolder in directory.GetDirectories(monitoredPath))
                 await Setup(subfolder);
         }
-        else
-            UpdateSidecarFile(monitoredPath);
+
+        currentContents = GetContentsFromFolder();
+        DetectChanges();
 
         return wasAlreadyMonitored;
     }
 
-    public List<string> GetAddedEntries()
-    {
-        throw new NotImplementedException();
-    }
-
-    public List<string> GetModifiedEntries()
-    {
-        throw new NotImplementedException();
-    }
-
-    public List<string> GetDeletedEntries()
-    {
-        throw new NotImplementedException();
-    }
+    public List<string> AddedEntries { get; private set; }
     
-    private void UpdateSidecarFile(string monitoredPath)
+    public List<(string, int)> ModifiedEntries { get; private set; }
+    
+    public List<string> DeletedEntries { get; private set; }
+
+    private FolderContents GetContentsFromFolder()
     {
-        string sidecarFile = path.Combine(monitoredPath, configuration.SidecarFileName);
-        
+        return FolderContents.FromFolder(monitoredPath, directory, path);
+    }
+
+    private FolderContents GetContentsFromSidecarFile()
+    {
         try
         {
-            var previousContents = JsonSerializer.Deserialize<FolderContents>(file.ReadAllText(sidecarFile))
-                ?? new FolderContents();
-
-            SyncSubfolders(monitoredPath, previousContents);
+            var sidecarFileContents = JsonSerializer.Deserialize<FolderContents>(file.ReadAllText(SidecarFile));
+            return sidecarFileContents ?? FolderContents.Empty;
         }
         catch (Exception ex)
         {
             // TODO log
         }
-    }
-
-    private void SyncSubfolders(string folderPath, FolderContents previousContents)
-    {
-        var currentSubfolders = directory.EnumerateDirectories(folderPath)
-            .Select(Path.GetDirectoryName)
-            .ToList();
         
-        foreach (var subfolder in currentSubfolders)
-        {
-            if (string.IsNullOrEmpty(subfolder))
-                continue;
-            
-            if (!previousContents.Subfolders.Contains(subfolder))
-                previousContents.Subfolders.Add(subfolder);
-        }
-
-        foreach (var subfolder in previousContents.Subfolders)
-        {
-            if (!currentSubfolders.Contains(subfolder))
-                previousContents.Subfolders.Remove(subfolder);
-        }
+        return FolderContents.Empty;
+    }
+    
+    private void DetectChanges()
+    {
+        
     }
 }

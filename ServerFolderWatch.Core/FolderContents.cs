@@ -22,13 +22,16 @@ public class FolderContents
 
         var files = directory.EnumerateFiles(folderPath)
             .Select(path.GetFileName).OfType<string>();
-        
-        var versionedFiles = files.ToDictionary(x => x, x => 1);
 
         return new FolderContents
         {
-            Subfolders = subfolders.ToList(),
-            VersionedFiles = versionedFiles
+            Subfolders = directory.EnumerateDirectories(folderPath)
+                .Select(path.GetDirectoryName)
+                .OfType<string>().ToList(),
+            
+            VersionedFiles = directory.EnumerateFiles(folderPath)
+                .Select(path.GetFileName).OfType<string>()
+                .ToDictionary(x => x, x => 1)
         };
     }
 }
