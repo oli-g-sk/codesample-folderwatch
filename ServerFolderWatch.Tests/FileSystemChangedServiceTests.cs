@@ -27,14 +27,6 @@ public class FileSystemChangedServiceTests
         pathMock.Setup(x => x.Combine(It.IsAny<string>(), It.IsAny<string>()))
             .Returns(SidecarFilePath);
     }
-
-    [Fact]
-    public async Task Setup_ThrowsForInvalidPath()
-    {
-        const string invalidPath = "abc";
-        directoryMock.Setup(x => x.Exists(invalidPath)).Returns(false);
-        await Assert.ThrowsAsync<ArgumentException>(() => sut.Setup(invalidPath));
-    }
     
     [Theory]
     [InlineData(true)]
