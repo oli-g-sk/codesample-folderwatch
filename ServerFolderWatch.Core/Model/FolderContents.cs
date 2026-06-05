@@ -8,9 +8,17 @@ public class FolderContents
     {
     }
     
+    public DateTime LastAnalyzed { get; set; }
+    
     public IList<Directory> Subfolders { get; private set; } = new List<Directory>();
     
     public IList<File> VersionedFiles { get; private set; } = new List<File>();
+    
+    public IList<FileSystemEntry> AllEntries => Subfolders.OfType<FileSystemEntry>()
+        .Concat(VersionedFiles)
+        .DistinctBy(x => x.Name)
+        .OrderBy(x => x.Name)
+        .ToList();
 
     // TODO remove - confusing - equals empty folder
     public static FolderContents Empty { get; } = new();

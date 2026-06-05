@@ -1,3 +1,5 @@
+using ServerFolderWatch.Core.Model;
+
 namespace ServerFolderWatch.Core;
 
 public interface IFileSystemChangeService
@@ -13,9 +15,9 @@ public interface IFileSystemChangeService
     /// </returns>
     Task<bool> Setup(string monitoredPath);
     
-    List<string> AddedEntries { get; }
+    List<FileSystemEntry> AddedEntries { get; }
     
-    List<(string, int)> ModifiedEntries { get; }
+    List<FileSystemEntry> ModifiedEntries { get; }
     
-    List<string> DeletedEntries { get; }
+    List<FileSystemEntry> DeletedEntries { get; }
 }

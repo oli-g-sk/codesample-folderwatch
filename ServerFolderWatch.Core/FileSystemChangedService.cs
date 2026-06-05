@@ -1,6 +1,9 @@
 using System.IO.Abstractions;
+using System.Net;
 using System.Text.Json;
+using System.Xml.Linq;
 using ServerFolderWatch.Core.Model;
+using File = ServerFolderWatch.Core.Model.File;
 
 namespace ServerFolderWatch.Core;
 
@@ -15,12 +18,14 @@ public class FileSystemChangedService(IPath path, IDirectory directory, IFile fi
     
     public FolderContents CurrentContents { get; private set; }
     
-    public List<string> AddedEntries { get; } = new();
+    // TODO add tests
+    public List<FileSystemEntry> AddedEntries { get; } = new();
     
-    public List<(string, int)> ModifiedEntries { get; } = new();
+    // TODO add tests
+    public List<FileSystemEntry> ModifiedEntries { get; } = new();
     
-    public List<string> DeletedEntries { get; } = new();
-
+    // TODO add tests
+    public List<FileSystemEntry> DeletedEntries { get; } = new();
     
     public async Task<bool> Setup(string folderPath)
     {
@@ -41,7 +46,10 @@ public class FileSystemChangedService(IPath path, IDirectory directory, IFile fi
         }
 
         CurrentContents = GetContentsFromFolder();
+        CurrentContents.LastAnalyzed = DateTime.Now;
+        
         DetectChanges();
+        SaveSidecarFile();
 
         return wasAlreadyMonitored;
     }
@@ -66,8 +74,51 @@ public class FileSystemChangedService(IPath path, IDirectory directory, IFile fi
         return FolderContents.Empty;
     }
     
+    private void SaveSidecarFile()
+    {
+        var json = JsonSerializer.Serialize(CurrentContents);
+        file.WriteAllText(SidecarFile, json);       
+    }
+    
     private void DetectChanges()
     {
-        // TODO
+        if (PreviousContents is null)
+            return;
+
+        var current = CurrentContents.AllEntries;
+        var previous = PreviousContents.AllEntries;
+        var combined = current.Union(previous);
+        
+        foreach (var entry in combined)
+        {
+            if (current.Contains(entry) && !previous.Contains(entry))
+                AddedEntries.Add(entry);
+            else if (previous.Contains(entry) && !current.Contains(entry))
+                DeletedEntries.Add(entry);
+            
+            else if (entry is File)
+            {
+                var previousEntry = previous.First(_ => true) as File;
+                var currentEntry = current.First(_ => true) as File;
+                currentEntry!.Version = previousEntry!.Version;
+
+                if (FileHasChanged(currentEntry))
+                    currentEntry!.Version++;
+                
+                ModifiedEntries.Add(currentEntry);
+            }
+        }
+    }
+
+    private bool FileHasChanged(File fileEntry)
+    {
+        if (PreviousContents == null)
+            return false;
+        
+        var fullPath = path.Combine(monitoredPath, fileEntry.Name);
+        var modified = file.GetLastWriteTime(fullPath);
+
+        // TODO other ways to detect changes? (size, MD5, etc.)
+        return modified > PreviousContents.LastAnalyzed;
     }
 }
