@@ -4,5 +4,5 @@ namespace ServerFolderWatch.CLI;
 
 public class Configuration : IConfiguration
 {
-    public string SidecarFileName { get; } = ".sidecar";
+    public string SidecarFileName { get; } = ".sidecar.json";
 }

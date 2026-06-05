@@ -1,4 +1,5 @@
 using System.IO.Abstractions;
+using Newtonsoft.Json;
 
 namespace ServerFolderWatch.Core.Model;
 
@@ -14,6 +15,7 @@ public class FolderContents
     
     public IList<File> VersionedFiles { get; private set; } = new List<File>();
     
+    [JsonIgnore]
     public IList<FileSystemEntry> AllEntries => Subfolders.OfType<FileSystemEntry>()
         .Concat(VersionedFiles)
         .DistinctBy(x => x.Name)

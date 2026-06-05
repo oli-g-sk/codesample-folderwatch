@@ -100,6 +100,15 @@ public class FileSystemChangedServiceTests
         directoryMock.Verify(x => x.GetDirectories(FolderName), Times.Never);
         directoryMock.Verify(x => x.EnumerateDirectories(FolderName), Times.Never);
     }
+    
+    [Fact]
+    public void Setup_NestedFolders_WritesCorrectValues()
+    {
+        // TODO
+        //  implement a test that verifies that each level of nesting
+        //  i.e. 0 and 1 gets its own unique values (so it's not duplicated / overwritten by a leaked state)
+        //  (see behavior before aff3fe8(
+    }
 
     private void SetupSubfolder()
     {
