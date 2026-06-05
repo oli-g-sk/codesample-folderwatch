@@ -4,5 +4,5 @@ public interface IConfiguration
 {
     string SidecarFileName { get; }
     
-    string DefaultPath { get; }
+    string RootPublicPath { get; }
 }

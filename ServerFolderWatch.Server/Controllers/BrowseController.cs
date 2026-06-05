@@ -14,7 +14,7 @@ public class BrowseController(IBrowseService browseService, IConfiguration confi
 {
     public IActionResult Index()
     {
-        var contents = browseService.ListContents(configuration.DefaultPath);
+        var contents = browseService.ListContents(configuration.RootPublicPath);
         return Ok(new
         {
             LastAnalyzed = contents.LastAnalyzed,

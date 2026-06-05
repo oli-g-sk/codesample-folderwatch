@@ -39,7 +39,7 @@ class Program
         if (path is null)
         {
             Console.WriteLine("Invalid path. Using default.");
-            path = configuration.DefaultPath;
+            path = configuration.RootPublicPath;
         }
 
         // TODO await

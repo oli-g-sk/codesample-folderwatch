@@ -6,5 +6,5 @@ public class Configuration : IConfiguration
 {
     public string SidecarFileName { get; } = ".sidecar.json";
 
-    public string DefaultPath { get; } = "C:\\Temp";
+    public string RootPublicPath { get; } = "C:\\Temp";
 }
