@@ -16,9 +16,9 @@ public interface IFileSystemDiffService
     /// </returns>
     Task<bool> Analyze(string monitoredPath);
     
-    List<FileSystemEntry> AddedEntries { get; }
+    ICollection<FileSystemEntry> AddedEntries { get; }
     
-    List<FileSystemEntry> ModifiedEntries { get; }
+    ICollection<FileSystemEntry> ModifiedEntries { get; }
     
-    List<FileSystemEntry> DeletedEntries { get; }
+    ICollection<FileSystemEntry> DeletedEntries { get; }
 }

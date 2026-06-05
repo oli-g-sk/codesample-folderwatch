@@ -19,13 +19,13 @@ public class FileSystemDiffService(IFileSystem fileSystem,
     public FolderContents CurrentContents { get; private set; }
     
     // TODO add tests
-    public List<FileSystemEntry> AddedEntries { get; } = new();
+    public ICollection<FileSystemEntry> AddedEntries { get; } = new List<FileSystemEntry>();
     
     // TODO add tests
-    public List<FileSystemEntry> ModifiedEntries { get; } = new();
+    public ICollection<FileSystemEntry> ModifiedEntries { get; } = new List<FileSystemEntry>();
     
     // TODO add tests
-    public List<FileSystemEntry> DeletedEntries { get; } = new();
+    public ICollection<FileSystemEntry> DeletedEntries { get; } = new List<FileSystemEntry>();
     
     public async Task<bool> Analyze(string folderPath)
     {
