@@ -12,6 +12,7 @@ public class FolderContents
     
     public IList<File> VersionedFiles { get; private set; } = new List<File>();
 
+    // TODO remove - confusing - equals empty folder
     public static FolderContents Empty { get; } = new();
 
     public static FolderContents FromFolder(string folderPath, IDirectory directory, IPath path)

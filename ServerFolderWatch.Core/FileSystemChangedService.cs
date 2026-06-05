@@ -7,11 +7,20 @@ namespace ServerFolderWatch.Core;
 public class FileSystemChangedService(IPath path, IDirectory directory, IFile file, IConfiguration configuration)
     : IFileSystemChangeService
 {
-    private string monitoredPath;
-    private FolderContents previousContents;
-    private FolderContents currentContents;
-    
     private string SidecarFile => path.Combine(monitoredPath, configuration.SidecarFileName);
+    
+    private string monitoredPath;
+    
+    public FolderContents? PreviousContents { get; private set; }
+    
+    public FolderContents CurrentContents { get; private set; }
+    
+    public List<string> AddedEntries { get; } = new();
+    
+    public List<(string, int)> ModifiedEntries { get; } = new();
+    
+    public List<string> DeletedEntries { get; } = new();
+
     
     public async Task<bool> Setup(string folderPath)
     {
@@ -21,7 +30,7 @@ public class FileSystemChangedService(IPath path, IDirectory directory, IFile fi
 
         if (wasAlreadyMonitored)
         {
-            previousContents = GetContentsFromSidecarFile();
+            PreviousContents = GetContentsFromSidecarFile();
         }
         else
         {
@@ -31,17 +40,11 @@ public class FileSystemChangedService(IPath path, IDirectory directory, IFile fi
                 await Setup(subfolder);
         }
 
-        currentContents = GetContentsFromFolder();
+        CurrentContents = GetContentsFromFolder();
         DetectChanges();
 
         return wasAlreadyMonitored;
     }
-
-    public List<string> AddedEntries { get; private set; }
-    
-    public List<(string, int)> ModifiedEntries { get; private set; }
-    
-    public List<string> DeletedEntries { get; private set; }
 
     private FolderContents GetContentsFromFolder()
     {
@@ -65,6 +68,6 @@ public class FileSystemChangedService(IPath path, IDirectory directory, IFile fi
     
     private void DetectChanges()
     {
-        
+        // TODO
     }
 }
