@@ -6,10 +6,12 @@ using File = ServerFolderWatch.Core.Model.File;
 namespace ServerFolderWatch.Core.Service;
 
 public class FileSystemDiffService(IFileSystem fileSystem,
+    IBrowseService browseService,
     IPersistenceService persistenceService,
-    IConfiguration configuration, ILoggerFactory loggerFactory)
+    ILoggerFactory loggerFactory)
     : IFileSystemDiffService
 {
+    private readonly IBrowseService browseService = browseService;
     private readonly ILogger<FileSystemDiffService> logger = loggerFactory.CreateLogger<FileSystemDiffService>();
     
     public FolderContents? PreviousContents { get; private set; }
@@ -56,7 +58,7 @@ public class FileSystemDiffService(IFileSystem fileSystem,
 
     private FolderContents GetContentsFromFolder(string folderPath)
     {
-        return FolderContents.FromFolder(folderPath, configuration, fileSystem);
+        return browseService.ListContents(folderPath);
     }
 
     private FolderContents GetContentsFromSidecarFile(string folderPath)

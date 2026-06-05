@@ -24,11 +24,12 @@ class Program
         var configuration = new Configuration();
         
         var persistenceService = new SidecarFilePersistenceService(fileWrapper, pathWrapper, configuration, loggerFactory);
+        var browseService = new BrowseService(configuration, fileSystemWrapper);
         
         var fileSystemChangedService = new FileSystemDiffService(
             new FileSystem(),
+            browseService,
             persistenceService,
-            configuration,
             loggerFactory
         );
         
