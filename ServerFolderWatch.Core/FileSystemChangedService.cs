@@ -43,7 +43,7 @@ public class FileSystemChangedService(IPath path, IDirectory directory, IFile fi
         }
         else
         {
-            file.Create(SidecarFile);
+            file.Create(SidecarFile).Close();
 
             foreach (var subfolder in directory.GetDirectories(monitoredPath))
                 await Analyze(subfolder);
