@@ -5,15 +5,16 @@ namespace ServerFolderWatch.Core;
 public interface IFileSystemChangeService
 {
     /// <summary>
-    /// Set up folder monitoring in the provided <see cref="monitoredPath"/>,
-    /// if not already set up (either directly here, or in a parent folder).
+    /// Analyze (or set up) this folder for file system changes tracking.
+    /// If the folder or its parents were already taking part in the change tracking,
+    /// changes since the last call will be set into <see cref="AddedEntries"/>,
+    /// <see cref="ModifiedEntries"/>, and <see cref="DeletedEntries"/>" respectively.
     /// </summary>
     /// <param name="monitoredPath"></param>
     /// <returns>
-    /// True if the folder was just set up for monitoring,
-    /// false if this or a parent folder was already set up in the past.
+    /// Whether file system changes were already being tracked for this folder.
     /// </returns>
-    Task<bool> Setup(string monitoredPath);
+    Task<bool> Analyze(string monitoredPath);
     
     List<FileSystemEntry> AddedEntries { get; }
     

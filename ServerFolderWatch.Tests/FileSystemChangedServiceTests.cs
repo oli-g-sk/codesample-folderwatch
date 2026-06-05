@@ -42,14 +42,14 @@ public class FileSystemChangedServiceTests
         fileMock.Setup(x => x.Exists(SidecarFilePath))
             .Returns(sidecarFileExists);
         
-        bool actual = await sut.Setup("foo");
+        bool actual = await sut.Analyze("foo");
         Assert.Equal(sidecarFileExists, actual);
     }
 
     [Fact]
     public async Task Setup_ReadsConfiguration()
     {
-        _ = await sut.Setup("foo");
+        _ = await sut.Analyze("foo");
         configurationMock.VerifyGet(x => x.SidecarFileName, Times.AtLeastOnce);
     }
     
@@ -58,7 +58,7 @@ public class FileSystemChangedServiceTests
     {
         fileMock.Setup(x => x.Exists(SidecarFilePath)).Returns(false);
         
-        _ = await sut.Setup("foo");
+        _ = await sut.Analyze("foo");
         
         fileMock.Verify(x => x.Create(SidecarFilePath), Times.Once);
     }
@@ -79,7 +79,7 @@ public class FileSystemChangedServiceTests
         pathMock.Setup(x => x.Combine(SubFolderName, SidecarFileName))
             .Returns(subSidecarFilePath);
         
-        _ = await sut.Setup(FolderName);
+        _ = await sut.Analyze(FolderName);
         
         // verify a sidecar file was created in subfolder
         fileMock.Verify(x => x.Create(subSidecarFilePath), Times.Once);
@@ -93,7 +93,7 @@ public class FileSystemChangedServiceTests
         
         SetupSubfolder();
         
-        _ = await sut.Setup(FolderName);
+        _ = await sut.Analyze(FolderName);
         
         // verify subfolders weren't even enumerated
         directoryMock.Verify(x => x.GetDirectories(FolderName), Times.Never);

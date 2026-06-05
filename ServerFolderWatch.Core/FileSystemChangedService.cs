@@ -27,7 +27,7 @@ public class FileSystemChangedService(IPath path, IDirectory directory, IFile fi
     // TODO add tests
     public List<FileSystemEntry> DeletedEntries { get; } = new();
     
-    public async Task<bool> Setup(string folderPath)
+    public async Task<bool> Analyze(string folderPath)
     {
         monitoredPath = folderPath; // TODO move to ctor
         
@@ -42,7 +42,7 @@ public class FileSystemChangedService(IPath path, IDirectory directory, IFile fi
             file.Create(SidecarFile);
 
             foreach (var subfolder in directory.GetDirectories(monitoredPath))
-                await Setup(subfolder);
+                await Analyze(subfolder);
         }
 
         CurrentContents = GetContentsFromFolder();

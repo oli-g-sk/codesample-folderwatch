@@ -30,7 +30,7 @@ class Program
         }
 
         // TODO await
-        var wasAlreadySetup = fileSystemChangedService.Setup(path).Result;
+        var wasAlreadySetup = fileSystemChangedService.Analyze(path).Result;
         
         if (!wasAlreadySetup)
         {
