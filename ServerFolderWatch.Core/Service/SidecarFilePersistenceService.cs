@@ -5,23 +5,25 @@ using ServerFolderWatch.Core.Model;
 
 namespace ServerFolderWatch.Core.Service;
 
-public class SidecarFilePersistenceService(IFile file, IPath path,IConfiguration configuration, ILoggerFactory loggerFactory)
+public class SidecarFilePersistenceService(IFileSystem fileSystem, IConfiguration configuration, ILoggerFactory loggerFactory)
     : IPersistenceService
 {
+    private readonly IFileSystem fileSystem = fileSystem;
+
     private readonly ILogger<SidecarFilePersistenceService> logger
         = loggerFactory.CreateLogger<SidecarFilePersistenceService>();
     
-    private string GetSidecarFilePath(string currentPath) => path.Combine(currentPath, configuration.SidecarFileName);
+    private string GetSidecarFilePath(string currentPath) => fileSystem.Path.Combine(currentPath, configuration.SidecarFileName);
     
     public bool IsFolderAlreadyMonitored(string folderPath)
     {
-        return file.Exists(GetSidecarFilePath(folderPath));
+        return fileSystem.File.Exists(GetSidecarFilePath(folderPath));
     }
     
     public void InitializeFolder(string folderPath)
     {
         var filePath = GetSidecarFilePath(folderPath);
-        file.Create(filePath).Close();
+        fileSystem.File.Create(filePath).Close();
     }
     
     public Task<FolderContents> LoadSnapshot(string folderPath)
@@ -29,7 +31,7 @@ public class SidecarFilePersistenceService(IFile file, IPath path,IConfiguration
         try
         {
             var sidecarFileContents = JsonConvert.DeserializeObject<FolderContents>
-            (file.ReadAllText(GetSidecarFilePath(folderPath)), new JsonSerializerSettings()
+            (fileSystem.File.ReadAllText(GetSidecarFilePath(folderPath)), new JsonSerializerSettings()
             {
                 ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor,
             });
@@ -48,7 +50,7 @@ public class SidecarFilePersistenceService(IFile file, IPath path,IConfiguration
     {
         var json = JsonConvert.SerializeObject(contents, Formatting.Indented);
         var filePath = GetSidecarFilePath(folderPath);
-        file.WriteAllText(filePath, json);
+        fileSystem.File.WriteAllText(filePath, json);
         return Task.CompletedTask;
     }
 }
