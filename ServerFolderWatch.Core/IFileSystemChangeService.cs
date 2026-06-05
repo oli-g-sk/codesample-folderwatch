@@ -2,10 +2,8 @@ namespace ServerFolderWatch.Core;
 
 public interface IFileSystemChangeService
 {
-    bool IsSetup(string monitoredPath);
+    Task<bool> Setup(string monitoredPath);
     
-    Task Setup(string monitoredPath);
-
     List<string> GetAddedEntries();
     
     List<string> GetModifiedEntries();

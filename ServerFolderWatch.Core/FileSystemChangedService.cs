@@ -10,12 +10,7 @@ public class FileSystemChangedService(IPath path, IDirectory directory, IFile fi
     private readonly IFile file = file;
     private readonly IConfiguration configuration = configuration;
 
-    public bool IsSetup(string monitoredPath)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task Setup(string monitoredPath)
+    public Task<bool> Setup(string monitoredPath)
     {
         throw new NotImplementedException();
     }

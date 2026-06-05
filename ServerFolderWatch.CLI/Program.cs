@@ -29,11 +29,11 @@ class Program
             path = DefaultPath;
         }
 
-        if (!fileSystemChangedService.IsSetup(path))
+        // TODO await
+        var wasAlreadySetup = fileSystemChangedService.Setup(path).Result;
+        
+        if (!wasAlreadySetup)
         {
-            Console.WriteLine("Setting up...");
-            // TODO await
-            fileSystemChangedService.Setup(path).Wait();
             Console.WriteLine("Setup complete.");
             return;
         }

@@ -20,17 +20,17 @@ public class FileSystemChangedServiceTests
     }
 
     [Fact]
-    public void IsSetup_ThrowsForInvalidPath()
+    public async Task Setup_ThrowsForInvalidPath()
     {
         const string invalidPath = "abc";
         directoryMock.Setup(x => x.Exists(invalidPath)).Returns(false);
-        Assert.Throws<ArgumentException>(() => sut.IsSetup(invalidPath));
+        await Assert.ThrowsAsync<ArgumentException>(() => sut.Setup(invalidPath));
     }
     
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public void IsSetup_ReturnsCorrectValue(bool sidecarFileExists)
+    public async Task Setup_ReturnsCorrectValue(bool sidecarFileExists)
     {
         string sidecarFile = "sidecar.txt";
 
@@ -39,14 +39,8 @@ public class FileSystemChangedServiceTests
         fileMock.Setup(x => x.Exists(sidecarFile))
             .Returns(sidecarFileExists);
         
-        bool actual = sut.IsSetup("foo");
+        bool actual = await sut.Setup("foo");
         Assert.Equal(sidecarFileExists, actual);
-    }
-    
-    [Fact]
-    public void Setup_ThrowsForInvalidPath()
-    {
-        
     }
     
     [Fact]
