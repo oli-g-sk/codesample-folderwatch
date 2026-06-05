@@ -95,8 +95,8 @@ public class FileSystemChangedService(IPath path, IDirectory directory, IFile fi
         if (PreviousContents is null)
             return;
 
-        var current = CurrentContents.AllEntries;
-        var previous = PreviousContents.AllEntries;
+        var current = CurrentContents.GetAllEntries();
+        var previous = PreviousContents.GetAllEntries();
         var combined = current.Union(previous);
         
         foreach (var entry in combined)

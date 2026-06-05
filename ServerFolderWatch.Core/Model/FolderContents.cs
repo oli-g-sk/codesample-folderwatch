@@ -15,8 +15,7 @@ public class FolderContents
     
     public IList<File> VersionedFiles { get; private set; } = new List<File>();
     
-    [JsonIgnore]
-    public IList<FileSystemEntry> AllEntries => Subfolders.OfType<FileSystemEntry>()
+    public IList<FileSystemEntry> GetAllEntries() => Subfolders.OfType<FileSystemEntry>()
         .Concat(VersionedFiles)
         .DistinctBy(x => x.Name)
         .OrderBy(x => x.Name)
