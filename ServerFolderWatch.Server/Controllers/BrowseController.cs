@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using ServerFolderWatch.Core;
 using ServerFolderWatch.Core.Model;
 using ServerFolderWatch.Core.Service;
 using ServerFolderWatch.Server.DTOs;
+using File = ServerFolderWatch.Core.Model.File;
 
 namespace ServerFolderWatch.Server.Controllers;
 
@@ -13,17 +16,23 @@ namespace ServerFolderWatch.Server.Controllers;
 [Route("api/browse")]
 public class BrowseController(IBrowseService browseService,
     IFileSystemDiffService diffService,
-    IConfiguration configuration) : ControllerBase
+    IConfiguration configuration,
+    ILoggerFactory loggerFactory) : ControllerBase
 {
-    public IActionResult Browse([FromQuery(Name = "folder")] string path)
+    private readonly ILogger<BrowseController> logger = loggerFactory.CreateLogger<BrowseController>();
+    
+    public IActionResult Browse([FromQuery(Name = "folder")] string? path)
     {
-        if (string.IsNullOrWhiteSpace(path))
-            path = configuration.RootPublicPath;
-        
-        if (!browseService.IsPathValid(path))
-            return BadRequest("Path does not exist or is not accessible.");
+        var fullPath = Path.Combine(configuration.RootPublicPath, path ?? string.Empty);
 
-        diffService.Analyze(path).Wait();
+        if (!browseService.IsPathValidAndBrowsable(fullPath))
+        {
+            const string message = "Path does not exist or is not accessible.";
+            logger.LogWarning("{Error} Path: {Path}", message, fullPath);
+            return BadRequest(message);
+        }
+
+        diffService.Analyze(fullPath).Wait();
 
         // TODO add path validation and throw 500 if invalid
 

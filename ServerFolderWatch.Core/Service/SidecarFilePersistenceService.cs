@@ -8,8 +8,6 @@ namespace ServerFolderWatch.Core.Service;
 public class SidecarFilePersistenceService(IFileSystem fileSystem, IConfiguration configuration, ILoggerFactory loggerFactory)
     : IPersistenceService
 {
-    private readonly IFileSystem fileSystem = fileSystem;
-
     private readonly ILogger<SidecarFilePersistenceService> logger
         = loggerFactory.CreateLogger<SidecarFilePersistenceService>();
     

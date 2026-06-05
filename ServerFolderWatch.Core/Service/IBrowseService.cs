@@ -4,7 +4,7 @@ namespace ServerFolderWatch.Core.Service;
 
 public interface IBrowseService
 {
-    bool IsPathValid(string path);
+    bool IsPathValidAndBrowsable(string path);
     
     FolderContents ListContents(string folderPath);
 }
