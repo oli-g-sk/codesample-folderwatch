@@ -4,6 +4,7 @@
 @using ServerFolderWatch.Core.Model
 @inject IConfiguration Configuration
 @inject IBrowseService BrowseService
+@inject NavigationManager NavigationManager
 
 @* Route Razor pages with @page. This page is served at /browse, matching the API shape of /api/browse. *@
 @* Inject registered DI services with @inject. For example, IBrowseService is registered in Program.cs and available here as BrowseService. *@
@@ -72,6 +73,9 @@
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
+        
+        if (Folder == string.Empty)
+            NavigationManager.NavigateTo("/browse");
         
         var basePath = Path.Combine(Configuration.RootPublicPath, Folder ?? string.Empty);
         
