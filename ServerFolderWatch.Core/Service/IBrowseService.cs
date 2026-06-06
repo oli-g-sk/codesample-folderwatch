@@ -6,5 +6,5 @@ public interface IBrowseService
 {
     bool IsPathValidAndBrowsable(string path);
     
-    FolderContents ListContents(string folderPath);
+    FolderSnapshot ListContents(string folderPath);
 }

@@ -1,5 +1,4 @@
 using System.IO.Abstractions;
-using ServerFolderWatch.Core.Model;
 using Directory = ServerFolderWatch.Core.Model.Directory;
 using File = ServerFolderWatch.Core.Model.File;
 
@@ -15,9 +14,9 @@ public class BrowseService(IConfiguration configuration, IFileSystem fileSystem)
         return fileSystem.Directory.Exists(path);
     }
     
-    public FolderContents ListContents(string folderPath)
+    public Model.FolderSnapshot ListContents(string folderPath)
     {
-        return new FolderContents
+        return new Model.FolderSnapshot
         {
             Subfolders = fileSystem.Directory.EnumerateDirectories(folderPath)
                 .Select(fileSystem.Path.GetFileName).OfType<string>()

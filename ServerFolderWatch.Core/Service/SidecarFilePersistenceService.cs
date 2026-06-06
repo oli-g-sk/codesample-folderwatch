@@ -28,27 +28,27 @@ public class SidecarFilePersistenceService(IFileSystem fileSystem, IConfiguratio
         stream?.Close();
     }
     
-    public Task<FolderContents> LoadSnapshot(string folderPath)
+    public Task<Model.FolderSnapshot> LoadSnapshot(string folderPath)
     {
         try
         {
-            var sidecarFileContents = JsonConvert.DeserializeObject<FolderContents>
+            var sidecarFileContents = JsonConvert.DeserializeObject<Model.FolderSnapshot>
             (fileSystem.File.ReadAllText(GetSidecarFilePath(folderPath)), new JsonSerializerSettings()
             {
                 ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor,
             });
 
-            return Task.FromResult(sidecarFileContents ?? FolderContents.Empty);
+            return Task.FromResult(sidecarFileContents ?? Model.FolderSnapshot.Empty);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Error reading sidecar file in {FolderPath}: {Error}", folderPath, ex.Message);
         }
         
-        return Task.FromResult(FolderContents.Empty);
+        return Task.FromResult(Model.FolderSnapshot.Empty);
     }
 
-    public Task SaveSnapshot(string folderPath, FolderContents contents)
+    public Task SaveSnapshot(string folderPath, Model.FolderSnapshot contents)
     {
         var json = JsonConvert.SerializeObject(contents, Formatting.Indented);
         var filePath = GetSidecarFilePath(folderPath);

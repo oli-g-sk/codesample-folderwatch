@@ -13,9 +13,9 @@ public class FileSystemDiffService(IFileSystem fileSystem,
 {
     private readonly ILogger<FileSystemDiffService> logger = loggerFactory.CreateLogger<FileSystemDiffService>();
     
-    public FolderContents? PreviousContents { get; private set; }
+    public Model.FolderSnapshot? PreviousContents { get; private set; }
     
-    public FolderContents CurrentContents { get; private set; }
+    public Model.FolderSnapshot CurrentContents { get; private set; }
     
     public IList<FileSystemEntry> CurrentEntries => CurrentContents.GetAllEntries().Order().ToList();
     
@@ -67,12 +67,12 @@ public class FileSystemDiffService(IFileSystem fileSystem,
         return initializeNeeded;
     }
 
-    private FolderContents GetContentsFromFolder(string folderPath)
+    private Model.FolderSnapshot GetContentsFromFolder(string folderPath)
     {
         return browseService.ListContents(folderPath);
     }
 
-    private FolderContents GetContentsFromSidecarFile(string folderPath)
+    private Model.FolderSnapshot GetContentsFromSidecarFile(string folderPath)
     {
         return persistenceService.LoadSnapshot(folderPath).Result;
     }

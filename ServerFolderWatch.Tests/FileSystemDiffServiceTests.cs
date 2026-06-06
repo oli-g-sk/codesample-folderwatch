@@ -23,7 +23,7 @@ public class FileSystemDiffServiceTests
     {
         var browseServiceMock = new Mock<IBrowseService>();
         browseServiceMock.Setup(x => x.ListContents(It.IsAny<string>()))
-            .Returns(FolderContents.Empty);
+            .Returns(FolderSnapshot.Empty);
         
         persistenceServiceMock = new Mock<IPersistenceService>();
         

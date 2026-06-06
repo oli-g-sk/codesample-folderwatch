@@ -1,11 +1,7 @@
 namespace ServerFolderWatch.Core.Model;
 
-public class FolderContents
+public class FolderSnapshot
 {
-    internal FolderContents()
-    {
-    }
-    
     public DateTime LastAnalyzed { get; set; }
     
     public IList<Directory> Subfolders { get; internal set; } = new List<Directory>();
@@ -17,5 +13,5 @@ public class FolderContents
         .ToList();
 
     // TODO remove - confusing - equals empty folder
-    public static FolderContents Empty { get; } = new();
+    public static FolderSnapshot Empty { get; } = new();
 }
