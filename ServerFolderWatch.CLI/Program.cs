@@ -17,11 +17,9 @@ class Program
         });
         
         var fileSystemWrapper = new FileSystem();
-        var fileWrapper = new FileWrapper(fileSystemWrapper);
-        var pathWrapper = new PathWrapper(fileSystemWrapper);
         var configuration = new Configuration();
         
-        var persistenceService = new SidecarFilePersistenceService(fileWrapper, pathWrapper, configuration, loggerFactory);
+        var persistenceService = new SidecarFilePersistenceService(fileSystemWrapper, configuration, loggerFactory);
         var browseService = new BrowseService(configuration, fileSystemWrapper);
         
         var fileSystemChangedService = new FileSystemDiffService(
