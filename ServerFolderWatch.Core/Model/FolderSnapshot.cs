@@ -2,7 +2,7 @@ namespace ServerFolderWatch.Core.Model;
 
 public class FolderSnapshot
 {
-    public DateTime LastAnalyzed { get; set; }
+    public DateTime? LastAnalyzed { get; set; }
     
     public IList<Directory> Subfolders { get; internal set; } = new List<Directory>();
     
