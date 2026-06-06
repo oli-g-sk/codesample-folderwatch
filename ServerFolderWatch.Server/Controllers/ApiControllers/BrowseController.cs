@@ -43,7 +43,7 @@ public class BrowseController(IBrowseService browseService,
 
         var previousSnapshot = persistenceService.LoadSnapshot(fullPath);
         var currentContent = browseService.ListContents(fullPath);
-        var diff = diffService.Diff(previousSnapshot, currentContent, fullPath);
+        var diff = diffService.Analyze(previousSnapshot, currentContent, fullPath, out _);
 
         return Ok(new
         {

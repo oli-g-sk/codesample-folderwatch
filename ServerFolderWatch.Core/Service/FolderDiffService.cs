@@ -9,13 +9,23 @@ namespace ServerFolderWatch.Core.Service;
 public class FolderDiffService(IFileSystem fileSystem, ILoggerFactory loggerFactory) : IFolderDiffService
 {
     private readonly ILogger<FolderDiffService> logger = loggerFactory.CreateLogger<FolderDiffService>();
-
-    public FolderSnapshotChanges Diff(FolderSnapshot? oldSnapshot, FolderSnapshot newSnapshot, string folderPath)
+    
+    public FolderSnapshotDiff Analyze(FolderSnapshot? oldSnapshot, FolderSnapshot newSnapshot, string folderPath,
+        out FolderSnapshotChanges changes)
     {
-        var diff = new FolderSnapshotChanges();
-        
-        if (oldSnapshot is null)
+        changes = new FolderSnapshotChanges();
+        var diff = new FolderSnapshotDiff();
+
+        if (oldSnapshot == null)
+        {
+            // No previous snapshot; diff will simply contain
+            // all current items with the operation listed as "unchangeD"
+            
+            diff.Entries.AddRange(newSnapshot.GetAllEntries()
+                .Select(x => (x, DiffOperation.Unchanged)));
+            
             return diff;
+        }
 
         var currentEntries = oldSnapshot.GetAllEntries();
         var previousEntries = newSnapshot.GetAllEntries();
@@ -23,11 +33,18 @@ public class FolderDiffService(IFileSystem fileSystem, ILoggerFactory loggerFact
         
         foreach (var entry in combined)
         {
+            DiffOperation operation = DiffOperation.Unchanged;
+
             if (currentEntries.Contains(entry) && !previousEntries.Contains(entry))
-                diff.AddedEntries.Add(entry);
+            {
+                changes.AddedEntries.Add(entry);
+                operation = DiffOperation.Added;
+            }
             else if (previousEntries.Contains(entry) && !currentEntries.Contains(entry))
-                diff.DeletedEntries.Add(entry);
-            
+            {
+                changes.DeletedEntries.Add(entry);
+                operation = DiffOperation.Removed;
+            }
             else if (entry is File)
             {
                 var previousEntry = previousEntries.First(x => x.Equals(entry)) as File;
@@ -36,22 +53,25 @@ public class FolderDiffService(IFileSystem fileSystem, ILoggerFactory loggerFact
 
                 if (FileHasChanged(currentEntry, oldSnapshot, folderPath))
                 {
-                    diff.ModifiedEntries.Add(currentEntry);
+                    operation = DiffOperation.Modified;
+                    changes.ModifiedEntries.Add(currentEntry);
                     currentEntry!.Version++;
                 }
             }
+            
+            diff.Entries.Add((entry, operation));
         }
         
-        if (!diff.AddedEntries.Any() && !diff.DeletedEntries.Any() && !diff.ModifiedEntries.Any())
+        if (!changes.AddedEntries.Any() && !changes.DeletedEntries.Any() && !changes.ModifiedEntries.Any())
             logger.LogInformation("No changes detected in {FolderPath}", folderPath);
         else
         
-        if (diff.AddedEntries.Any())
-            logger.LogInformation("Items added in {FolderPath}: {AddedFiles}", folderPath, diff.AddedEntries.Count);
-        if (diff.DeletedEntries.Any())
-            logger.LogInformation("Items deleted in {FolderPath}: {DeletedFiles}", folderPath, diff.DeletedEntries.Count);
-        if (diff.ModifiedEntries.Any())
-            logger.LogInformation("Items modified in {FolderPath}: {ModifiedFiles}", folderPath, diff.ModifiedEntries.Count);
+        if (changes.AddedEntries.Any())
+            logger.LogInformation("Items added in {FolderPath}: {AddedFiles}", folderPath, changes.AddedEntries.Count);
+        if (changes.DeletedEntries.Any())
+            logger.LogInformation("Items deleted in {FolderPath}: {DeletedFiles}", folderPath, changes.DeletedEntries.Count);
+        if (changes.ModifiedEntries.Any())
+            logger.LogInformation("Items modified in {FolderPath}: {ModifiedFiles}", folderPath, changes.ModifiedEntries.Count);
 
         newSnapshot.LastAnalyzed = DateTime.Now;
         
