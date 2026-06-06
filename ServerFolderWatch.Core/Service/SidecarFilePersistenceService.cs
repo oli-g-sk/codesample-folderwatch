@@ -1,6 +1,7 @@
 using System.IO.Abstractions;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using ServerFolderWatch.Core.Model;
 using ServerFolderWatch.Core.Service.Interfaces;
 
 namespace ServerFolderWatch.Core.Service;
@@ -34,7 +35,7 @@ public class SidecarFilePersistenceService(IFileSystem fileSystem, IConfiguratio
         }
     }
     
-    public Task<Model.FolderSnapshot> LoadSnapshot(string folderPath)
+    public FolderSnapshot LoadSnapshot(string folderPath)
     {
         try
         {
@@ -44,14 +45,15 @@ public class SidecarFilePersistenceService(IFileSystem fileSystem, IConfiguratio
                 ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor,
             });
 
-            return Task.FromResult(sidecarFileContents ?? Model.FolderSnapshot.Empty);
+            return sidecarFileContents ?? FolderSnapshot.Empty;
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Error reading sidecar file in {FolderPath}: {Error}", folderPath, ex.Message);
         }
         
-        return Task.FromResult(Model.FolderSnapshot.Empty);
+        // TODO return null
+        return FolderSnapshot.Empty;
     }
 
     public Task SaveSnapshot(string folderPath, Model.FolderSnapshot contents)
