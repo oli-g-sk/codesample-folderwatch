@@ -30,7 +30,6 @@ public class PersistenceServiceTests
         var fileSystemMock = new Mock<IFileSystem>();
         fileSystemMock.SetupGet(x => x.Path).Returns(pathMock.Object);
         fileSystemMock.SetupGet(x => x.File).Returns(fileMock.Object);
-            
         fileSystemMock.SetupGet(x => x.Path)
             .Returns(pathMock.Object);
         
@@ -51,6 +50,24 @@ public class PersistenceServiceTests
         bool result = sut.IsFolderAlreadyMonitored(FolderName);
 
         Assert.Equal(sidecarFileExists, result);
+    }
+
+    [Fact]
+    public void InitializeFolder_CreatesSidecarFile()
+    {
+        fileMock.Setup(x => x.Exists(SidecarFilePath)).Returns(false);
+        
+        sut.InitializeFolder(FolderName);
+        
+        fileMock.Verify(x => x.Create(SidecarFilePath), Times.Once);
+    }
+
+    [Fact]
+    public void InitializeFolder_SidecarFileAlreadyExists_ThrowsException()
+    {
+        fileMock.Setup(x => x.Exists(SidecarFilePath)).Returns(true);
+        
+        Assert.Throws<InvalidOperationException>(() => sut.InitializeFolder(FolderName));
     }
     
     // TODO duplicate code

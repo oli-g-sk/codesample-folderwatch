@@ -20,8 +20,12 @@ public class SidecarFilePersistenceService(IFileSystem fileSystem, IConfiguratio
     
     public void InitializeFolder(string folderPath)
     {
+        if (IsFolderAlreadyMonitored(folderPath))
+            throw new InvalidOperationException("Folder is already monitored");
+        
         var filePath = GetSidecarFilePath(folderPath);
-        fileSystem.File.Create(filePath).Close();
+        var stream = fileSystem.File.Create(filePath);
+        stream?.Close();
     }
     
     public Task<FolderContents> LoadSnapshot(string folderPath)
