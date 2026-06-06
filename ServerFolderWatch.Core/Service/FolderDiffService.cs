@@ -53,6 +53,8 @@ public class FolderDiffService(IFileSystem fileSystem, ILoggerFactory loggerFact
         if (diff.ModifiedEntries.Any())
             logger.LogInformation("Items modified in {FolderPath}: {ModifiedFiles}", folderPath, diff.ModifiedEntries.Count);
 
+        newSnapshot.LastAnalyzed = DateTime.Now;
+        
         return diff;
     }
     
