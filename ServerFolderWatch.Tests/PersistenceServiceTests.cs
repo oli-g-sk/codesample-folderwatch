@@ -10,7 +10,7 @@ public class PersistenceServiceTests
 {
     private const string FolderName = "foo";
     private const string SidecarFileName = "bar.txt";
-    private static string SidecarFilePath => CombinePaths(FolderName, SidecarFileName);
+    private string SidecarFilePath => TestHelpers.GetPath(FolderName, SidecarFileName, pathMock);
     
     private readonly Mock<IPath> pathMock = new();
     private readonly Mock<IFile> fileMock = new();
@@ -68,11 +68,5 @@ public class PersistenceServiceTests
         fileMock.Setup(x => x.Exists(SidecarFilePath)).Returns(true);
         
         Assert.Throws<InvalidOperationException>(() => sut.InitializeFolder(FolderName));
-    }
-    
-    // TODO duplicate code
-    private static string CombinePaths(string part1, string part2)
-    {
-        return $"filesystem://{part1}/{part2}";
     }
 }
