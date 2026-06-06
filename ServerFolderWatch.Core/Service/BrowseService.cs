@@ -13,7 +13,13 @@ public class BrowseService(IConfiguration configuration, IFileSystem fileSystem)
         // TODO check if path "tries to exit" the root public folder
         return fileSystem.Directory.Exists(path);
     }
-    
+
+    public bool CanGoToParent(string path)
+    {
+        // TODO TEST
+        return !path.Equals(configuration.RootPublicPath);
+    }
+
     public Model.FolderSnapshot ListContents(string folderPath)
     {
         return new Model.FolderSnapshot
