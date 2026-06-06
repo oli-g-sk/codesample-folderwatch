@@ -20,15 +20,18 @@ public class FileSystemDiffServiceTests
     private readonly Mock<IFile> fileMock = new();
     private readonly Mock<IConfiguration> configurationMock = new();
     
-    private FileSystemDiffService sut;
+    private readonly Mock<IBrowseService> browseServiceMock1;
+    private readonly Mock<IPersistenceService> persistenceServiceMock;
     
+    private readonly FileSystemDiffService sut;
+
     public FileSystemDiffServiceTests()
     {
-        var browseServiceMock = new Mock<IBrowseService>();
-        browseServiceMock.Setup(x => x.ListContents(It.IsAny<string>()))
+        browseServiceMock1 = new Mock<IBrowseService>();
+        browseServiceMock1.Setup(x => x.ListContents(It.IsAny<string>()))
             .Returns(FolderContents.Empty);
         
-        var persistenceServiceMock = new Mock<IPersistenceService>();
+        persistenceServiceMock = new Mock<IPersistenceService>();
         
         var loggerFactoryMock = new Mock<ILoggerFactory>();
         loggerFactoryMock.Setup(x => x.CreateLogger(It.IsAny<string>()))
@@ -44,7 +47,7 @@ public class FileSystemDiffServiceTests
         pathMock.Setup(x => x.Combine(It.IsAny<string>(), It.IsAny<string>()))
             .Returns(SidecarFilePath);
         
-        sut = new FileSystemDiffService(fileSystemMock.Object, browseServiceMock.Object,
+        sut = new FileSystemDiffService(fileSystemMock.Object, browseServiceMock1.Object,
             persistenceServiceMock.Object, loggerFactoryMock.Object);
     }
     
@@ -71,14 +74,18 @@ public class FileSystemDiffServiceTests
         configurationMock.VerifyGet(x => x.SidecarFileName, Times.AtLeastOnce);
     }
     
-    [Fact]
-    public async Task Setup_CreatesSidecarFile()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task Setup_NewFolder_InitializesIfNeeded(bool folderWasInitialized)
     {
-        fileMock.Setup(x => x.Exists(SidecarFilePath)).Returns(false);
+        persistenceServiceMock.Setup(x => x.IsFolderAlreadyMonitored(FolderName))
+            .Returns(folderWasInitialized);
         
         _ = await sut.Analyze("foo");
         
-        fileMock.Verify(x => x.Create(SidecarFilePath), Times.Once);
+        Times timesToCallInitialization = folderWasInitialized ? Times.Never() : Times.Once();
+        persistenceServiceMock.Verify(x => x.InitializeFolder(FolderName),timesToCallInitialization);
     }
 
     [Fact]
