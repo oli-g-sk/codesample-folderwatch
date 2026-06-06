@@ -25,6 +25,7 @@ builder.Services.AddControllers()
     });
 
 var app = builder.Build();
+app.UseStaticFiles();
 app.UseAntiforgery();
 app.MapControllers();
 app.MapRazorComponents<App>()
