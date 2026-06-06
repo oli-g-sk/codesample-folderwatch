@@ -6,24 +6,19 @@
 @inject IBrowseService BrowseService
 @inject NavigationManager NavigationManager
 
-@* Route Razor pages with @page. This page is served at /browse, matching the API shape of /api/browse. *@
-@* Inject registered DI services with @inject. For example, IBrowseService is registered in Program.cs and available here as BrowseService. *@
-@* Handle UI events with Blazor attributes like @onclick. This button increments without a full page reload. *@
-
+<!--
 <h1>Browse</h1>
 <p>Clicks: @clicks</p>
 <button @onclick="Increment">Increment</button>
-
-<p>Files:</p>
-
-@if (BrowseService.CanGoToParent(Folder ?? string.Empty))
-{
-    <h1>
-        <a href="/browse/?folder=@GetParentPath()">Back!</a>
-    </h1>
-}
+-->
 
 <ul>
+    @if (BrowseService.CanGoToParent(Folder ?? string.Empty))
+    {
+        <li>
+            <a href="/browse/?folder=@GetParentPath()">👆 ..</a>
+        </li>
+    }
     @foreach (var child in children)
     {
         <li>
@@ -35,10 +30,7 @@
 </ul>
 
 @code {
-    private int clicks;
     private List<BaseEntry> children;
-
-    private void Increment() => clicks++;
     
     [SupplyParameterFromQuery]
     public string? Folder { get; set; }
@@ -58,28 +50,14 @@
         return Folder?[..Folder.IndexOf('/')] ?? "/";
     }
 
-    string Foo()
-    {
-        return "foo";
-    }
-
-    protected override void OnInitialized()
-    {
-        base.OnInitialized();
-
-
-    }
-
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
         
         if (Folder == string.Empty)
             NavigationManager.NavigateTo("/browse");
-        
+
         var basePath = Path.Combine(Configuration.RootPublicPath, Folder ?? string.Empty);
-        
-        // TODO append query path
         var contents = BrowseService.ListContents(basePath);
         children = contents.GetAllEntries().ToList();
     }
