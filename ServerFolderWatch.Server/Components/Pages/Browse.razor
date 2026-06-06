@@ -17,8 +17,8 @@
         @if (BrowseService.CanGoToParent(Folder ?? string.Empty))
         {
             <li>
-                <a href="/browse/?folder=@GetParentPath()">
-                    <span>👆 .. </span>
+                <a href="@GetParentUrl()">
+                    <span><em class="icon">⇧</em> .. </span>
                 </a>
             </li>
         }
@@ -28,12 +28,12 @@
                 @if (child is Folder)
                 {
                     <a href="/browse?folder=@GetChildPath(child)">
-                        <span>📁 @child.Name</span>
+                        <span><em class="icon">🗀</em> @child.Name</span>
                     </a>
                 }
                 else
                 {
-                    <span>📄 @child.Name</span>
+                    <span><em class="icon">🗎</em> @child.Name</span>
                 }
             </li>
         }
@@ -61,12 +61,18 @@
         return Folder?[..Folder.IndexOf('/')] ?? "/";
     }
 
+    string GetParentUrl()
+    {
+        var parentPath = GetParentPath();
+        return string.IsNullOrEmpty(parentPath) ? "/browse" : $"/browse?folder={parentPath}";
+    }
+
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
         
         if (Folder == string.Empty)
-            NavigationManager.NavigateTo("/browse");
+            NavigationManager.NavigateTo("/browse", replace: true);
 
         var basePath = Path.Combine(Configuration.RootPublicPath, Folder ?? string.Empty);
         var contents = BrowseService.ListContents(basePath);
