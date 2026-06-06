@@ -15,29 +15,53 @@
 
 <p>Files:</p>
 <ul>
-    @foreach (var file in files)
+    @foreach (var child in children)
     {
-        <li>@file.Name</li>
+        <li>
+            <a href="/browse?folder=@GetChildPath(child)">
+                @child.Name
+            </a>
+        </li>
     }
 </ul>
 
 @code {
     private int clicks;
-    private List<BaseEntry> files;
+    private List<BaseEntry> children;
 
     private void Increment() => clicks++;
     
     [SupplyParameterFromQuery]
     public string? Folder { get; set; }
 
+    string GetChildPath(BaseEntry entry)
+    {
+        return (string.IsNullOrWhiteSpace(Folder)
+            ? string.Empty
+            : $"{Folder}/") + entry.Name;
+    }
+
+    string Foo()
+    {
+        return "foo";
+    }
+
     protected override void OnInitialized()
     {
         base.OnInitialized();
 
+
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        
         var basePath = Path.Combine(Configuration.RootPublicPath, Folder ?? string.Empty);
         
         // TODO append query path
         var contents = BrowseService.ListContents(basePath);
-        files = contents.GetAllEntries().ToList();
+        children = contents.GetAllEntries().ToList();
     }
+
 }
