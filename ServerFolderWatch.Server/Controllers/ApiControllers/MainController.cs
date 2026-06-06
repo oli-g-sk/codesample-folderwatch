@@ -7,7 +7,7 @@ namespace ServerFolderWatch.Server.Controllers.ApiControllers;
 [Route("api")]
 public class MainController : ControllerBase
 {
-    [HttpGet]
+    [HttpGet("/")]
     public IActionResult Index() => Ok("Hello World");
     
     [HttpGet("health")]

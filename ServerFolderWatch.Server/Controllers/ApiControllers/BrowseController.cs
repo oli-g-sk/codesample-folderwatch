@@ -20,7 +20,7 @@ public class BrowseController(IBrowseService browseService,
 {
     private readonly ILogger<BrowseController> logger = loggerFactory.CreateLogger<BrowseController>();
     
-    [Route("api/browse")]
+    [HttpGet("api/browse")]
     public IActionResult Browse([FromQuery(Name = "folder")] string? path)
     {
         if (!ValidateRequest(path, out var fullPath, out var error))
@@ -35,7 +35,7 @@ public class BrowseController(IBrowseService browseService,
         });
     }
         
-    [Route("api/diff")]
+    [HttpGet("api/diff")]
     public IActionResult Diff([FromQuery(Name = "folder")] string? path)
     {
         if (!ValidateRequest(path, out var fullPath, out var error))
