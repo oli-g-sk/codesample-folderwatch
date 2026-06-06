@@ -18,7 +18,7 @@ public class SidecarFilePersistenceService(IFileSystem fileSystem, IConfiguratio
         return fileSystem.File.Exists(GetSidecarFilePath(folderPath));
     }
     
-    public void InitializeFolder(string folderPath)
+    public void InitializeFolder(string folderPath, bool recursive)
     {
         if (IsFolderAlreadyMonitored(folderPath))
             throw new InvalidOperationException("Folder is already monitored");
@@ -26,6 +26,12 @@ public class SidecarFilePersistenceService(IFileSystem fileSystem, IConfiguratio
         var filePath = GetSidecarFilePath(folderPath);
         var stream = fileSystem.File.Create(filePath);
         stream?.Close();
+
+        if (recursive)
+        {
+            foreach (var subFolder in fileSystem.Directory.EnumerateDirectories(folderPath))
+                InitializeFolder(subFolder, recursive);
+        }
     }
     
     public Task<Model.FolderSnapshot> LoadSnapshot(string folderPath)
