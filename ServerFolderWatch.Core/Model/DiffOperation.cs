@@ -1,6 +1,6 @@
-namespace ServerFolderWatch.Server.DTOs;
+namespace ServerFolderWatch.Core.Model;
 
-public enum FileSystemEntityDiffOperation
+public enum DiffOperation
 {
     Unchanged,
     Added,

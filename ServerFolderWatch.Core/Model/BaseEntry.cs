@@ -1,6 +1,6 @@
 namespace ServerFolderWatch.Core.Model;
 
-public abstract class FileSystemEntry(string name) : IComparable<FileSystemEntry>
+public abstract class BaseEntry(string name) : IComparable<BaseEntry>
 {
     public string Name { get; } = name;
 
@@ -8,7 +8,7 @@ public abstract class FileSystemEntry(string name) : IComparable<FileSystemEntry
     {
         if (obj is null) return false;
         if (ReferenceEquals(this, obj)) return true;
-        return obj.GetType() == GetType() && Equals((FileSystemEntry)obj);
+        return obj.GetType() == GetType() && Equals((BaseEntry)obj);
     }
 
     public override int GetHashCode()
@@ -16,19 +16,19 @@ public abstract class FileSystemEntry(string name) : IComparable<FileSystemEntry
         return Name.GetHashCode();
     }
     
-    private bool Equals(FileSystemEntry other)
+    private bool Equals(BaseEntry other)
     {
         return Name == other.Name;
     }
 
-    public int CompareTo(FileSystemEntry? other)
+    public int CompareTo(BaseEntry? other)
     {
         if (ReferenceEquals(this, other)) return 0;
 
         return other switch
         {
             File => -1,
-            null or Directory => 1,
+            null or Folder => 1,
             _ => string.Compare(Name, other.Name, StringComparison.Ordinal)
         };
     }

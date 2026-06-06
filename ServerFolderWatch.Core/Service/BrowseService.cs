@@ -1,7 +1,6 @@
 using System.IO.Abstractions;
 using ServerFolderWatch.Core.Model;
 using ServerFolderWatch.Core.Service.Interfaces;
-using Directory = ServerFolderWatch.Core.Model.Directory;
 using File = ServerFolderWatch.Core.Model.File;
 
 namespace ServerFolderWatch.Core.Service;
@@ -28,7 +27,7 @@ public class BrowseService(IConfiguration configuration, IFileSystem fileSystem)
         {
             Subfolders = fileSystem.Directory.EnumerateDirectories(folderPath)
                 .Select(fileSystem.Path.GetFileName).OfType<string>()
-                .Select(x => new Directory(x)).ToList(),
+                .Select(x => new Folder(x)).ToList(),
             
             VersionedFiles = fileSystem.Directory.EnumerateFiles(folderPath)
                 .Select(fileSystem.Path.GetFileName).OfType<string>()

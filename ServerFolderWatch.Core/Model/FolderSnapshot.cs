@@ -4,11 +4,11 @@ public class FolderSnapshot
 {
     public DateTime? LastAnalyzed { get; set; }
     
-    public IList<Directory> Subfolders { get; internal set; } = new List<Directory>();
+    public IList<Folder> Subfolders { get; internal set; } = new List<Folder>();
     
     public IList<File> VersionedFiles { get; internal set; } = new List<File>();
     
-    public IList<FileSystemEntry> GetAllEntries() => Subfolders.OfType<FileSystemEntry>()
+    public IList<BaseEntry> GetAllEntries() => Subfolders.OfType<BaseEntry>()
         .Concat(VersionedFiles)
         .ToList();
 

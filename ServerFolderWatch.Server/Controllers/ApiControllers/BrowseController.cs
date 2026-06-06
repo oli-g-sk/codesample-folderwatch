@@ -53,7 +53,7 @@ public class BrowseController(IBrowseService browseService,
         });
     }
 
-    private static IEnumerable<FileSystemEntryDto> MapCurrentEntries(IEnumerable<FileSystemEntry> currentEntries)
+    private static IEnumerable<FileSystemEntryDto> MapCurrentEntries(IEnumerable<BaseEntry> currentEntries)
     {
         var ordered = currentEntries.Order();
         
@@ -68,9 +68,9 @@ public class BrowseController(IBrowseService browseService,
             ));
     }
     
-    private static IEnumerable<FileSystemEntryDiffDto> MapDiffedEntries(IMainService diffService)
+    private static IEnumerable<FileSystemEntryDiffDto> MapDiffedEntries( FolderSnapshotChanges folderSnapshotChanges)
     {
-        var joinedEntries = diffService.AllEntries.Order();
+        var joinedEntries = folderSnapshotChanges.AllEntries.Order();
         
         return joinedEntries.Select(entry => new FileSystemEntryDiffDto(
             entry.Name,
@@ -83,15 +83,15 @@ public class BrowseController(IBrowseService browseService,
                 : null
         ));
 
-        FileSystemEntityDiffOperation GetDiffOperation(FileSystemEntry entry)
+        DiffOperation GetDiffOperation(BaseEntry entry)
         {
-            if (diffService.AddedEntries.Contains(entry))
-                return FileSystemEntityDiffOperation.Added;
-            if (diffService.DeletedEntries.Contains(entry))
-                return FileSystemEntityDiffOperation.Removed;
-            if (diffService.ModifiedEntries.Contains(entry))
-                return FileSystemEntityDiffOperation.Modified;
-            return FileSystemEntityDiffOperation.Unchanged;
+            if (folderSnapshotChanges.AddedEntries.Contains(entry))
+                return DiffOperation.Added;
+            if (folderSnapshotChanges.DeletedEntries.Contains(entry))
+                return DiffOperation.Removed;
+            if (folderSnapshotChanges.ModifiedEntries.Contains(entry))
+                return DiffOperation.Modified;
+            return DiffOperation.Unchanged;
         }
     }
 
