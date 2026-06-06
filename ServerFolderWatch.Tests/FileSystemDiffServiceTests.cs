@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Moq;
 using ServerFolderWatch.Core;
+using ServerFolderWatch.Core.Model;
 using ServerFolderWatch.Core.Service;
 
 namespace ServerFolderWatch.Tests;
@@ -24,9 +25,12 @@ public class FileSystemDiffServiceTests
     public FileSystemDiffServiceTests()
     {
         var browseServiceMock = new Mock<IBrowseService>();
-        var persistenceServiceMock = new Mock<IPersistenceService>();
-        var loggerFactoryMock = new Mock<ILoggerFactory>();
+        browseServiceMock.Setup(x => x.ListContents(It.IsAny<string>()))
+            .Returns(FolderContents.Empty);
         
+        var persistenceServiceMock = new Mock<IPersistenceService>();
+        
+        var loggerFactoryMock = new Mock<ILoggerFactory>();
         loggerFactoryMock.Setup(x => x.CreateLogger(It.IsAny<string>()))
             .Returns(new Mock<ILogger>().Object);
         
