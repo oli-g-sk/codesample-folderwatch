@@ -8,7 +8,7 @@ public interface IPersistenceService
     
     public bool IsFolderAlreadyMonitored(string folderPath);
     
-    Task<FolderSnapshot> LoadSnapshot(string folderPath);
+    FolderSnapshot LoadSnapshot(string folderPath);
     
     Task SaveSnapshot(string folderPath, Model.FolderSnapshot contents);
 }

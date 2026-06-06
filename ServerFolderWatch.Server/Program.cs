@@ -13,10 +13,6 @@ builder.Services.AddSingleton<IConfiguration, Configuration>();
 builder.Services.AddSingleton<IBrowseService, BrowseService>();
 builder.Services.AddSingleton<IPersistenceService, SidecarFilePersistenceService>();
 
-// TODO make scoped and provide path parameter in ctor?
-//  otherwise it's unreliable and calling properties can throw NREs
-builder.Services.AddSingleton<IMainService, MainService>();
-
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {

@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ServerFolderWatch.Core;
 using ServerFolderWatch.Core.Model;
-using ServerFolderWatch.Core.Service;
 using ServerFolderWatch.Core.Service.Interfaces;
 using ServerFolderWatch.Server.DTOs;
 using File = ServerFolderWatch.Core.Model.File;
@@ -14,7 +13,8 @@ namespace ServerFolderWatch.Server.Controllers.ApiControllers;
 
 [ApiController]
 public class BrowseController(IBrowseService browseService,
-    IMainService diffService,
+    IPersistenceService persistenceService,
+    IFolderDiffService diffService,
     IConfiguration configuration,
     ILoggerFactory loggerFactory) : ControllerBase
 {
@@ -42,7 +42,9 @@ public class BrowseController(IBrowseService browseService,
         if (!ValidateRequest(path, out var fullPath, out var error))
             return BadRequest(error);
 
-        diffService.Analyze(fullPath).Wait();
+        var previousSnapshot = persistenceService.LoadSnapshot(fullPath);
+        var currentContent = browseService.ListContents(fullPath);
+        var diff = diffService.Diff(previousSnapshot, currentContent, fullPath);
 
         return Ok(new
         {
