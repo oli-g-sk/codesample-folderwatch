@@ -1,7 +1,6 @@
 ﻿using System.IO.Abstractions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using ServerFolderWatch.Core;
 using ServerFolderWatch.Core.Model;
 using ServerFolderWatch.Core.Service;
 
@@ -9,19 +8,17 @@ namespace ServerFolderWatch.Tests;
 
 public class FileSystemDiffServiceTests
 {
-    private const string FolderName = "foo";
-    private const string SubFolderName = "subFolder";
-    private static string SubFolderPath => CombinePaths(FolderName, SubFolderName);
-    
     private readonly Mock<IPath> pathMock = new();
     private readonly Mock<IDirectory> directoryMock = new();
     private readonly Mock<IFile> fileMock = new();
-    private readonly Mock<IConfiguration> configurationMock = new();
     
     private readonly Mock<IBrowseService> browseServiceMock1;
     private readonly Mock<IPersistenceService> persistenceServiceMock;
     
     private readonly FileSystemDiffService sut;
+    
+    private string FolderPath => TestHelpers.GetPath("foo");
+    private string SubFolderPath => TestHelpers.GetPath("foo", "bar", pathMock);
 
     public FileSystemDiffServiceTests()
     {
@@ -39,12 +36,7 @@ public class FileSystemDiffServiceTests
         fileSystemMock.SetupGet(x => x.Directory).Returns(directoryMock.Object);
         fileSystemMock.SetupGet(x => x.Path).Returns(pathMock.Object);
         fileSystemMock.SetupGet(x => x.File).Returns(fileMock.Object);
-        
-        configurationMock.SetupGet(x => x.SidecarFileName)
-            .Returns(SidecarFileName);
-        pathMock.Setup(x => x.Combine(It.IsAny<string>(), It.IsAny<string>()))
-            .Returns(SidecarFilePath);
-        
+
         sut = new FileSystemDiffService(fileSystemMock.Object, browseServiceMock1.Object,
             persistenceServiceMock.Object, loggerFactoryMock.Object);
     }
@@ -54,33 +46,25 @@ public class FileSystemDiffServiceTests
     [InlineData(false)]
     public async Task Setup_NewFolder_InitializesIfNeeded(bool folderAlreadyMonitored)
     {
-        persistenceServiceMock.Setup(x => x.IsFolderAlreadyMonitored(FolderName))
+        persistenceServiceMock.Setup(x => x.IsFolderAlreadyMonitored(FolderPath))
             .Returns(folderAlreadyMonitored);
 
         Times timesToCallInitialization = folderAlreadyMonitored ? Times.Never() : Times.Once();
         bool wasInitialized = await sut.Analyze("foo");
 
-        persistenceServiceMock.Verify(x => x.InitializeFolder(FolderName),timesToCallInitialization);
+        persistenceServiceMock.Verify(x => x.InitializeFolder(FolderPath),timesToCallInitialization);
         Assert.NotEqual(folderAlreadyMonitored, wasInitialized);
     }
 
     [Fact]
     public async Task Setup_NewFolder_RunsRecursively()
     {
-        persistenceServiceMock.Setup(x => x.IsFolderAlreadyMonitored(FolderName)).Returns(false);
+        persistenceServiceMock.Setup(x => x.IsFolderAlreadyMonitored(FolderPath)).Returns(false);
         persistenceServiceMock.Setup(x => x.IsFolderAlreadyMonitored(SubFolderPath)).Returns(false);
         
         SetupSubfolder();
         
-        // mock there's no sidecar file in subfolder
-        var subSidecarFilePath = CombinePaths(SubFolderPath, SidecarFileName);
-        fileMock.Setup(x => x.Exists(subSidecarFilePath)).Returns(false);
-        
-        // setup path combining for subfolder sidecar file
-        pathMock.Setup(x => x.Combine(SubFolderName, SidecarFileName))
-            .Returns(subSidecarFilePath);
-        
-        _ = await sut.Analyze(FolderName);
+        _ = await sut.Analyze(FolderPath);
         
         // verify the subfolder was initialized
         persistenceServiceMock.Verify(x => x.InitializeFolder(SubFolderPath), Times.Once);
@@ -89,16 +73,16 @@ public class FileSystemDiffServiceTests
     [Fact]
     public async Task Setup_ExistingFolder_DoesNotRunRecursively()
     {
-        // mock there's already a sidecar file in folder
-        fileMock.Setup(x => x.Exists(SidecarFilePath)).Returns(true);
+        persistenceServiceMock.Setup(x => x.IsFolderAlreadyMonitored(FolderPath)).Returns(true);
+        persistenceServiceMock.Setup(x => x.IsFolderAlreadyMonitored(SubFolderPath)).Returns(true);
         
         SetupSubfolder();
         
-        _ = await sut.Analyze(FolderName);
+        _ = await sut.Analyze(FolderPath);
         
         // verify subfolders weren't even enumerated
-        directoryMock.Verify(x => x.GetDirectories(FolderName), Times.Never);
-        directoryMock.Verify(x => x.EnumerateDirectories(FolderName), Times.Never);
+        directoryMock.Verify(x => x.GetDirectories(FolderPath), Times.Never);
+        directoryMock.Verify(x => x.EnumerateDirectories(FolderPath), Times.Never);
     }
     
     [Fact]
@@ -113,18 +97,12 @@ public class FileSystemDiffServiceTests
     private void SetupSubfolder()
     {
         // mock that subfolder exists
-        directoryMock.Setup(x => x.Exists(SubFolderName)).Returns(true);
         directoryMock.Setup(x => x.Exists(SubFolderPath)).Returns(true);
         
         // mock that subfolder is listed
-        directoryMock.Setup(x => x.GetDirectories(FolderName)).Returns(new[] {SubFolderName});
+        directoryMock.Setup(x => x.GetDirectories(FolderPath)).Returns(new[] {SubFolderPath});
         directoryMock.Setup(x => x.GetDirectories(SubFolderPath)).Returns(Array.Empty<string>());
-        directoryMock.Setup(x => x.EnumerateDirectories(FolderName)).Returns(new[] { SubFolderName });
+        directoryMock.Setup(x => x.EnumerateDirectories(FolderPath)).Returns(new[] { SubFolderPath });
         directoryMock.Setup(x => x.EnumerateDirectories(SubFolderPath)).Returns(new[] {SubFolderPath});
-    }
-
-    private static string CombinePaths(string part1, string part2)
-    {
-        return $"filesystem://{part1}/{part2}";
     }
 }
