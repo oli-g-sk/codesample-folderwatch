@@ -11,7 +11,6 @@ public class FileSystemDiffService(IFileSystem fileSystem,
     ILoggerFactory loggerFactory)
     : IFileSystemDiffService
 {
-    private readonly IBrowseService browseService = browseService;
     private readonly ILogger<FileSystemDiffService> logger = loggerFactory.CreateLogger<FileSystemDiffService>();
     
     public FolderContents? PreviousContents { get; private set; }
@@ -43,13 +42,9 @@ public class FileSystemDiffService(IFileSystem fileSystem,
         
         logger.LogTrace("Analyzing {FolderPath}", folderPath);
         
-        bool wasAlreadyMonitored = persistenceService.IsFolderAlreadyMonitored(folderPath);
+        bool initializeNeeded = !persistenceService.IsFolderAlreadyMonitored(folderPath);
 
-        if (wasAlreadyMonitored)
-        {
-            PreviousContents = GetContentsFromSidecarFile(folderPath);
-        }
-        else
+        if (initializeNeeded)
         {
             logger.LogInformation("Setting up folder {FolderPath} for monitoring", folderPath);
 
@@ -58,6 +53,10 @@ public class FileSystemDiffService(IFileSystem fileSystem,
             foreach (var subfolder in fileSystem.Directory.GetDirectories(folderPath))
                 await Analyze(subfolder);
         }
+        else
+        {
+            PreviousContents = GetContentsFromSidecarFile(folderPath);
+        }
 
         CurrentContents = GetContentsFromFolder(folderPath);
         CurrentContents.LastAnalyzed = DateTime.Now;
@@ -65,7 +64,7 @@ public class FileSystemDiffService(IFileSystem fileSystem,
         DetectChanges(folderPath);
         SaveSidecarFile(folderPath);
 
-        return wasAlreadyMonitored;
+        return initializeNeeded;
     }
 
     private FolderContents GetContentsFromFolder(string folderPath)

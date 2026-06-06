@@ -57,38 +57,23 @@ public class FileSystemDiffServiceTests
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public async Task Setup_ReturnsCorrectValue(bool sidecarFileExists)
-    {
-        const string folder = "myFolder";
-        directoryMock.Setup(x => x.Exists(It.IsAny<string>()))
-            .Returns(true);
-        
-        fileMock.Setup(x => x.Exists(SidecarFilePath))
-            .Returns(sidecarFileExists);
-        
-        bool actual = await sut.Analyze("foo");
-        Assert.Equal(sidecarFileExists, actual);
-    }
-    
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public async Task Setup_NewFolder_InitializesIfNeeded(bool folderWasInitialized)
+    public async Task Setup_NewFolder_InitializesIfNeeded(bool folderAlreadyMonitored)
     {
         persistenceServiceMock.Setup(x => x.IsFolderAlreadyMonitored(FolderName))
-            .Returns(folderWasInitialized);
-        
-        _ = await sut.Analyze("foo");
-        
-        Times timesToCallInitialization = folderWasInitialized ? Times.Never() : Times.Once();
+            .Returns(folderAlreadyMonitored);
+
+        Times timesToCallInitialization = folderAlreadyMonitored ? Times.Never() : Times.Once();
+        bool wasInitialized = await sut.Analyze("foo");
+
         persistenceServiceMock.Verify(x => x.InitializeFolder(FolderName),timesToCallInitialization);
+        Assert.NotEqual(folderAlreadyMonitored, wasInitialized);
     }
 
     [Fact]
     public async Task Setup_NewFolder_RunsRecursively()
     {
-        // mock there's no sidecar file in folder
-        fileMock.Setup(x => x.Exists(SidecarFilePath)).Returns(false);
+        persistenceServiceMock.Setup(x => x.IsFolderAlreadyMonitored(FolderName)).Returns(false);
+        persistenceServiceMock.Setup(x => x.IsFolderAlreadyMonitored(SubFolderPath)).Returns(false);
         
         SetupSubfolder();
         
@@ -102,8 +87,8 @@ public class FileSystemDiffServiceTests
         
         _ = await sut.Analyze(FolderName);
         
-        // verify a sidecar file was created in subfolder
-        fileMock.Verify(x => x.Create(subSidecarFilePath), Times.Once);
+        // verify the subfolder was initialized
+        persistenceServiceMock.Verify(x => x.InitializeFolder(SubFolderPath), Times.Once);
     }
 
     [Fact]

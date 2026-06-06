@@ -12,7 +12,8 @@ public interface IFileSystemDiffService
     /// </summary>
     /// <param name="monitoredPath"></param>
     /// <returns>
-    /// Whether file system changes were already being tracked for this folder.
+    /// <true/> if the folder was just initialized for monitoring,
+    /// <false/> if it was already being monitored.
     /// </returns>
     Task<bool> Analyze(string monitoredPath);
 
