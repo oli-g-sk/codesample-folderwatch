@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using ServerFolderWatch.Core.Service;
 using ServerFolderWatch.Core.Service.Interfaces;
 using ServerFolderWatch.Server;
+using ServerFolderWatch.Server.Components;
 using IConfiguration = ServerFolderWatch.Core.IConfiguration;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +14,8 @@ builder.Services.AddSingleton<IConfiguration, Configuration>();
 builder.Services.AddSingleton<IBrowseService, BrowseService>();
 builder.Services.AddSingleton<IFolderDiffService, FolderDiffService>();
 builder.Services.AddSingleton<IPersistenceService, SidecarFilePersistenceService>();
+builder.Services.AddRazorComponents()
+    .AddInteractiveServerComponents();
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -22,5 +25,8 @@ builder.Services.AddControllers()
     });
 
 var app = builder.Build();
+app.UseAntiforgery();
 app.MapControllers();
+app.MapRazorComponents<App>()
+    .AddInteractiveServerRenderMode();
 app.Run();

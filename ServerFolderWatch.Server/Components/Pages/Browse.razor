@@ -1,0 +1,16 @@
+@page "/browse"
+@inject IBrowseService BrowseService
+
+@* Route Razor pages with @page. This page is served at /browse, matching the API shape of /api/browse. *@
+@* Inject registered DI services with @inject. For example, IBrowseService is registered in Program.cs and available here as BrowseService. *@
+@* Handle UI events with Blazor attributes like @onclick. This button increments without a full page reload. *@
+
+<h1>Browse</h1>
+<p>Clicks: @clicks</p>
+<button @onclick="Increment">Increment</button>
+
+@code {
+    private int clicks;
+
+    private void Increment() => clicks++;
+}
