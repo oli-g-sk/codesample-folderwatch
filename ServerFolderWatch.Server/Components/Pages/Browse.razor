@@ -12,29 +12,33 @@
 <button @onclick="Increment">Increment</button>
 -->
 
-<ul>
-    @if (BrowseService.CanGoToParent(Folder ?? string.Empty))
-    {
-        <li>
-            <a href="/browse/?folder=@GetParentPath()">👆 ..</a>
-        </li>
-    }
-    @foreach (var child in children)
-    {
-        <li>
-            @if (child is Folder)
-            {
-                <a href="/browse?folder=@GetChildPath(child)">
-                    @child.Name
+<div id="browser">
+    <ul>
+        @if (BrowseService.CanGoToParent(Folder ?? string.Empty))
+        {
+            <li>
+                <a href="/browse/?folder=@GetParentPath()">
+                    <span>👆 .. </span>
                 </a>
-            }
-            else
-            {
-                @child.Name
-            }
-        </li>
-    }
-</ul>
+            </li>
+        }
+        @foreach (var child in children)
+        {
+            <li>
+                @if (child is Folder)
+                {
+                    <a href="/browse?folder=@GetChildPath(child)">
+                        <span>📁 @child.Name</span>
+                    </a>
+                }
+                else
+                {
+                    <span>📄 @child.Name</span>
+                }
+            </li>
+        }
+    </ul>
+</div>
 
 @code {
     private List<BaseEntry> children;
