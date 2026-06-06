@@ -14,7 +14,7 @@ namespace ServerFolderWatch.Server.Controllers.ApiControllers;
 [ApiController]
 public class BrowseController(IBrowseService browseService,
     IPersistenceService persistenceService,
-    IFolderDiffService diffService,
+    IFolderDiffService folderDiffService,
     IConfiguration configuration,
     ILoggerFactory loggerFactory) : ControllerBase
 {
@@ -43,7 +43,7 @@ public class BrowseController(IBrowseService browseService,
 
         var previousSnapshot = persistenceService.LoadSnapshot(fullPath);
         var currentContent = browseService.ListContents(fullPath);
-        var diff = diffService.Analyze(previousSnapshot, currentContent, fullPath, out _);
+        var diff = folderDiffService.Analyze(previousSnapshot, currentContent, fullPath, out _);
 
         return Ok(new
         {

@@ -11,6 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton<IFileSystem, FileSystem>();
 builder.Services.AddSingleton<IConfiguration, Configuration>();
 builder.Services.AddSingleton<IBrowseService, BrowseService>();
+builder.Services.AddSingleton<IFolderDiffService, FolderDiffService>();
 builder.Services.AddSingleton<IPersistenceService, SidecarFilePersistenceService>();
 
 builder.Services.AddControllers()
