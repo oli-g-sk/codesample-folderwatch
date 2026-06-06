@@ -34,7 +34,6 @@ public class BrowseController(IBrowseService browseService,
             Entries = MapCurrentEntries(currentContent.GetAllEntries())
         });
     }
-    
         
     [Route("api/diff")]
     public IActionResult Diff([FromQuery(Name = "folder")] string? path)
@@ -48,8 +47,8 @@ public class BrowseController(IBrowseService browseService,
 
         return Ok(new
         {
-            LastAnalyzed = diffService.LastAnalyzed,
-            Entries = MapDiffedEntries(diffService)
+            LastAnalyzed = currentContent.LastAnalyzed,
+            Entries = MapDiffedEntries(diff)
         });
     }
 
@@ -68,31 +67,20 @@ public class BrowseController(IBrowseService browseService,
             ));
     }
     
-    private static IEnumerable<FileSystemEntryDiffDto> MapDiffedEntries( FolderSnapshotChanges folderSnapshotChanges)
+    private static IEnumerable<FileSystemEntryDiffDto> MapDiffedEntries(FolderSnapshotDiff diff)
     {
-        var joinedEntries = folderSnapshotChanges.AllEntries.Order();
+        var ordered = diff.Entries.Order();
         
-        return joinedEntries.Select(entry => new FileSystemEntryDiffDto(
-            entry.Name,
-            entry is File
+        return ordered.Select(entry => new FileSystemEntryDiffDto(
+            entry.FileSystemEntry.Name,
+            entry.FileSystemEntry is File
                 ? FileSystemEntityType.File
                 : FileSystemEntityType.Directory,
-            GetDiffOperation(entry),
-            entry is File file
+            entry.Operation,
+            entry.FileSystemEntry is File file
                 ? file.Version
                 : null
         ));
-
-        DiffOperation GetDiffOperation(BaseEntry entry)
-        {
-            if (folderSnapshotChanges.AddedEntries.Contains(entry))
-                return DiffOperation.Added;
-            if (folderSnapshotChanges.DeletedEntries.Contains(entry))
-                return DiffOperation.Removed;
-            if (folderSnapshotChanges.ModifiedEntries.Contains(entry))
-                return DiffOperation.Modified;
-            return DiffOperation.Unchanged;
-        }
     }
 
     // TODO find a common pattern to handle validation like this
