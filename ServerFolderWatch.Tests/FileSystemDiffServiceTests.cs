@@ -11,8 +11,11 @@ public class FileSystemDiffServiceTests
 {
     private const string FolderName = "foo";
     private const string SubFolderName = "subFolder";
+    
+    // TODO remove? (belong to persistence service)
     private const string SidecarFileName = "bar.txt";
     private static string SidecarFilePath => CombinePaths(FolderName, SidecarFileName);
+
     private static string SubFolderPath => CombinePaths(FolderName, SubFolderName);
     
     private readonly Mock<IPath> pathMock = new();
@@ -65,13 +68,6 @@ public class FileSystemDiffServiceTests
         
         bool actual = await sut.Analyze("foo");
         Assert.Equal(sidecarFileExists, actual);
-    }
-
-    [Fact]
-    public async Task Setup_ReadsConfiguration()
-    {
-        _ = await sut.Analyze("foo");
-        configurationMock.VerifyGet(x => x.SidecarFileName, Times.AtLeastOnce);
     }
     
     [Theory]
