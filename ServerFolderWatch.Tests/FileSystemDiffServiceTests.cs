@@ -11,8 +11,7 @@ public class FileSystemDiffServiceTests
     private readonly Mock<IPath> pathMock = new();
     private readonly Mock<IDirectory> directoryMock = new();
     private readonly Mock<IFile> fileMock = new();
-    
-    private readonly Mock<IBrowseService> browseServiceMock1;
+
     private readonly Mock<IPersistenceService> persistenceServiceMock;
     
     private readonly FileSystemDiffService sut;
@@ -22,8 +21,8 @@ public class FileSystemDiffServiceTests
 
     public FileSystemDiffServiceTests()
     {
-        browseServiceMock1 = new Mock<IBrowseService>();
-        browseServiceMock1.Setup(x => x.ListContents(It.IsAny<string>()))
+        var browseServiceMock = new Mock<IBrowseService>();
+        browseServiceMock.Setup(x => x.ListContents(It.IsAny<string>()))
             .Returns(FolderContents.Empty);
         
         persistenceServiceMock = new Mock<IPersistenceService>();
@@ -37,7 +36,7 @@ public class FileSystemDiffServiceTests
         fileSystemMock.SetupGet(x => x.Path).Returns(pathMock.Object);
         fileSystemMock.SetupGet(x => x.File).Returns(fileMock.Object);
 
-        sut = new FileSystemDiffService(fileSystemMock.Object, browseServiceMock1.Object,
+        sut = new FileSystemDiffService(fileSystemMock.Object, browseServiceMock.Object,
             persistenceServiceMock.Object, loggerFactoryMock.Object);
     }
     
@@ -50,14 +49,32 @@ public class FileSystemDiffServiceTests
             .Returns(folderAlreadyMonitored);
 
         Times timesToCallInitialization = folderAlreadyMonitored ? Times.Never() : Times.Once();
-        bool wasInitialized = await sut.Analyze("foo");
+        bool wasInitialized = await sut.Analyze(FolderPath);
 
         persistenceServiceMock.Verify(x => x.InitializeFolder(FolderPath),timesToCallInitialization);
         Assert.NotEqual(folderAlreadyMonitored, wasInitialized);
     }
 
     [Fact]
-    public async Task Setup_NewFolder_RunsRecursively()
+    public async Task Setup_NewFolder_EnumeratesSubfolders()
+    {
+        persistenceServiceMock.Setup(x => x.IsFolderAlreadyMonitored(FolderPath)).Returns(false);
+        persistenceServiceMock.Setup(x => x.IsFolderAlreadyMonitored(SubFolderPath)).Returns(false);
+        
+        SetupSubfolder();
+        
+        _ = await sut.Analyze(FolderPath);
+        
+        bool directoriesListed = directoryMock.Invocations
+            .Any(x => x.Method.Name == nameof(IDirectory.GetDirectories));
+        bool directoriesEnumerated = directoryMock.Invocations
+            .Any(x => x.Method.Name == nameof(IDirectory.EnumerateDirectories));
+        
+        Assert.True(directoriesListed || directoriesEnumerated);
+    }
+
+    [Fact]
+    public async Task Setup_NewFolder_RunsRecursively_InitializesSubfolders()
     {
         persistenceServiceMock.Setup(x => x.IsFolderAlreadyMonitored(FolderPath)).Returns(false);
         persistenceServiceMock.Setup(x => x.IsFolderAlreadyMonitored(SubFolderPath)).Returns(false);
@@ -83,6 +100,19 @@ public class FileSystemDiffServiceTests
         // verify subfolders weren't even enumerated
         directoryMock.Verify(x => x.GetDirectories(FolderPath), Times.Never);
         directoryMock.Verify(x => x.EnumerateDirectories(FolderPath), Times.Never);
+    }
+        
+    [Fact]
+    public async Task Setup_ExistingFolder_NoFolderIsInitialized()
+    {
+        persistenceServiceMock.Setup(x => x.IsFolderAlreadyMonitored(FolderPath)).Returns(true);
+        persistenceServiceMock.Setup(x => x.IsFolderAlreadyMonitored(SubFolderPath)).Returns(true);
+        
+        SetupSubfolder();
+        
+        _ = await sut.Analyze(FolderPath);
+        
+        persistenceServiceMock.Verify(x => x.InitializeFolder(It.IsAny<string>()), Times.Never);
     }
     
     [Fact]
