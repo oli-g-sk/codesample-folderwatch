@@ -11,6 +11,7 @@ public class FolderSnapshot
     
     public IList<BaseEntry> GetAllEntries() => Subfolders.OfType<BaseEntry>()
         .Concat(VersionedFiles)
+        .Order()
         .ToList();
 
     // TODO remove - confusing - equals empty folder

@@ -1,4 +1,7 @@
 @page "/browse"
+@using ServerFolderWatch.Core
+@using ServerFolderWatch.Core.Model
+@inject IConfiguration Configuration
 @inject IBrowseService BrowseService
 
 @* Route Razor pages with @page. This page is served at /browse, matching the API shape of /api/browse. *@
@@ -9,8 +12,28 @@
 <p>Clicks: @clicks</p>
 <button @onclick="Increment">Increment</button>
 
+<p>Files:</p>
+<ul>
+    @foreach (var file in files)
+    {
+        <li>@file.Name</li>
+    }
+</ul>
+
 @code {
     private int clicks;
+    private List<BaseEntry> files;
 
     private void Increment() => clicks++;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        var basePath = Configuration.RootPublicPath;
+        
+        // TODO append query path
+        var contents = BrowseService.ListContents(basePath);
+        files = contents.GetAllEntries().ToList();
+    }
 }
