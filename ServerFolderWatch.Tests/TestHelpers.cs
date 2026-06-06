@@ -15,14 +15,14 @@ public class TestHelpers
     internal static string GetPath(string folder, string subfolder, Mock<IPath> pathMock)
     {
         string prefixed = GetPath(Path.Combine(folder, subfolder));
-        pathMock.SetupGet(x => x.Combine(folder, subfolder)).Returns(prefixed);
+        pathMock.Setup(x => x.Combine(folder, subfolder)).Returns(prefixed);
         return prefixed;
     }
     
     internal static string GetPath(string folder, string subfolder, string file, Mock<IPath> pathMock)
     {
         string prefixed = GetPath(Path.Combine(folder, subfolder, file));
-        pathMock.SetupGet(x => x.Combine(folder, subfolder)).Returns(prefixed);
+        pathMock.Setup(x => x.Combine(folder, subfolder)).Returns(prefixed);
         return prefixed;
     } 
 }
