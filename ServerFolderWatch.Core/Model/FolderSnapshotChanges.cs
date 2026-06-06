@@ -1,6 +1,10 @@
 namespace ServerFolderWatch.Core.Model;
 
-public class FolderSnapshotDiff
+/// <summary>
+/// Represents the changes between two snapshots of the same folder
+/// by listing the added, modified and deleted entries.
+/// </summary>
+public class FolderSnapshotChanges
 {
     public List<FileSystemEntry> AddedEntries { get; } = new ();
 

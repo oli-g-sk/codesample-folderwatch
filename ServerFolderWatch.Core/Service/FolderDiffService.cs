@@ -10,9 +10,9 @@ public class FolderDiffService(IFileSystem fileSystem, ILoggerFactory loggerFact
 {
     private readonly ILogger<FolderDiffService> logger = loggerFactory.CreateLogger<FolderDiffService>();
 
-    public FolderSnapshotDiff Diff(FolderSnapshot? oldSnapshot, FolderSnapshot newSnapshot, string folderPath)
+    public FolderSnapshotChanges Diff(FolderSnapshot? oldSnapshot, FolderSnapshot newSnapshot, string folderPath)
     {
-        var diff = new FolderSnapshotDiff();
+        var diff = new FolderSnapshotChanges();
         
         if (oldSnapshot is null)
             return diff;
