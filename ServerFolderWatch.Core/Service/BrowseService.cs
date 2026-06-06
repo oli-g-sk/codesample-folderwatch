@@ -17,8 +17,9 @@ public class BrowseService(IConfiguration configuration, IFileSystem fileSystem)
 
     public bool CanGoToParent(string path)
     {
+        var fullPath = Path.Combine(configuration.RootPublicPath, path);
         // TODO TEST
-        return !path.Equals(configuration.RootPublicPath);
+        return !fullPath.Equals(configuration.RootPublicPath);
     }
 
     public FolderSnapshot ListContents(string folderPath)

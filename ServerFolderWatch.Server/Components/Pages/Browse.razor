@@ -14,6 +14,14 @@
 <button @onclick="Increment">Increment</button>
 
 <p>Files:</p>
+
+@if (BrowseService.CanGoToParent(Folder ?? string.Empty))
+{
+    <h1>
+        <a href="/browse/?folder=@GetParentPath()">Back!</a>
+    </h1>
+}
+
 <ul>
     @foreach (var child in children)
     {
@@ -39,6 +47,14 @@
         return (string.IsNullOrWhiteSpace(Folder)
             ? string.Empty
             : $"{Folder}/") + entry.Name;
+    }
+
+    string GetParentPath()
+    {
+        if (string.IsNullOrWhiteSpace(Folder) || !Folder.Contains('/'))
+            return string.Empty;
+        
+        return Folder?[..Folder.IndexOf('/')] ?? "/";
     }
 
     string Foo()
