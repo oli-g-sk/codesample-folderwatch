@@ -11,11 +11,6 @@ public class FileSystemDiffServiceTests
 {
     private const string FolderName = "foo";
     private const string SubFolderName = "subFolder";
-    
-    // TODO remove? (belong to persistence service)
-    private const string SidecarFileName = "bar.txt";
-    private static string SidecarFilePath => CombinePaths(FolderName, SidecarFileName);
-
     private static string SubFolderPath => CombinePaths(FolderName, SubFolderName);
     
     private readonly Mock<IPath> pathMock = new();

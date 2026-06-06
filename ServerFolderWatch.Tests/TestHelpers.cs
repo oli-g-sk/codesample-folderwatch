@@ -3,9 +3,9 @@ using Moq;
 
 namespace ServerFolderWatch.Tests;
 
-public class TestHelpers
+internal static class TestHelpers
 {
-    private static string Prefix = "filesystem://";
+    private static readonly string Prefix = "filesystem://";
     
     internal static string GetPath(string folder)
     {

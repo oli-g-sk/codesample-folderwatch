@@ -38,6 +38,8 @@ public class PersistenceServiceTests
         
         sut = new SidecarFilePersistenceService(fileSystemMock.Object, configurationMock.Object,
             loggerFactoryMock.Object);
+        
+        // TODO test that we're checking configuration file name
     }
     
     [Theory]
