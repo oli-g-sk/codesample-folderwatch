@@ -1,4 +1,5 @@
 @page "/browse"
+@using System.IO
 @using ServerFolderWatch.Core
 @using ServerFolderWatch.Core.Model
 @inject IConfiguration Configuration
@@ -25,12 +26,15 @@
     private List<BaseEntry> files;
 
     private void Increment() => clicks++;
+    
+    [SupplyParameterFromQuery]
+    public string? Folder { get; set; }
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
 
-        var basePath = Configuration.RootPublicPath;
+        var basePath = Path.Combine(Configuration.RootPublicPath, Folder ?? string.Empty);
         
         // TODO append query path
         var contents = BrowseService.ListContents(basePath);
