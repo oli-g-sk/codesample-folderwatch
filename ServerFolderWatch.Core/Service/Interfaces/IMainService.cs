@@ -2,7 +2,7 @@ using ServerFolderWatch.Core.Model;
 
 namespace ServerFolderWatch.Core.Service.Interfaces;
 
-public interface IFileSystemDiffService
+public interface IMainService
 {
     /// <summary>
     /// Analyze (or set up) this folder for file system changes tracking.

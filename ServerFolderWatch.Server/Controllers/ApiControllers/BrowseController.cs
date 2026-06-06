@@ -14,7 +14,7 @@ namespace ServerFolderWatch.Server.Controllers.ApiControllers;
 
 [ApiController]
 public class BrowseController(IBrowseService browseService,
-    IFileSystemDiffService diffService,
+    IMainService diffService,
     IConfiguration configuration,
     ILoggerFactory loggerFactory) : ControllerBase
 {
@@ -66,7 +66,7 @@ public class BrowseController(IBrowseService browseService,
             ));
     }
     
-    private static IEnumerable<FileSystemEntryDiffDto> MapDiffedEntries(IFileSystemDiffService diffService)
+    private static IEnumerable<FileSystemEntryDiffDto> MapDiffedEntries(IMainService diffService)
     {
         var joinedEntries = diffService.AllEntries.Order();
         

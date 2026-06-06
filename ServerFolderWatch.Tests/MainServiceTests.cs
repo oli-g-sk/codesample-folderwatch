@@ -7,7 +7,7 @@ using ServerFolderWatch.Core.Service.Interfaces;
 
 namespace ServerFolderWatch.Tests;
 
-public class FileSystemDiffServiceTests
+public class MainServiceTests
 {
     private readonly Mock<IPath> pathMock = new();
     private readonly Mock<IDirectory> directoryMock = new();
@@ -15,12 +15,12 @@ public class FileSystemDiffServiceTests
 
     private readonly Mock<IPersistenceService> persistenceServiceMock;
     
-    private readonly FileSystemDiffService sut;
+    private readonly MainService sut;
     
     private string FolderPath => TestHelpers.GetPath("foo");
     private string SubFolderPath => TestHelpers.GetPath("foo", "bar", pathMock);
 
-    public FileSystemDiffServiceTests()
+    public MainServiceTests()
     {
         var browseServiceMock = new Mock<IBrowseService>();
         browseServiceMock.Setup(x => x.ListContents(It.IsAny<string>()))
@@ -37,7 +37,7 @@ public class FileSystemDiffServiceTests
         fileSystemMock.SetupGet(x => x.Path).Returns(pathMock.Object);
         fileSystemMock.SetupGet(x => x.File).Returns(fileMock.Object);
 
-        sut = new FileSystemDiffService(fileSystemMock.Object, browseServiceMock.Object,
+        sut = new MainService(fileSystemMock.Object, browseServiceMock.Object,
             persistenceServiceMock.Object, loggerFactoryMock.Object);
     }
     

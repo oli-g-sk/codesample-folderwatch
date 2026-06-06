@@ -22,7 +22,7 @@ class Program
         var persistenceService = new SidecarFilePersistenceService(fileSystemWrapper, configuration, loggerFactory);
         var browseService = new BrowseService(configuration, fileSystemWrapper);
         
-        var fileSystemChangedService = new FileSystemDiffService(
+        var fileSystemChangedService = new MainService(
             new FileSystem(),
             browseService,
             persistenceService,

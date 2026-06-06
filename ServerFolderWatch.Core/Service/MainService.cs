@@ -6,13 +6,13 @@ using File = ServerFolderWatch.Core.Model.File;
 
 namespace ServerFolderWatch.Core.Service;
 
-public class FileSystemDiffService(IFileSystem fileSystem,
+public class MainService(IFileSystem fileSystem,
     IBrowseService browseService,
     IPersistenceService persistenceService,
     ILoggerFactory loggerFactory)
-    : IFileSystemDiffService
+    : IMainService
 {
-    private readonly ILogger<FileSystemDiffService> logger = loggerFactory.CreateLogger<FileSystemDiffService>();
+    private readonly ILogger<MainService> logger = loggerFactory.CreateLogger<MainService>();
     
     public FolderSnapshot? PreviousContents { get; private set; }
     
