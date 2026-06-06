@@ -25,6 +25,7 @@ public class FileSystemDiffServiceTests
     
     public FileSystemDiffServiceTests()
     {
+        var browseServiceMock = new Mock<IBrowseService>();
         persistenceServiceMock = new Mock<IPersistenceService>();
         
         var fileSystemMock = new Mock<IFileSystem>();
@@ -37,8 +38,8 @@ public class FileSystemDiffServiceTests
         pathMock.Setup(x => x.Combine(It.IsAny<string>(), It.IsAny<string>()))
             .Returns(SidecarFilePath);
         
-        sut = new FileSystemDiffService(fileSystemMock.Object,
-            persistenceServiceMock.Object, configurationMock.Object, new Mock<ILoggerFactory>().Object);
+        sut = new FileSystemDiffService(fileSystemMock.Object, browseServiceMock.Object,
+            persistenceServiceMock.Object, new Mock<ILoggerFactory>().Object);
     }
     
     [Theory]
