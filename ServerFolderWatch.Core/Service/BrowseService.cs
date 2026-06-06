@@ -1,4 +1,6 @@
 using System.IO.Abstractions;
+using ServerFolderWatch.Core.Model;
+using ServerFolderWatch.Core.Service.Interfaces;
 using Directory = ServerFolderWatch.Core.Model.Directory;
 using File = ServerFolderWatch.Core.Model.File;
 
@@ -20,9 +22,9 @@ public class BrowseService(IConfiguration configuration, IFileSystem fileSystem)
         return !path.Equals(configuration.RootPublicPath);
     }
 
-    public Model.FolderSnapshot ListContents(string folderPath)
+    public FolderSnapshot ListContents(string folderPath)
     {
-        return new Model.FolderSnapshot
+        return new FolderSnapshot
         {
             Subfolders = fileSystem.Directory.EnumerateDirectories(folderPath)
                 .Select(fileSystem.Path.GetFileName).OfType<string>()

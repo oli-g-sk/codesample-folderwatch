@@ -1,6 +1,4 @@
-using ServerFolderWatch.Core.Model;
-
-namespace ServerFolderWatch.Core.Service;
+namespace ServerFolderWatch.Core.Service.Interfaces;
 
 public interface IPersistenceService
 {

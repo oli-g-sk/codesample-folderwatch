@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using ServerFolderWatch.Core.Model;
 using ServerFolderWatch.Core.Service;
+using ServerFolderWatch.Core.Service.Interfaces;
 
 namespace ServerFolderWatch.Tests;
 

@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using ServerFolderWatch.Core.Service;
+using ServerFolderWatch.Core.Service.Interfaces;
 using ServerFolderWatch.Server;
 using IConfiguration = ServerFolderWatch.Core.IConfiguration;
 

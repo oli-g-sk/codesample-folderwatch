@@ -1,6 +1,7 @@
 using System.IO.Abstractions;
 using Microsoft.Extensions.Logging;
 using ServerFolderWatch.Core.Model;
+using ServerFolderWatch.Core.Service.Interfaces;
 using File = ServerFolderWatch.Core.Model.File;
 
 namespace ServerFolderWatch.Core.Service;
@@ -13,9 +14,9 @@ public class FileSystemDiffService(IFileSystem fileSystem,
 {
     private readonly ILogger<FileSystemDiffService> logger = loggerFactory.CreateLogger<FileSystemDiffService>();
     
-    public Model.FolderSnapshot? PreviousContents { get; private set; }
+    public FolderSnapshot? PreviousContents { get; private set; }
     
-    public Model.FolderSnapshot CurrentContents { get; private set; }
+    public FolderSnapshot CurrentContents { get; private set; }
     
     public IList<FileSystemEntry> CurrentEntries => CurrentContents.GetAllEntries().Order().ToList();
     
@@ -67,12 +68,12 @@ public class FileSystemDiffService(IFileSystem fileSystem,
         return initializeNeeded;
     }
 
-    private Model.FolderSnapshot GetContentsFromFolder(string folderPath)
+    private FolderSnapshot GetContentsFromFolder(string folderPath)
     {
         return browseService.ListContents(folderPath);
     }
 
-    private Model.FolderSnapshot GetContentsFromSidecarFile(string folderPath)
+    private FolderSnapshot GetContentsFromSidecarFile(string folderPath)
     {
         return persistenceService.LoadSnapshot(folderPath).Result;
     }

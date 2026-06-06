@@ -1,7 +1,7 @@
 using System.IO.Abstractions;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using ServerFolderWatch.Core.Model;
+using ServerFolderWatch.Core.Service.Interfaces;
 
 namespace ServerFolderWatch.Core.Service;
 

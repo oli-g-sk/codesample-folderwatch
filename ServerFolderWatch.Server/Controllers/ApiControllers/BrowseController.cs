@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using ServerFolderWatch.Core;
 using ServerFolderWatch.Core.Model;
 using ServerFolderWatch.Core.Service;
+using ServerFolderWatch.Core.Service.Interfaces;
 using ServerFolderWatch.Server.DTOs;
 using File = ServerFolderWatch.Core.Model.File;
 
