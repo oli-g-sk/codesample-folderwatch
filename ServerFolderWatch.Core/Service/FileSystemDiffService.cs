@@ -24,8 +24,6 @@ public class FileSystemDiffService(IFileSystem fileSystem,
         .Union(PreviousContents?.GetAllEntries() ?? Enumerable.Empty<FileSystemEntry>())
         .ToList();
     
-    public DateTime LastAnalyzed => CurrentContents.LastAnalyzed;
-    
     // TODO add tests
     public ICollection<FileSystemEntry> AddedEntries { get; } = new List<FileSystemEntry>();
     

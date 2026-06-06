@@ -16,8 +16,6 @@ public interface IFileSystemDiffService
     /// <false/> if it was already being monitored.
     /// </returns>
     Task<bool> Analyze(string monitoredPath);
-
-    DateTime LastAnalyzed { get; }
     
     /// <summary>
     /// Existing entries (subfolders or files) currently in the folder last set
