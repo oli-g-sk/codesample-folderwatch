@@ -22,9 +22,16 @@
     @foreach (var child in children)
     {
         <li>
-            <a href="/browse?folder=@GetChildPath(child)">
+            @if (child is Folder)
+            {
+                <a href="/browse?folder=@GetChildPath(child)">
+                    @child.Name
+                </a>
+            }
+            else
+            {
                 @child.Name
-            </a>
+            }
         </li>
     }
 </ul>
