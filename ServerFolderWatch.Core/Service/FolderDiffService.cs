@@ -27,8 +27,8 @@ public class FolderDiffService(IFileSystem fileSystem, ILoggerFactory loggerFact
             return diff;
         }
 
-        var currentEntries = oldSnapshot.GetAllEntries();
-        var previousEntries = newSnapshot.GetAllEntries();
+        var currentEntries = newSnapshot.GetAllEntries();
+        var previousEntries = oldSnapshot.GetAllEntries();
         var combined = currentEntries.Union(previousEntries);
         
         foreach (var entry in combined)
