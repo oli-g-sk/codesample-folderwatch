@@ -17,10 +17,8 @@ public class SidecarFileFolderSnapshotService : IFolderSnapshotService
     {
         if (string.IsNullOrWhiteSpace(configuration.SidecarFileName))
             throw new ArgumentException("Invalid configuration: Sidecar file name is not set");
-        if (fileSystem.Path.IsPathRooted(configuration.SidecarFileName))
-            throw new ArgumentException("Invalid configuration: Sidecar file name cannot be an absolute path");
-        if (configuration.SidecarFileName.Contains(fileSystem.Path.DirectorySeparatorChar))
-            throw new ArgumentException("Invalid configuration: Sidecar file name cannot contain directory separator");       
+        if (fileSystem.Path.GetInvalidFileNameChars().Any(configuration.SidecarFileName.Contains))
+            throw new ArgumentException("Invalid configuration: Sidecar file name cannot contain volume separator");
         
         this.fileSystem = fileSystem;
         this.configuration = configuration;

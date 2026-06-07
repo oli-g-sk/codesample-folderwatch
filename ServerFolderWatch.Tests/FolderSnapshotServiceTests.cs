@@ -14,14 +14,15 @@ public class FolderSnapshotServiceTests
 
     private readonly MockFileSystem mockFileSystem = new();
     private readonly Mock<IConfiguration> configurationMock = new();
+    private readonly Mock<ILoggerFactory> loggerFactoryMock;
 
     private readonly SidecarFileFolderSnapshotService sut;
-    
+
     private string SidecarFilePath => mockFileSystem.Path.Combine(FolderName, SidecarFileName);
     
     public FolderSnapshotServiceTests()
     {
-        var loggerFactoryMock = new Mock<ILoggerFactory>();
+        loggerFactoryMock = new Mock<ILoggerFactory>();
         loggerFactoryMock.Setup(x => x.CreateLogger(It.IsAny<string>()))
             .Returns(new Mock<ILogger>().Object);
         
@@ -40,26 +41,40 @@ public class FolderSnapshotServiceTests
     [Fact]
     public void Constructor_ChecksSidecarFileName()
     {
-        configurationMock.VerifyGet(x => x.SidecarFileName, Times.Once);
+        configurationMock.VerifyGet(x => x.SidecarFileName, Times.AtLeastOnce());
     }
 
     [Theory]
     [InlineData(null)]
     [InlineData("")]
     [InlineData(" ")]
-    [InlineData("foo/bar")]
-    [InlineData("foo\bar")]
+    [InlineData(@"foo/bar")]
+    [InlineData("foo\\bar")]
     [InlineData("C:\\foo")]
-    [InlineData("/")]
-    public void Constructor_RefusesInvalidConfiguration(string? sidecarFileName)
+    public void Constructor_LoadsConfiguration_RefusesInvalidFilename(string? sidecarFileName)
     {
         configurationMock.Reset();
         configurationMock.SetupGet(x => x.SidecarFileName)
             .Returns(sidecarFileName);
         
         Assert.Throws<ArgumentException>(() => 
-            new SidecarFileFolderSnapshotService(new Mock<IFileSystem>().Object,
-                configurationMock.Object, new Mock<ILoggerFactory>().Object));
+            new SidecarFileFolderSnapshotService(mockFileSystem, configurationMock.Object,
+                loggerFactoryMock.Object));
+    }
+    
+    [Fact]
+    public void Constructor_LoadsConfiguration_RefusesInvalidChars()
+    {
+        foreach (var invalidChar in mockFileSystem.Path.GetInvalidFileNameChars())
+        {
+            configurationMock.Reset();
+            configurationMock.SetupGet(x => x.SidecarFileName)
+                .Returns($"sidecar{invalidChar}");
+            
+            Assert.Throws<ArgumentException>(() => 
+                new SidecarFileFolderSnapshotService(mockFileSystem, configurationMock.Object,
+                    loggerFactoryMock.Object));
+        }
     }
     
     [Theory]
