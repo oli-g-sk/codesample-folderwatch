@@ -2,6 +2,7 @@ using System.IO.Abstractions;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using ServerFolderWatch.Core.Model;
+using ServerFolderWatch.Core.Service.Interfaces;
 
 namespace ServerFolderWatch.Core.Service;
 
@@ -12,8 +13,8 @@ public class JsonFolderSnapshotService : BaseFolderSnapshotService
     private readonly IConfiguration configuration;
     private readonly ILogger<JsonFolderSnapshotService> logger;
 
-    public JsonFolderSnapshotService(IFileSystem fileSystem, IConfiguration configuration, ILoggerFactory loggerFactory)
-        : base(fileSystem, loggerFactory)
+    public JsonFolderSnapshotService(IBrowseService browseService, IFileSystem fileSystem, IConfiguration configuration, ILoggerFactory loggerFactory)
+        : base(browseService, fileSystem, loggerFactory)
     {
         if (string.IsNullOrWhiteSpace(configuration.SidecarFileName))
             throw new ArgumentException("Invalid configuration: Sidecar file name is not set");

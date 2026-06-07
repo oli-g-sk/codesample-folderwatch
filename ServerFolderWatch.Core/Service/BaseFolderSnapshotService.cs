@@ -5,7 +5,7 @@ using ServerFolderWatch.Core.Service.Interfaces;
 
 namespace ServerFolderWatch.Core.Service;
 
-public abstract class BaseFolderSnapshotService(IFileSystem fileSystem, ILoggerFactory loggerFactory)
+public abstract class BaseFolderSnapshotService(IBrowseService browseService, IFileSystem fileSystem, ILoggerFactory loggerFactory)
     : IFolderSnapshotService
 {
     private readonly ILogger<BaseFolderSnapshotService> logger
@@ -19,7 +19,10 @@ public abstract class BaseFolderSnapshotService(IFileSystem fileSystem, ILoggerF
         {
             InitializeFolderInternal(folderPath);
             wasInitialzed = true;
-            SaveSnapshot(folderPath, FolderSnapshot.Empty).Wait();
+            
+            var initialSnapshot = browseService.ListContents(folderPath);
+            initialSnapshot.LastAnalyzed = DateTime.Now;
+            SaveSnapshot(folderPath, initialSnapshot).Wait();
         }
 
         if (recursive)
