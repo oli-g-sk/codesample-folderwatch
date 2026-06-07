@@ -6,7 +6,7 @@ using Testably.Abstractions.Testing;
 
 namespace ServerFolderWatch.Tests;
 
-public class FolderSnapshotServiceTests
+public class JsonFolderSnapshotServiceTests
 {
     private const string FolderName = "test";
     private const string SidecarFileName = "metadata.txt";
@@ -19,7 +19,7 @@ public class FolderSnapshotServiceTests
 
     private string SidecarFilePath => mockFileSystem.Path.Combine(FolderName, SidecarFileName);
     
-    public FolderSnapshotServiceTests()
+    public JsonFolderSnapshotServiceTests()
     {
         loggerFactoryMock = new Mock<ILoggerFactory>();
         loggerFactoryMock.Setup(x => x.CreateLogger(It.IsAny<string>()))
@@ -28,7 +28,7 @@ public class FolderSnapshotServiceTests
         configurationMock.SetupGet(x => x.SidecarFileName)
             .Returns(SidecarFileName);
         
-        sut = new JsonFileSnapshotService(mockFileSystem, configurationMock.Object,
+        sut = new JsonFolderSnapshotService(mockFileSystem, configurationMock.Object,
             loggerFactoryMock.Object);
         
         // TODO test that we're checking configuration file name
@@ -57,7 +57,7 @@ public class FolderSnapshotServiceTests
             .Returns(sidecarFileName);
         
         Assert.Throws<ArgumentException>(() => 
-            new JsonFileSnapshotService(mockFileSystem, configurationMock.Object,
+            new JsonFolderSnapshotService(mockFileSystem, configurationMock.Object,
                 loggerFactoryMock.Object));
     }
     
@@ -71,7 +71,7 @@ public class FolderSnapshotServiceTests
                 .Returns($"sidecar{invalidChar}");
             
             Assert.Throws<ArgumentException>(() => 
-                new JsonFileSnapshotService(mockFileSystem, configurationMock.Object,
+                new JsonFolderSnapshotService(mockFileSystem, configurationMock.Object,
                     loggerFactoryMock.Object));
         }
     }
@@ -89,35 +89,49 @@ public class FolderSnapshotServiceTests
     }
 
     [Fact]
-    public void InitializeFolder_CreatesSidecarFile()
+    public void InitializeFolder_NotInitializedBefore_CreatesSidecarFile()
     {
-        sut.InitializeFolder(FolderName, false);
+        bool result = sut.InitializeFolder(FolderName, false);
+        
+        Assert.True(result);
         Assert.True(mockFileSystem.File.Exists(SidecarFilePath));
+    }
+    
+    [Fact]
+    public void InitializeFolder_WasInitializedBefore_DoesNothing()
+    {
+        // Prepare a sidecar file with dummy content
+        string tempFileContents = DateTime.Now.Ticks.ToString();
+        mockFileSystem.File.WriteAllText(SidecarFilePath, tempFileContents);
+        mockFileSystem.File.Create(SidecarFilePath);
+        
+        bool result = sut.InitializeFolder(FolderName, false);
+        
+        // Verify sidecar file was not overwritten
+        Assert.False(result);
+        string content = mockFileSystem.File.ReadAllText(SidecarFilePath);
+        Assert.Equal(tempFileContents, content);
     }
 
     [Theory]
     [InlineData(true)]
-    [InlineData(false)]
-    public void InitializeFolder_SidecarFileAlreadyExists_ThrowsException(bool runRecursively)
+    [InlineData(false)]   
+    public void InitializeFolder_RunsRecursively(bool currentFolderWasInitializedBefore)
     {
-        mockFileSystem.File.Create(SidecarFilePath);
-        Assert.Throws<InvalidOperationException>(() => sut.InitializeFolder(FolderName, runRecursively));
-    }
+        if (currentFolderWasInitializedBefore)
+            mockFileSystem.File.Create(SidecarFilePath);
+        
+        const string subfolder1 = "subfolder1";
+        const string subfolder2 = "subfolder2";
 
-    [Fact]
-    public void InitializeFolder_NotInitializedBefore_RunsRecursively()
-    {
-        mockFileSystem.File.Create(SidecarFilePath);
-    }
-    
-    [Fact]
-    public void InitializeFolder_WasnitializedBefore_DoesNotRunRecursively()
-    {
-        mockFileSystem.File.Create(SidecarFilePath);
-    }
+        mockFileSystem.File.Create(mockFileSystem.Path.Combine(FolderName, subfolder1));
+        mockFileSystem.File.Create(mockFileSystem.Path.Combine(FolderName, subfolder2));
+        
+        sut.InitializeFolder(FolderName, true);
 
-    [Fact]
-    public void InitializeFolder_WasInitializedBefore_RunsOnNewSubfolder()
-    {
+        string subfolderSidecarFile1 = mockFileSystem.Path.Combine(FolderName, subfolder1, SidecarFileName);
+        Assert.True(mockFileSystem.File.Exists(subfolderSidecarFile1));
+        string subfolderSidecarFile2 = mockFileSystem.Path.Combine(FolderName, subfolder1, SidecarFileName);
+        Assert.True(mockFileSystem.File.Exists(subfolderSidecarFile2));
     }
 }

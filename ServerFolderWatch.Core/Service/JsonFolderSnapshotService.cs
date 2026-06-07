@@ -6,13 +6,13 @@ using ServerFolderWatch.Core.Model;
 namespace ServerFolderWatch.Core.Service;
 
 // TODO composition over inheritance?
-public class JsonFileSnapshotService : BaseFolderSnapshotService
+public class JsonFolderSnapshotService : BaseFolderSnapshotService
 {
     private readonly IFileSystem fileSystem;
     private readonly IConfiguration configuration;
-    private readonly ILogger<JsonFileSnapshotService> logger;
+    private readonly ILogger<JsonFolderSnapshotService> logger;
 
-    public JsonFileSnapshotService(IFileSystem fileSystem, IConfiguration configuration, ILoggerFactory loggerFactory)
+    public JsonFolderSnapshotService(IFileSystem fileSystem, IConfiguration configuration, ILoggerFactory loggerFactory)
         : base(fileSystem, loggerFactory)
     {
         if (string.IsNullOrWhiteSpace(configuration.SidecarFileName))
@@ -22,7 +22,7 @@ public class JsonFileSnapshotService : BaseFolderSnapshotService
         
         this.fileSystem = fileSystem;
         this.configuration = configuration;
-        logger = loggerFactory.CreateLogger<JsonFileSnapshotService>();
+        logger = loggerFactory.CreateLogger<JsonFolderSnapshotService>();
     }
     
     public override bool IsFolderAlreadyMonitored(string folderPath)
