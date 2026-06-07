@@ -4,7 +4,7 @@
 @using ServerFolderWatch.Core.Model
 @inject IConfiguration Configuration
 @inject IBrowseService BrowseService
-@inject IPersistenceService PersistenceService
+@inject IFolderSnapshotService FolderSnapshotService
 @inject IFolderDiffService FolderDiffService
 @inject NavigationManager NavigationManager
 
@@ -92,8 +92,8 @@
         var folderPath = Path.Combine(Configuration.RootPublicPath, Folder ?? string.Empty);
         var contents = BrowseService.ListContents(folderPath);
 
-        var oldSnapshot = PersistenceService.LoadSnapshot(folderPath);
-        var diff = FolderDiffService.Analyze(oldSnapshot, contents, folderPath, out _);
+        var oldSnapshot = FolderSnapshotService.LoadSnapshot(folderPath);
+        var diff = FolderDiffService.Compare(oldSnapshot, contents, folderPath, out _);
         
         currentContents = contents.GetAllEntries().ToList();
         diffEntries = diff.Entries;

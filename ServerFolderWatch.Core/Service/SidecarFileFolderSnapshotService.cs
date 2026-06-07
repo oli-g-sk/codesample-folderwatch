@@ -6,11 +6,11 @@ using ServerFolderWatch.Core.Service.Interfaces;
 
 namespace ServerFolderWatch.Core.Service;
 
-public class SidecarFilePersistenceService(IFileSystem fileSystem, IConfiguration configuration, ILoggerFactory loggerFactory)
-    : IPersistenceService
+public class SidecarFileFolderSnapshotService(IFileSystem fileSystem, IConfiguration configuration, ILoggerFactory loggerFactory)
+    : IFolderSnapshotService
 {
-    private readonly ILogger<SidecarFilePersistenceService> logger
-        = loggerFactory.CreateLogger<SidecarFilePersistenceService>();
+    private readonly ILogger<SidecarFileFolderSnapshotService> logger
+        = loggerFactory.CreateLogger<SidecarFileFolderSnapshotService>();
     
     private string GetSidecarFilePath(string currentPath) => fileSystem.Path.Combine(currentPath, configuration.SidecarFileName);
     

@@ -14,7 +14,7 @@ builder.Services.AddSingleton<IConfiguration, Configuration>();
 // TODO use scoped lifecycles?
 builder.Services.AddSingleton<IBrowseService, BrowseService>();
 builder.Services.AddSingleton<IFolderDiffService, FolderDiffService>();
-builder.Services.AddSingleton<IPersistenceService, SidecarFilePersistenceService>();
+builder.Services.AddSingleton<IFolderSnapshotService, SidecarFileFolderSnapshotService>();
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 

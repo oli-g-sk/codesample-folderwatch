@@ -2,7 +2,7 @@ using ServerFolderWatch.Core.Model;
 
 namespace ServerFolderWatch.Core.Service.Interfaces;
 
-public interface IPersistenceService
+public interface IFolderSnapshotService
 {
     void InitializeFolder(string folderPath, bool recursive);
     

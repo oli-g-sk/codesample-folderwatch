@@ -16,7 +16,7 @@ public class PersistenceServiceTests
     private readonly Mock<IFile> fileMock = new();
     private readonly Mock<IConfiguration> configurationMock = new();
     
-    private readonly SidecarFilePersistenceService sut;
+    private readonly SidecarFileFolderSnapshotService sut;
 
     public PersistenceServiceTests()
     {
@@ -33,7 +33,7 @@ public class PersistenceServiceTests
         configurationMock.SetupGet(x => x.SidecarFileName)
             .Returns(SidecarFileName);
         
-        sut = new SidecarFilePersistenceService(fileSystemMock.Object, configurationMock.Object,
+        sut = new SidecarFileFolderSnapshotService(fileSystemMock.Object, configurationMock.Object,
             loggerFactoryMock.Object);
         
         // TODO test that we're checking configuration file name

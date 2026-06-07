@@ -10,7 +10,7 @@ public class FolderDiffService(IFileSystem fileSystem, ILoggerFactory loggerFact
 {
     private readonly ILogger<FolderDiffService> logger = loggerFactory.CreateLogger<FolderDiffService>();
     
-    public FolderSnapshotDiff Analyze(FolderSnapshot? oldSnapshot, FolderSnapshot newSnapshot, string folderPath,
+    public FolderSnapshotDiff Compare(FolderSnapshot? oldSnapshot, FolderSnapshot newSnapshot, string folderPath,
         out FolderSnapshotChanges changes)
     {
         changes = new FolderSnapshotChanges();
