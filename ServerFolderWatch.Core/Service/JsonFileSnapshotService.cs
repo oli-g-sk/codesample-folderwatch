@@ -5,7 +5,8 @@ using ServerFolderWatch.Core.Model;
 
 namespace ServerFolderWatch.Core.Service;
 
-public class JsonFileSnapshotService : SidecarFileFolderSnapshotService
+// TODO composition over inheritance?
+public class JsonFileSnapshotService : BaseFolderSnapshotService
 {
     private readonly IFileSystem fileSystem;
     private readonly IConfiguration configuration;

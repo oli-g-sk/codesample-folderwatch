@@ -1,4 +1,3 @@
-using System.IO.Abstractions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using ServerFolderWatch.Core;
@@ -16,7 +15,7 @@ public class FolderSnapshotServiceTests
     private readonly Mock<IConfiguration> configurationMock = new();
     private readonly Mock<ILoggerFactory> loggerFactoryMock;
 
-    private readonly SidecarFileFolderSnapshotService sut;
+    private readonly BaseFolderSnapshotService sut;
 
     private string SidecarFilePath => mockFileSystem.Path.Combine(FolderName, SidecarFileName);
     
@@ -29,7 +28,7 @@ public class FolderSnapshotServiceTests
         configurationMock.SetupGet(x => x.SidecarFileName)
             .Returns(SidecarFileName);
         
-        sut = new SidecarFileFolderSnapshotService(mockFileSystem, configurationMock.Object,
+        sut = new JsonFileSnapshotService(mockFileSystem, configurationMock.Object,
             loggerFactoryMock.Object);
         
         // TODO test that we're checking configuration file name
@@ -58,7 +57,7 @@ public class FolderSnapshotServiceTests
             .Returns(sidecarFileName);
         
         Assert.Throws<ArgumentException>(() => 
-            new SidecarFileFolderSnapshotService(mockFileSystem, configurationMock.Object,
+            new JsonFileSnapshotService(mockFileSystem, configurationMock.Object,
                 loggerFactoryMock.Object));
     }
     
@@ -72,7 +71,7 @@ public class FolderSnapshotServiceTests
                 .Returns($"sidecar{invalidChar}");
             
             Assert.Throws<ArgumentException>(() => 
-                new SidecarFileFolderSnapshotService(mockFileSystem, configurationMock.Object,
+                new JsonFileSnapshotService(mockFileSystem, configurationMock.Object,
                     loggerFactoryMock.Object));
         }
     }
