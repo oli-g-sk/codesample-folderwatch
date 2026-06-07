@@ -23,13 +23,18 @@ public abstract class BaseEntry(string name) : IComparable<BaseEntry>
 
     public int CompareTo(BaseEntry? other)
     {
-        if (ReferenceEquals(this, other)) return 0;
+        if (ReferenceEquals(this, other))
+            return 0;
 
-        return other switch
-        {
-            File => -1,
-            null or Folder => 1,
-            _ => string.Compare(Name, other.Name, StringComparison.Ordinal)
-        };
+        if (other is null)
+            return 1;
+
+        if (this is Folder && other is File)
+            return -1;
+
+        if (this is File && other is Folder)
+            return 1;
+
+        return string.Compare(Name, other.Name, StringComparison.Ordinal);
     }
 }
