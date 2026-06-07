@@ -1,6 +1,7 @@
 ﻿using System.IO.Abstractions;
 using Microsoft.Extensions.Logging;
 using ServerFolderWatch.Core.Service;
+using Testably.Abstractions;
 
 namespace ServerFolderWatch.CLI;
 
@@ -16,18 +17,11 @@ class Program
 #endif
         });
         
-        var fileSystemWrapper = new FileSystem();
+        var fileSystemWrapper = new RealFileSystem();
         var configuration = new Configuration();
         
-        var persistenceService = new BaseFolderSnapshotService(fileSystemWrapper, configuration, loggerFactory);
+        var snapshotService = new JsonFolderSnapshotService(fileSystemWrapper, configuration, loggerFactory);
         var browseService = new BrowseService(configuration, fileSystemWrapper);
-        
-        var fileSystemChangedService = new MainService(
-            new FileSystem(),
-            browseService,
-            persistenceService,
-            loggerFactory
-        );
         
         Console.WriteLine("Enter path (defaults to C:\\Temp):");
         
@@ -41,7 +35,7 @@ class Program
         }
 
         // TODO await
-        var wasAlreadySetup = fileSystemChangedService.Analyze(path).Result;
+        var wasAlreadySetup = snapshotService.IsFolderAlreadyMonitored(path);
         
         if (!wasAlreadySetup)
         {
