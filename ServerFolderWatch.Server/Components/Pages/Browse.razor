@@ -4,6 +4,8 @@
 @using ServerFolderWatch.Core.Model
 @inject IConfiguration Configuration
 @inject IBrowseService BrowseService
+@inject IPersistenceService PersistenceService
+@inject IFolderDiffService FolderDiffService
 @inject NavigationManager NavigationManager
 
 <!--
@@ -22,18 +24,18 @@
                 </a>
             </li>
         }
-        @foreach (var child in children)
+        @foreach (var child in diffEntries)
         {
-            <li>
-                @if (child is Folder)
+            <li class="@GetClassName(child.Item1, diffEntries.IndexOf(child))">
+                @if (child.Item1 is Folder)
                 {
-                    <a href="/browse?folder=@GetChildPath(child)">
-                        <span><em class="icon">🗀</em> @child.Name</span>
+                    <a href="/browse?folder=@GetChildPath(child.Item1)">
+                        <span><em class="icon">🗀</em> @child.Item1.Name</span>
                     </a>
                 }
                 else
                 {
-                    <span><em class="icon">🗎</em> @child.Name</span>
+                    <span><em class="icon">🗎</em> @child.Item1.Name</span>
                 }
             </li>
         }
@@ -41,7 +43,8 @@
 </div>
 
 @code {
-    private List<BaseEntry> children;
+    private List<BaseEntry> currentContents;
+    private IList<(BaseEntry, DiffOperation)> diffEntries;
     
     [SupplyParameterFromQuery]
     public string? Folder { get; set; }
@@ -74,9 +77,14 @@
         if (Folder == string.Empty)
             NavigationManager.NavigateTo("/browse", replace: true);
 
-        var basePath = Path.Combine(Configuration.RootPublicPath, Folder ?? string.Empty);
-        var contents = BrowseService.ListContents(basePath);
-        children = contents.GetAllEntries().ToList();
+        var folderPath = Path.Combine(Configuration.RootPublicPath, Folder ?? string.Empty);
+        var contents = BrowseService.ListContents(folderPath);
+
+        var oldSnapshot = PersistenceService.LoadSnapshot(folderPath);
+        var diff = FolderDiffService.Analyze(oldSnapshot, contents, folderPath, out _);
+        
+        currentContents = contents.GetAllEntries().ToList();
+        diffEntries = diff.Entries;
     }
 
 }

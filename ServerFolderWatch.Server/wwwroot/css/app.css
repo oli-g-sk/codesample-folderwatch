@@ -1,5 +1,5 @@
 body {
-    background-color: #181818;
+    background-color: #121212;
     color: #CCC;
     font-family: monospace, 'Roboto', sans-serif;
 }
@@ -9,9 +9,9 @@ body {
     margin: 0;
     
     a, a:visited {
+        color: #EEE;
         text-decoration: none;
         font-weight: bold;
-        color: #EEE;
     }
     
     li {
@@ -23,7 +23,7 @@ body {
         }
     }
     li:hover {
-        background-color: #333;
+        background-color: RGBA(255,255,255,0.1);
     }
     
     em.icon {
@@ -31,5 +31,19 @@ body {
         font-style: normal;
         display: inline-block;
         width: 2em;
+    }
+    
+    /* TODO fixup CSS so we don't need the explicit 'a' targeting */
+    li.diff-added,
+    li.diff-added a {
+        color: #3bd83b !important;
+    }
+    li.diff-removed,
+    li.diff-removed a {
+        color: #ec173e !important;
+    }
+    li.diff-modified,
+    li.diff-modified a {
+        color: #dfcc00 !important;
     }
 }
