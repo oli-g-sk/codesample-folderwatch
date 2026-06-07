@@ -49,6 +49,18 @@
     [SupplyParameterFromQuery]
     public string? Folder { get; set; }
 
+    // TODO fix for proper use (remove indexInList mostly)
+    string GetClassName(BaseEntry entry, int indexInList)
+    {
+        return indexInList switch
+        {
+            1 => "diff-added",
+            3 => "diff-removed",
+            5 => "diff-modified",
+            _ => ""
+        };
+    }
+
     string GetChildPath(BaseEntry entry)
     {
         return (string.IsNullOrWhiteSpace(Folder)
