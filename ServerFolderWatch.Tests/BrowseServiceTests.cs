@@ -19,9 +19,7 @@ public class BrowseServiceTests
         sut = new BrowseService(configurationMock.Object, fileSystemMock.Object);
     }
     
-    [Fact]
     public void FromFolder_ExcludesSidecarFile()
     {
-        // TODO
     }
 }

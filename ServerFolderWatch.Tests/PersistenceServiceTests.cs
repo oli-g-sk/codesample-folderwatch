@@ -9,8 +9,8 @@ namespace ServerFolderWatch.Tests;
 public class PersistenceServiceTests
 {
     private const string FolderName = "foo";
-    private const string SidecarFileName = "bar.txt";
-    private string SidecarFilePath => TestHelpers.GetPath(FolderName, SidecarFileName, pathMock);
+    private const string SubFolderName = "bar";
+    private const string SidecarFileName = "metadata.txt";
     
     private readonly Mock<IPath> pathMock = new();
     private readonly Mock<IFile> fileMock = new();
@@ -23,9 +23,6 @@ public class PersistenceServiceTests
         var loggerFactoryMock = new Mock<ILoggerFactory>();
         loggerFactoryMock.Setup(x => x.CreateLogger(It.IsAny<string>()))
             .Returns(new Mock<ILogger>().Object);
-        
-        pathMock.Setup(x => x.Combine(FolderName, SidecarFileName))
-            .Returns(SidecarFilePath);
 
         var fileSystemMock = new Mock<IFileSystem>();
         fileSystemMock.SetupGet(x => x.Path).Returns(pathMock.Object);
@@ -47,7 +44,10 @@ public class PersistenceServiceTests
     [InlineData(false)]
     public void IsFolderAlreadyMonitored_ReturnsCorrectValue(bool sidecarFileExists)
     {
-        fileMock.Setup(x => x.Exists(SidecarFilePath)).Returns(sidecarFileExists);
+        string sidecarFilePath = TestHelpers.GetPath(FolderName, SidecarFileName, pathMock);
+        
+        fileMock.Setup(x => x.Exists(sidecarFilePath))
+            .Returns(sidecarFileExists);
         
         bool result = sut.IsFolderAlreadyMonitored(FolderName);
 
@@ -57,18 +57,34 @@ public class PersistenceServiceTests
     [Fact]
     public void InitializeFolder_CreatesSidecarFile()
     {
-        fileMock.Setup(x => x.Exists(SidecarFilePath)).Returns(false);
+        string sidecarFilePath = TestHelpers.GetPath(FolderName, SidecarFileName, pathMock);
         
-        sut.InitializeFolder(FolderName);
+        fileMock.Setup(x => x.Exists(sidecarFilePath)).Returns(false);
         
-        fileMock.Verify(x => x.Create(SidecarFilePath), Times.Once);
+        sut.InitializeFolder(FolderName, false);
+        
+        fileMock.Verify(x => x.Create(sidecarFilePath), Times.Once);
     }
-
-    [Fact]
-    public void InitializeFolder_SidecarFileAlreadyExists_ThrowsException()
+    
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void InitializeFolder_SidecarFileAlreadyExists_ThrowsException(bool runRecursively)
     {
-        fileMock.Setup(x => x.Exists(SidecarFilePath)).Returns(true);
+        string sidecarFilePath = TestHelpers.GetPath(FolderName, SidecarFileName, pathMock);
         
-        Assert.Throws<InvalidOperationException>(() => sut.InitializeFolder(FolderName));
+        fileMock.Setup(x => x.Exists(sidecarFilePath)).Returns(true);
+        
+        Assert.Throws<InvalidOperationException>(() => sut.InitializeFolder(FolderName, runRecursively));
+    }
+    
+    [Fact]
+    public void InitializeFolder_RunsRecursively_IfSidecarExistsInCurrentFolder()
+    {
+    }
+    
+    [Fact]
+    public void InitializeFolder_RunsRecursively_IfSidecarDoesNotExistInCurrentFolder()
+    {
     }
 }

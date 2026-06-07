@@ -15,7 +15,7 @@ public class MainServiceTests
 
     private readonly Mock<IPersistenceService> persistenceServiceMock;
     
-    private readonly MainService sut;
+    private readonly FolderDiffService sut;
     
     private string FolderPath => TestHelpers.GetPath("foo");
     private string SubFolderPath => TestHelpers.GetPath("foo", "bar", pathMock);
@@ -37,8 +37,7 @@ public class MainServiceTests
         fileSystemMock.SetupGet(x => x.Path).Returns(pathMock.Object);
         fileSystemMock.SetupGet(x => x.File).Returns(fileMock.Object);
 
-        sut = new MainService(fileSystemMock.Object, browseServiceMock.Object,
-            persistenceServiceMock.Object, loggerFactoryMock.Object);
+        sut = new FolderDiffService(fileSystemMock.Object, loggerFactoryMock.Object);
     }
     
     [Theory]

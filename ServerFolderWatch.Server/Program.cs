@@ -11,6 +11,7 @@ using IConfiguration = ServerFolderWatch.Core.IConfiguration;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton<IFileSystem, FileSystem>();
 builder.Services.AddSingleton<IConfiguration, Configuration>();
+// TODO use scoped lifecycles?
 builder.Services.AddSingleton<IBrowseService, BrowseService>();
 builder.Services.AddSingleton<IFolderDiffService, FolderDiffService>();
 builder.Services.AddSingleton<IPersistenceService, SidecarFilePersistenceService>();
