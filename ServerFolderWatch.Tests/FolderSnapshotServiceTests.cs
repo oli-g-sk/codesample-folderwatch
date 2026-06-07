@@ -17,12 +17,18 @@ public class FolderSnapshotServiceTests
     
     private readonly SidecarFileFolderSnapshotService sut;
     
-    private string FolderPath => TestHelpers.GetPath("foo");
-    private string SubFolderPath => TestHelpers.GetPath("foo", "bar", pathMock);
-    private string SidecarFilePath => TestHelpers.GetPath("foo", "bar", SidecarFileName, pathMock);
+    private string FolderPath { get; }
+    private string SubFolderPath { get; }
+    private string SidecarFilePath { get; }
+    private string SubSidecarFilePath { get; }
     
     public FolderSnapshotServiceTests()
     {
+        FolderPath = TestHelpers.GetPath("foo");
+        SidecarFilePath = TestHelpers.GetPath("foo", SidecarFileName, pathMock);
+        SubFolderPath = TestHelpers.GetPath("foo", "bar", pathMock);
+        SubSidecarFilePath = TestHelpers.GetPath("foo", "bar", SidecarFileName, pathMock);
+        
         var loggerFactoryMock = new Mock<ILoggerFactory>();
         loggerFactoryMock.Setup(x => x.CreateLogger(It.IsAny<string>()))
             .Returns(new Mock<ILogger>().Object);
@@ -57,13 +63,24 @@ public class FolderSnapshotServiceTests
             new SidecarFileFolderSnapshotService(new Mock<IFileSystem>().Object,
                 configurationMock.Object, new Mock<ILoggerFactory>().Object));
     }
+
+    [Fact]
+    public void IsFolderAlreadyMonitored_BuildsCorrectSidecarFilePath()
+    {
+        _ = sut.IsFolderAlreadyMonitored(FolderPath);
+        
+        pathMock.Verify(x => x.Combine(FolderPath, SidecarFileName), Times.Once);
+    }
     
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
     public void IsFolderAlreadyMonitored_ReturnsCorrectValue(bool sidecarFileExists)
     {
-        fileMock.Setup(x => x.Exists(SidecarFileName))
+        const string mockedSidecarFilePath = "mocked_sidecar_file_path";
+            
+            .Returns(mockedSidecarFilePath);
+        fileMock.Setup(x => x.Exists(mockedSidecarFile))
             .Returns(sidecarFileExists);
         
         bool result = sut.IsFolderAlreadyMonitored(FolderPath);
