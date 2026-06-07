@@ -43,11 +43,19 @@ public class FolderSnapshotServiceTests
         configurationMock.VerifyGet(x => x.SidecarFileName, Times.Once);
     }
 
-    [Fact]
-    public void Constructor_RefusesFullSidecarFilePath()
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData(" ")]
+    [InlineData("foo/bar")]
+    [InlineData("foo\bar")]
+    [InlineData("C:\\foo")]
+    [InlineData("/")]
+    public void Constructor_RefusesInvalidConfiguration(string? sidecarFileName)
     {
+        configurationMock.Reset();
         configurationMock.SetupGet(x => x.SidecarFileName)
-            .Returns("C:\\invalid_rooted_path.json");
+            .Returns(sidecarFileName);
         
         Assert.Throws<ArgumentException>(() => 
             new SidecarFileFolderSnapshotService(new Mock<IFileSystem>().Object,

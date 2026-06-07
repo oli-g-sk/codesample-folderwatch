@@ -6,12 +6,27 @@ using ServerFolderWatch.Core.Service.Interfaces;
 
 namespace ServerFolderWatch.Core.Service;
 
-public class SidecarFileFolderSnapshotService(IFileSystem fileSystem, IConfiguration configuration, ILoggerFactory loggerFactory)
-    : IFolderSnapshotService
+public class SidecarFileFolderSnapshotService : IFolderSnapshotService
 {
-    private readonly ILogger<SidecarFileFolderSnapshotService> logger
-        = loggerFactory.CreateLogger<SidecarFileFolderSnapshotService>();
-    
+    private readonly ILogger<SidecarFileFolderSnapshotService> logger;
+
+    private readonly IFileSystem fileSystem;
+    private readonly IConfiguration configuration;
+
+    public SidecarFileFolderSnapshotService(IFileSystem fileSystem, IConfiguration configuration, ILoggerFactory loggerFactory)
+    {
+        if (string.IsNullOrWhiteSpace(configuration.SidecarFileName))
+            throw new ArgumentException("Invalid configuration: Sidecar file name is not set");
+        if (fileSystem.Path.IsPathRooted(configuration.SidecarFileName))
+            throw new ArgumentException("Invalid configuration: Sidecar file name cannot be an absolute path");
+        if (configuration.SidecarFileName.Contains(fileSystem.Path.DirectorySeparatorChar))
+            throw new ArgumentException("Invalid configuration: Sidecar file name cannot contain directory separator");       
+        
+        this.fileSystem = fileSystem;
+        this.configuration = configuration;
+        logger = loggerFactory.CreateLogger<SidecarFileFolderSnapshotService>();
+    }
+
     private string GetSidecarFilePath(string currentPath) => fileSystem.Path.Combine(currentPath, configuration.SidecarFileName);
     
     public bool IsFolderAlreadyMonitored(string folderPath)
