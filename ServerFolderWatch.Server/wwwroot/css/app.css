@@ -1,4 +1,6 @@
 body {
+    margin: 0;
+    padding: 0;
     background-color: #121212;
     color: #CCC;
     font-family: monospace, 'Roboto', sans-serif;
@@ -18,8 +20,13 @@ body {
         list-style: none;
         
         span {
-            padding: 0.25em 0.5em;
+            padding: 0.5em 1em;
             display: block;
+            opacity: 0.85;
+        }
+        
+        a:hover span {
+            opacity: 1;
         }
     }
     li:hover {
