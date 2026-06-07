@@ -25,7 +25,7 @@ public abstract class BaseFolderSnapshotService(IFileSystem fileSystem, ILoggerF
         if (recursive)
         {
             foreach (var subFolder in fileSystem.Directory.EnumerateDirectories(folderPath))
-                wasInitialzed = wasInitialzed || InitializeFolder(subFolder, recursive);
+                wasInitialzed = InitializeFolder(subFolder, recursive) || wasInitialzed;
         }
 
         return wasInitialzed;

@@ -103,7 +103,6 @@ public class JsonFolderSnapshotServiceTests
         // Prepare a sidecar file with dummy content
         string tempFileContents = DateTime.Now.Ticks.ToString();
         mockFileSystem.File.WriteAllText(SidecarFilePath, tempFileContents);
-        mockFileSystem.File.Create(SidecarFilePath);
         
         bool result = sut.InitializeFolder(FolderName, false);
         
@@ -124,14 +123,14 @@ public class JsonFolderSnapshotServiceTests
         const string subfolder1 = "subfolder1";
         const string subfolder2 = "subfolder2";
 
-        mockFileSystem.File.Create(mockFileSystem.Path.Combine(FolderName, subfolder1));
-        mockFileSystem.File.Create(mockFileSystem.Path.Combine(FolderName, subfolder2));
+        mockFileSystem.Directory.CreateDirectory(mockFileSystem.Path.Combine(FolderName, subfolder1));
+        mockFileSystem.Directory.CreateDirectory(mockFileSystem.Path.Combine(FolderName, subfolder2));
         
         sut.InitializeFolder(FolderName, true);
 
         string subfolderSidecarFile1 = mockFileSystem.Path.Combine(FolderName, subfolder1, SidecarFileName);
         Assert.True(mockFileSystem.File.Exists(subfolderSidecarFile1));
-        string subfolderSidecarFile2 = mockFileSystem.Path.Combine(FolderName, subfolder1, SidecarFileName);
+        string subfolderSidecarFile2 = mockFileSystem.Path.Combine(FolderName, subfolder2, SidecarFileName);
         Assert.True(mockFileSystem.File.Exists(subfolderSidecarFile2));
     }
 }
