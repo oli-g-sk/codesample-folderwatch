@@ -7,23 +7,13 @@ namespace ServerFolderWatch.Core.Service;
 
 public abstract class SidecarFileFolderSnapshotService : IFolderSnapshotService
 {
+    private readonly IFileSystem fileSystem;
     private readonly ILogger<SidecarFileFolderSnapshotService> logger;
 
-    public SidecarFileFolderSnapshotService(IFileSystem fileSystem, IConfiguration configuration, ILoggerFactory loggerFactory)
+    public SidecarFileFolderSnapshotService(IFileSystem fileSystem, ILoggerFactory loggerFactory)
     {
-        if (string.IsNullOrWhiteSpace(configuration.SidecarFileName))
-            throw new ArgumentException("Invalid configuration: Sidecar file name is not set");
-        if (fileSystem.Path.GetInvalidFileNameChars().Any(configuration.SidecarFileName.Contains))
-            throw new ArgumentException("Invalid configuration: Sidecar file name cannot contain volume separator");
-        
         this.fileSystem = fileSystem;
-        this.configuration = configuration;
         logger = loggerFactory.CreateLogger<SidecarFileFolderSnapshotService>();
-    }
-    
-    public bool IsFolderAlreadyMonitored(string folderPath)
-    {
-        return fileSystem.File.Exists(GetSidecarFilePath(folderPath));
     }
 
     public bool InitializeFolder(string folderPath, bool recursive)
@@ -45,16 +35,12 @@ public abstract class SidecarFileFolderSnapshotService : IFolderSnapshotService
 
         return wasInitialzed;
     }
+
+    public abstract bool IsFolderAlreadyMonitored(string folderPath);
     
     public abstract FolderSnapshot LoadSnapshot(string folderPath);
 
     public abstract Task SaveSnapshot(string folderPath, FolderSnapshot contents);
     
     protected abstract void InitializeFolderInternal(string folderPath);
-    
-    private string GetSidecarFilePath(string currentPath) =>
-        fileSystem.Path.Combine(currentPath, configuration.SidecarFileName);
-    
-    protected readonly IFileSystem fileSystem;
-    protected readonly IConfiguration configuration;
 }

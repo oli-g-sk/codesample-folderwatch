@@ -12,11 +12,21 @@ public class JsonFileSnapshotService : SidecarFileFolderSnapshotService
     private readonly ILogger<JsonFileSnapshotService> logger;
 
     public JsonFileSnapshotService(IFileSystem fileSystem, IConfiguration configuration, ILoggerFactory loggerFactory)
-        : base(fileSystem, configuration, loggerFactory)
+        : base(fileSystem, loggerFactory)
     {
+        if (string.IsNullOrWhiteSpace(configuration.SidecarFileName))
+            throw new ArgumentException("Invalid configuration: Sidecar file name is not set");
+        if (fileSystem.Path.GetInvalidFileNameChars().Any(configuration.SidecarFileName.Contains))
+            throw new ArgumentException("Invalid configuration: Sidecar file name cannot contain volume separator");
+        
         this.fileSystem = fileSystem;
         this.configuration = configuration;
         logger = loggerFactory.CreateLogger<JsonFileSnapshotService>();
+    }
+    
+    public override bool IsFolderAlreadyMonitored(string folderPath)
+    {
+        return fileSystem.File.Exists(GetSidecarFilePath(folderPath));
     }
     
     public override FolderSnapshot LoadSnapshot(string folderPath)
