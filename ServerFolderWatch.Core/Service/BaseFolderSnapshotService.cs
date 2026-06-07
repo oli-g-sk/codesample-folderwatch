@@ -5,16 +5,11 @@ using ServerFolderWatch.Core.Service.Interfaces;
 
 namespace ServerFolderWatch.Core.Service;
 
-public abstract class SidecarFileFolderSnapshotService : IFolderSnapshotService
+public abstract class BaseFolderSnapshotService(IFileSystem fileSystem, ILoggerFactory loggerFactory)
+    : IFolderSnapshotService
 {
-    private readonly IFileSystem fileSystem;
-    private readonly ILogger<SidecarFileFolderSnapshotService> logger;
-
-    public SidecarFileFolderSnapshotService(IFileSystem fileSystem, ILoggerFactory loggerFactory)
-    {
-        this.fileSystem = fileSystem;
-        logger = loggerFactory.CreateLogger<SidecarFileFolderSnapshotService>();
-    }
+    private readonly ILogger<BaseFolderSnapshotService> logger
+        = loggerFactory.CreateLogger<BaseFolderSnapshotService>();
 
     public bool InitializeFolder(string folderPath, bool recursive)
     {

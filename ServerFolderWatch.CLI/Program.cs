@@ -19,7 +19,7 @@ class Program
         var fileSystemWrapper = new FileSystem();
         var configuration = new Configuration();
         
-        var persistenceService = new SidecarFileFolderSnapshotService(fileSystemWrapper, configuration, loggerFactory);
+        var persistenceService = new BaseFolderSnapshotService(fileSystemWrapper, configuration, loggerFactory);
         var browseService = new BrowseService(configuration, fileSystemWrapper);
         
         var fileSystemChangedService = new MainService(
