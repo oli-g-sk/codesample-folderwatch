@@ -90,9 +90,9 @@
             NavigationManager.NavigateTo("/browse", replace: true);
 
         var folderPath = Path.Combine(Configuration.RootPublicPath, Folder ?? string.Empty);
-        var contents = BrowseService.ListContents(folderPath);
+        var contents = FolderSnapshotService.GetCurrentContents(folderPath);
 
-        var oldSnapshot = FolderSnapshotService.LoadSnapshot(folderPath);
+        var oldSnapshot = FolderSnapshotService.LoadPersistedSnapshot(folderPath);
         var diff = FolderDiffService.Compare(oldSnapshot, contents, folderPath, out _);
         
         currentContents = contents.GetAllEntries().ToList();

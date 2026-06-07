@@ -21,19 +21,4 @@ public class BrowseService(IConfiguration configuration, IFileSystem fileSystem)
         // TODO TEST
         return !fullPath.Equals(configuration.RootPublicPath);
     }
-
-    public FolderSnapshot ListContents(string folderPath)
-    {
-        return new FolderSnapshot
-        {
-            Subfolders = fileSystem.Directory.EnumerateDirectories(folderPath)
-                .Select(fileSystem.Path.GetFileName).OfType<string>()
-                .Select(x => new Folder(x)).ToList(),
-            
-            VersionedFiles = fileSystem.Directory.EnumerateFiles(folderPath)
-                .Select(fileSystem.Path.GetFileName).OfType<string>()
-                .Where(x => !x.Equals(configuration.SidecarFileName))
-                .Select(x => new File(x)).ToList()
-        };
-    }
 }

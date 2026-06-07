@@ -57,7 +57,7 @@ public class JsonFolderSnapshotServiceTests
             .Returns(sidecarFileName);
         
         Assert.Throws<ArgumentException>(() => 
-            new JsonFolderSnapshotService(mockFileSystem, configurationMock.Object,
+            new JsonFolderSnapshotService( mockFileSystem, configurationMock.Object,
                 loggerFactoryMock.Object));
     }
     

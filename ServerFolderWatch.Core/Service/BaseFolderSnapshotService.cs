@@ -2,10 +2,11 @@ using System.IO.Abstractions;
 using Microsoft.Extensions.Logging;
 using ServerFolderWatch.Core.Model;
 using ServerFolderWatch.Core.Service.Interfaces;
+using File = ServerFolderWatch.Core.Model.File;
 
 namespace ServerFolderWatch.Core.Service;
 
-public abstract class BaseFolderSnapshotService(IBrowseService browseService, IFileSystem fileSystem, ILoggerFactory loggerFactory)
+public abstract class BaseFolderSnapshotService(IConfiguration configuration, IFileSystem fileSystem, ILoggerFactory loggerFactory)
     : IFolderSnapshotService
 {
     private readonly ILogger<BaseFolderSnapshotService> logger
@@ -20,9 +21,9 @@ public abstract class BaseFolderSnapshotService(IBrowseService browseService, IF
             InitializeFolderInternal(folderPath);
             wasInitialzed = true;
             
-            var initialSnapshot = browseService.ListContents(folderPath);
+            var initialSnapshot = GetCurrentContents(folderPath);
             initialSnapshot.LastAnalyzed = DateTime.Now;
-            SaveSnapshot(folderPath, initialSnapshot).Wait();
+            PersistSnapshot(folderPath, initialSnapshot).Wait();
         }
 
         if (recursive)
@@ -33,12 +34,28 @@ public abstract class BaseFolderSnapshotService(IBrowseService browseService, IF
 
         return wasInitialzed;
     }
+    
+    
+    public FolderSnapshot GetCurrentContents(string folderPath)
+    {
+        return new FolderSnapshot
+        {
+            Subfolders = fileSystem.Directory.EnumerateDirectories(folderPath)
+                .Select(fileSystem.Path.GetFileName).OfType<string>()
+                .Select(x => new Folder(x)).ToList(),
+            
+            VersionedFiles = fileSystem.Directory.EnumerateFiles(folderPath)
+                .Select(fileSystem.Path.GetFileName).OfType<string>()
+                .Where(x => !x.Equals(configuration.SidecarFileName))
+                .Select(x => new File(x)).ToList()
+        };
+    }
 
     public abstract bool IsFolderAlreadyMonitored(string folderPath);
     
-    public abstract FolderSnapshot LoadSnapshot(string folderPath);
+    public abstract FolderSnapshot LoadPersistedSnapshot(string folderPath);
 
-    public abstract Task SaveSnapshot(string folderPath, FolderSnapshot contents);
+    public abstract Task PersistSnapshot(string folderPath, FolderSnapshot contents);
     
     protected abstract void InitializeFolderInternal(string folderPath);
 }

@@ -26,7 +26,7 @@ public class BrowseController(IBrowseService browseService,
         if (!ValidateRequest(path, out var fullPath, out var error))
             return BadRequest(error);
 
-        var currentContent = browseService.ListContents(fullPath);
+        var currentContent = folderSnapshotService.GetCurrentContents(fullPath);
         
         return Ok(new
         {
@@ -41,8 +41,8 @@ public class BrowseController(IBrowseService browseService,
         if (!ValidateRequest(path, out var fullPath, out var error))
             return BadRequest(error);
 
-        var previousSnapshot = folderSnapshotService.LoadSnapshot(fullPath);
-        var currentContent = browseService.ListContents(fullPath);
+        var previousSnapshot = folderSnapshotService.LoadPersistedSnapshot(fullPath);
+        var currentContent = folderSnapshotService.GetCurrentContents(fullPath);
         var diff = folderDiffService.Compare(previousSnapshot, currentContent, fullPath, out _);
 
         return Ok(new

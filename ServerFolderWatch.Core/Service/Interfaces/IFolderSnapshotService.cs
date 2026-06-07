@@ -9,7 +9,14 @@ public interface IFolderSnapshotService
     
     bool IsFolderAlreadyMonitored(string folderPath);
     
-    FolderSnapshot LoadSnapshot(string folderPath);
+    /// <summary>
+    /// Lists the current contents of a given folder
+    /// (as seen by the file system) in the <see cref="FolderSnapshot"/> format.
+    /// TODO not sure if here, or BrowseService is a better place for this
+    /// </summary>
+    FolderSnapshot GetCurrentContents(string folderPath);
     
-    Task SaveSnapshot(string folderPath, Model.FolderSnapshot contents);
+    FolderSnapshot LoadPersistedSnapshot(string folderPath);
+    
+    Task PersistSnapshot(string folderPath, Model.FolderSnapshot contents);
 }

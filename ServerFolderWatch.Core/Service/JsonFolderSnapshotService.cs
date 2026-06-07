@@ -13,8 +13,8 @@ public class JsonFolderSnapshotService : BaseFolderSnapshotService
     private readonly IConfiguration configuration;
     private readonly ILogger<JsonFolderSnapshotService> logger;
 
-    public JsonFolderSnapshotService(IBrowseService browseService, IFileSystem fileSystem, IConfiguration configuration, ILoggerFactory loggerFactory)
-        : base(browseService, fileSystem, loggerFactory)
+    public JsonFolderSnapshotService(IFileSystem fileSystem, IConfiguration configuration, ILoggerFactory loggerFactory)
+        : base(configuration, fileSystem, loggerFactory)
     {
         if (string.IsNullOrWhiteSpace(configuration.SidecarFileName))
             throw new ArgumentException("Invalid configuration: Sidecar file name is not set");
@@ -31,7 +31,7 @@ public class JsonFolderSnapshotService : BaseFolderSnapshotService
         return fileSystem.File.Exists(GetSidecarFilePath(folderPath));
     }
     
-    public override FolderSnapshot LoadSnapshot(string folderPath)
+    public override FolderSnapshot LoadPersistedSnapshot(string folderPath)
     {
         try
         {
@@ -52,7 +52,7 @@ public class JsonFolderSnapshotService : BaseFolderSnapshotService
         return FolderSnapshot.Empty;
     }
 
-    public override Task SaveSnapshot(string folderPath, Model.FolderSnapshot contents)
+    public override Task PersistSnapshot(string folderPath, Model.FolderSnapshot contents)
     {
         var json = JsonConvert.SerializeObject(contents, Formatting.Indented);
         var filePath = GetSidecarFilePath(folderPath);
