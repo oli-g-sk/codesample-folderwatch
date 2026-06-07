@@ -5,9 +5,9 @@ namespace ServerFolderWatch.Core.Service.Interfaces;
 public interface IFolderSnapshotService
 {
     // TODO make this async
-    void InitializeFolder(string folderPath, bool recursive);
+    bool InitializeFolder(string folderPath, bool recursive);
     
-    public bool IsFolderAlreadyMonitored(string folderPath);
+    bool IsFolderAlreadyMonitored(string folderPath);
     
     FolderSnapshot LoadSnapshot(string folderPath);
     

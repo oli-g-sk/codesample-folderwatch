@@ -6,10 +6,11 @@ using ServerFolderWatch.Core.Service;
 using ServerFolderWatch.Core.Service.Interfaces;
 using ServerFolderWatch.Server;
 using ServerFolderWatch.Server.Components;
+using Testably.Abstractions;
 using IConfiguration = ServerFolderWatch.Core.IConfiguration;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddSingleton<IFileSystem, FileSystem>();
+builder.Services.AddSingleton<IFileSystem, RealFileSystem>();
 builder.Services.AddSingleton<IConfiguration, Configuration>();
 // TODO use scoped lifecycles?
 builder.Services.AddSingleton<IBrowseService, BrowseService>();

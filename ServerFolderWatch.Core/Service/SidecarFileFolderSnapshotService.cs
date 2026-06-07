@@ -1,17 +1,13 @@
 using System.IO.Abstractions;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using ServerFolderWatch.Core.Model;
 using ServerFolderWatch.Core.Service.Interfaces;
 
 namespace ServerFolderWatch.Core.Service;
 
-public class SidecarFileFolderSnapshotService : IFolderSnapshotService
+public abstract class SidecarFileFolderSnapshotService : IFolderSnapshotService
 {
     private readonly ILogger<SidecarFileFolderSnapshotService> logger;
-
-    private readonly IFileSystem fileSystem;
-    private readonly IConfiguration configuration;
 
     public SidecarFileFolderSnapshotService(IFileSystem fileSystem, IConfiguration configuration, ILoggerFactory loggerFactory)
     {
@@ -24,56 +20,41 @@ public class SidecarFileFolderSnapshotService : IFolderSnapshotService
         this.configuration = configuration;
         logger = loggerFactory.CreateLogger<SidecarFileFolderSnapshotService>();
     }
-
-    private string GetSidecarFilePath(string currentPath) => fileSystem.Path.Combine(currentPath, configuration.SidecarFileName);
     
     public bool IsFolderAlreadyMonitored(string folderPath)
     {
         return fileSystem.File.Exists(GetSidecarFilePath(folderPath));
     }
-    
-    public void InitializeFolder(string folderPath, bool recursive)
+
+    public bool InitializeFolder(string folderPath, bool recursive)
     {
-        if (IsFolderAlreadyMonitored(folderPath))
-            throw new InvalidOperationException("Folder is already monitored");
+        bool wasInitialzed = false;
         
-        var filePath = GetSidecarFilePath(folderPath);
-        var stream = fileSystem.File.Create(filePath);
-        stream?.Close();
+        if (!IsFolderAlreadyMonitored(folderPath))
+        {
+            InitializeFolderInternal(folderPath);
+            wasInitialzed = true;
+            SaveSnapshot(folderPath, FolderSnapshot.Empty).Wait();
+        }
 
         if (recursive)
         {
             foreach (var subFolder in fileSystem.Directory.EnumerateDirectories(folderPath))
-                InitializeFolder(subFolder, recursive);
+                wasInitialzed = wasInitialzed || InitializeFolder(subFolder, recursive);
         }
+
+        return wasInitialzed;
     }
     
-    public FolderSnapshot LoadSnapshot(string folderPath)
-    {
-        try
-        {
-            var sidecarFileContents = JsonConvert.DeserializeObject<Model.FolderSnapshot>
-            (fileSystem.File.ReadAllText(GetSidecarFilePath(folderPath)), new JsonSerializerSettings()
-            {
-                ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor,
-            });
+    public abstract FolderSnapshot LoadSnapshot(string folderPath);
 
-            return sidecarFileContents ?? FolderSnapshot.Empty;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error reading sidecar file in {FolderPath}: {Error}", folderPath, ex.Message);
-        }
-        
-        // TODO return null
-        return FolderSnapshot.Empty;
-    }
-
-    public Task SaveSnapshot(string folderPath, Model.FolderSnapshot contents)
-    {
-        var json = JsonConvert.SerializeObject(contents, Formatting.Indented);
-        var filePath = GetSidecarFilePath(folderPath);
-        fileSystem.File.WriteAllText(filePath, json);
-        return Task.CompletedTask;
-    }
+    public abstract Task SaveSnapshot(string folderPath, FolderSnapshot contents);
+    
+    protected abstract void InitializeFolderInternal(string folderPath);
+    
+    private string GetSidecarFilePath(string currentPath) =>
+        fileSystem.Path.Combine(currentPath, configuration.SidecarFileName);
+    
+    protected readonly IFileSystem fileSystem;
+    protected readonly IConfiguration configuration;
 }

@@ -106,12 +106,19 @@ public class FolderSnapshotServiceTests
     }
 
     [Fact]
-    public void InitializeFolder_RunsRecursively_IfSidecarExistsInCurrentFolder()
+    public void InitializeFolder_NotInitializedBefore_RunsRecursively()
     {
+        mockFileSystem.File.Create(SidecarFilePath);
+    }
+    
+    [Fact]
+    public void InitializeFolder_WasnitializedBefore_DoesNotRunRecursively()
+    {
+        mockFileSystem.File.Create(SidecarFilePath);
     }
 
     [Fact]
-    public void InitializeFolder_RunsRecursively_IfSidecarDoesNotExistInCurrentFolder()
+    public void InitializeFolder_WasInitializedBefore_RunsOnNewSubfolder()
     {
     }
 }
