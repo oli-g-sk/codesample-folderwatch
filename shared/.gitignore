@@ -1,0 +1,5 @@
+# Ignore everything in this subfolder
+# but make sure it exists in the repo
+
+*
+!.gitignore
