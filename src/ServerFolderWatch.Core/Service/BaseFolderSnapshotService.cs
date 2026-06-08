@@ -73,7 +73,18 @@ public abstract class BaseFolderSnapshotService(
     
     public abstract FolderSnapshot LoadPersistedSnapshot(string folderPath);
 
-    public abstract Task TakeSnapshot(string folderPath);
+    public async Task TakeSnapshot(string folderPath, bool recursive = true)
+    {
+        await TakeSnapshotInternal(folderPath);
+
+        if (!recursive)
+            return;
+        
+        foreach (var subFolder in fileSystem.Directory.EnumerateDirectories(folderPath))
+            await TakeSnapshot(subFolder);
+    }
+    
+    protected abstract Task TakeSnapshotInternal(string folderPath);
     
     protected abstract bool InitializeFolderInternal(string folderPath);
     

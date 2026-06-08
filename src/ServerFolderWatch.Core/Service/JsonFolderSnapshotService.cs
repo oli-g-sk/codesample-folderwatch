@@ -58,7 +58,7 @@ public class JsonFolderSnapshotService : BaseFolderSnapshotService
         return FolderSnapshot.Empty;
     }
 
-    public override Task TakeSnapshot(string folderPath)
+    protected override Task TakeSnapshotInternal(string folderPath)
     {
         var filePath = GetSidecarFilePath(folderPath);
         var contents = GetCurrentContents(folderPath);

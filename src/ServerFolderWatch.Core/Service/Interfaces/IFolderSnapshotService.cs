@@ -18,5 +18,5 @@ public interface IFolderSnapshotService
     
     FolderSnapshot LoadPersistedSnapshot(string folderPath);
     
-    Task TakeSnapshot(string folderPath);
+    Task TakeSnapshot(string folderPath, bool recursive);
 }
