@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using ServerFolderWatch.Core;
 using ServerFolderWatch.Core.Service;
 using ServerFolderWatch.Core.Service.Interfaces;
@@ -43,7 +44,24 @@ app.MapRazorComponents<App>()
 
 var configuration = app.Services.GetRequiredService<IAppConfiguration>();
 var snapshotService = app.Services.GetRequiredService<IFolderSnapshotService>();
-string rootPath = configuration.RootPublicPath;
-snapshotService.InitializeFolder(rootPath, true);
+string rootPublicPath = configuration.RootPublicPath;
 
+var browseService = app.Services.GetRequiredService<IBrowseService>();
+
+var logger = app.Services.GetRequiredService<ILogger<Program>>();
+
+var fileSystem = app.Services.GetRequiredService<IFileSystem>();
+
+if (!fileSystem.Directory.Exists(rootPublicPath))
+{
+    logger.LogError("Public folder path defined in configuration does not exist: {configurationPath}", rootPublicPath);
+    return;
+}
+if (!browseService.CanWriteToFolder(rootPublicPath))
+{
+    logger.LogError("Public folder path defined in configuration is not writeable: {configurationPath}", rootPublicPath);
+    return;
+}
+
+snapshotService.InitializeFolder(rootPublicPath, true);
 app.Run();

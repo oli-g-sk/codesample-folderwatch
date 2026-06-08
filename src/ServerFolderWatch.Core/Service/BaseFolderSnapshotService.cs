@@ -6,7 +6,11 @@ using File = ServerFolderWatch.Core.Model.File;
 
 namespace ServerFolderWatch.Core.Service;
 
-public abstract class BaseFolderSnapshotService(IAppConfiguration configuration, IFileSystem fileSystem, ILoggerFactory loggerFactory)
+public abstract class BaseFolderSnapshotService(
+    IBrowseService browseService,
+    IAppConfiguration configuration,
+    IFileSystem fileSystem,
+    ILoggerFactory loggerFactory)
     : IFolderSnapshotService
 {
     private readonly ILogger<BaseFolderSnapshotService> logger
@@ -18,14 +22,21 @@ public abstract class BaseFolderSnapshotService(IAppConfiguration configuration,
         
         if (!IsFolderAlreadyMonitored(folderPath))
         {
-            logger.LogInformation("Taking initial snapshot of folder: {folderPath}", folderPath);
-            
-            InitializeFolderInternal(folderPath);
-            wasInitialzed = true;
-            
-            var initialSnapshot = GetCurrentContents(folderPath);
-            initialSnapshot.LastAnalyzed = DateTime.Now;
-            TakeSnapshot(folderPath).Wait();
+            if (!browseService.CanWriteToFolder(folderPath))
+                logger.LogWarning("Cannot write to folder: {folderPath}", folderPath);
+
+            else
+            {
+                wasInitialzed = InitializeFolderInternal(folderPath);
+
+                if (wasInitialzed)
+                {
+                    var initialSnapshot = GetCurrentContents(folderPath);
+                    initialSnapshot.LastAnalyzed = DateTime.Now;
+                    TakeSnapshot(folderPath).Wait();
+                    logger.LogInformation("Created initial snapshot of folder: {folderPath}", folderPath);
+                }
+            }
         }
 
         if (recursive)
@@ -59,5 +70,5 @@ public abstract class BaseFolderSnapshotService(IAppConfiguration configuration,
 
     public abstract Task TakeSnapshot(string folderPath);
     
-    protected abstract void InitializeFolderInternal(string folderPath);
+    protected abstract bool InitializeFolderInternal(string folderPath);
 }

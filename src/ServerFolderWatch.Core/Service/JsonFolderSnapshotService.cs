@@ -9,18 +9,24 @@ namespace ServerFolderWatch.Core.Service;
 // TODO composition over inheritance?
 public class JsonFolderSnapshotService : BaseFolderSnapshotService
 {
+    private readonly IBrowseService browseService;
     private readonly IFileSystem fileSystem;
     private readonly IAppConfiguration configuration;
     private readonly ILogger<JsonFolderSnapshotService> logger;
 
-    public JsonFolderSnapshotService(IFileSystem fileSystem, IAppConfiguration configuration, ILoggerFactory loggerFactory)
-        : base(configuration, fileSystem, loggerFactory)
+    public JsonFolderSnapshotService(
+        IBrowseService browseService,
+        IFileSystem fileSystem,
+        IAppConfiguration configuration,
+        ILoggerFactory loggerFactory)
+        : base(browseService, configuration, fileSystem, loggerFactory)
     {
         if (string.IsNullOrWhiteSpace(configuration.SidecarFileName))
             throw new ArgumentException("Invalid configuration: Sidecar file name is not set");
         if (fileSystem.Path.GetInvalidFileNameChars().Any(configuration.SidecarFileName.Contains))
             throw new ArgumentException("Invalid configuration: Sidecar file name cannot contain volume separator");
-        
+
+        this.browseService = browseService;
         this.fileSystem = fileSystem;
         this.configuration = configuration;
         logger = loggerFactory.CreateLogger<JsonFolderSnapshotService>();
@@ -71,11 +77,18 @@ public class JsonFolderSnapshotService : BaseFolderSnapshotService
         return Task.CompletedTask;
     }
 
-    protected override void InitializeFolderInternal(string folderPath)
+    protected override bool InitializeFolderInternal(string folderPath)
     {
+        if (!browseService.CanWriteToFolder(folderPath))
+        {
+            logger.LogWarning("Cannot write to folder: {folderPath}", folderPath);
+            return false;
+        }
+        
         var filePath = GetSidecarFilePath(folderPath);
         var stream = fileSystem.File.Create(filePath);
         stream?.Close();
+        return true;
     }
 
     private string GetSidecarFilePath(string currentPath) =>

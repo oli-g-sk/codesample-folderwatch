@@ -92,9 +92,9 @@ public class BrowseController(IBrowseService browseService,
     {
         fullPath = Path.Combine(configuration.RootPublicPath, path ?? string.Empty);
 
-        if (!browseService.IsPathValidAndBrowsable(fullPath))
+        if (!browseService.CanReadFolderContents(fullPath))
         {
-            error = "Path does not exist or is not accessible.";
+            error = "Cannot read folder contents.";
             logger.LogWarning("{Error} Path: {Path}", error, fullPath);
             return false;
         }
