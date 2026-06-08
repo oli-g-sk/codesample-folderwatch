@@ -1,6 +1,8 @@
+using System;
 using System.IO.Abstractions;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ServerFolderWatch.Core;
 using ServerFolderWatch.Core.Service;
@@ -10,8 +12,14 @@ using ServerFolderWatch.Server.Components;
 using Testably.Abstractions;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddSingleton<IAppConfiguration>(sp =>
+    builder.Configuration
+        .GetSection("App")
+        .Get<AppConfiguration>() ??
+    throw new InvalidOperationException("Configuration could not be loaded."));
+
 builder.Services.AddSingleton<IFileSystem, RealFileSystem>();
-builder.Services.AddSingleton<IAppConfiguration, AppConfiguration>();
 // TODO use scoped lifecycles?
 builder.Services.AddSingleton<IBrowseService, BrowseService>();
 builder.Services.AddSingleton<IFolderDiffService, FolderDiffService>();
