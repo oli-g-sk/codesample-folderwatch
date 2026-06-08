@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "ServerFolderWatch.Server": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
