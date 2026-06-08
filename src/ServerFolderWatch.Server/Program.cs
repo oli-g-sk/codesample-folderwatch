@@ -32,4 +32,10 @@ app.UseAntiforgery();
 app.MapControllers();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+
+var configuration = app.Services.GetRequiredService<IConfiguration>();
+var snapshotService = app.Services.GetRequiredService<IFolderSnapshotService>();
+string rootPath = configuration.RootPublicPath;
+snapshotService.InitializeFolder(rootPath, true);
+
 app.Run();
