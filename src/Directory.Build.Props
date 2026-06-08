@@ -1,0 +1,14 @@
+<Project>
+	<PropertyGroup>
+	    <Nullable>enable</Nullable>
+		<LangVersion>latest</LangVersion>
+
+		<Product>ServerFolderWatch</Product>
+		<Title>ServerFolderWatch</Title>
+		<Version>1.0.0</Version>
+
+		<BaseOutputPath>$(SolutionDir)..\build\</BaseOutputPath>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+		<AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+	</PropertyGroup>
+</Project>
