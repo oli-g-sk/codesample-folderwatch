@@ -63,14 +63,6 @@ public class JsonFolderSnapshotService : BaseFolderSnapshotService
         return browseService.CanWriteToFolder(folderPath);
     }
 
-    protected override bool InitializeFolderInternal(string folderPath)
-    {
-        var filePath = GetSidecarFilePath(folderPath);
-        var stream = fileSystem.File.Create(filePath);
-        stream?.Close();
-        return true;
-    }
-
     protected override Task TakeSnapshotInternal(string folderPath)
     {
         var filePath = GetSidecarFilePath(folderPath);

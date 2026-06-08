@@ -15,45 +15,6 @@ public abstract class BaseFolderSnapshotService(
     private readonly ILogger<BaseFolderSnapshotService> logger
         = loggerFactory.CreateLogger<BaseFolderSnapshotService>();
 
-    public bool InitializeFolder(string folderPath, bool recursive)
-    {
-        bool wasInitialzed = false;
-        
-        if (!IsFolderAlreadyMonitored(folderPath))
-        {
-            if (!CanMonitorFolder(folderPath))
-            {
-                logger.LogWarning("Cannot set up folder for monitoring: {folderPath}", folderPath);
-                
-                // early abort; assume if we cannot monitor this folder,
-                // there's no point continuing the recursion
-                return false;
-            }
-
-            else
-            {
-                wasInitialzed = InitializeFolderInternal(folderPath);
-
-                if (wasInitialzed)
-                {
-                    var initialSnapshot = GetCurrentContents(folderPath);
-                    initialSnapshot.LastAnalyzed = DateTime.Now;
-                    TakeSnapshot(folderPath).Wait();
-                    logger.LogInformation("Created initial snapshot of folder: {folderPath}", folderPath);
-                }
-            }
-        }
-
-        if (recursive)
-        {
-            foreach (var subFolder in fileSystem.Directory.EnumerateDirectories(folderPath))
-                wasInitialzed = InitializeFolder(subFolder, recursive) || wasInitialzed;
-        }
-
-        return wasInitialzed;
-    }
-    
-    
     public FolderSnapshot GetCurrentContents(string folderPath)
     {
         return new FolderSnapshot
@@ -73,20 +34,31 @@ public abstract class BaseFolderSnapshotService(
     
     public abstract FolderSnapshot LoadPersistedSnapshot(string folderPath);
 
-    public async Task TakeSnapshot(string folderPath, bool recursive = true)
+    public async Task TakeSnapshot(string folderPath, bool recursive)
     {
+        bool wasAlreadyMonitored = IsFolderAlreadyMonitored(folderPath);
+
+        if (!wasAlreadyMonitored && !CanMonitorFolder(folderPath))
+        {
+            logger.LogWarning("Cannot take snapshot of folder: {folderPath}", folderPath);
+            return;
+        }
+
         await TakeSnapshotInternal(folderPath);
+        logger.LogInformation(
+            wasAlreadyMonitored
+                ? "Persisted snapshot of folder: {folderPath}"
+                : "Created initial snapshot of folder: {folderPath}",
+            folderPath);
 
         if (!recursive)
             return;
         
         foreach (var subFolder in fileSystem.Directory.EnumerateDirectories(folderPath))
-            await TakeSnapshot(subFolder);
+            await TakeSnapshot(subFolder, true);
     }
     
     protected abstract Task TakeSnapshotInternal(string folderPath);
-    
-    protected abstract bool InitializeFolderInternal(string folderPath);
-    
+
     protected abstract bool CanMonitorFolder(string folderPath);
 }

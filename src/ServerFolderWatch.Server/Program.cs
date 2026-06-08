@@ -85,7 +85,6 @@ internal class Program
             new AppConfiguration(),
             new LoggerFactory());
      
-        // TODO if not initialized, commit
-        snapshotService.InitializeFolder(rootPublicPath, true);
+        snapshotService.TakeSnapshot(rootPublicPath, true).Wait();
     }
 }
