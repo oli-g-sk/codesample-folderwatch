@@ -10,7 +10,7 @@ public class BrowseServiceTests
     // TODO add tests for sorting of returned items
     
     private readonly Mock<IFileSystem> fileSystemMock = new();
-    private readonly Mock<IConfiguration> configurationMock = new();
+    private readonly Mock<IAppConfiguration> configurationMock = new();
     
     private readonly BrowseService sut;
     

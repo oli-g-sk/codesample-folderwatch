@@ -1,11 +1,10 @@
 using ServerFolderWatch.Core;
 
-namespace ServerFolderWatch.Server;
+namespace ServerFolderWatch.CLI;
 
-// TODO load from file
-public class Configuration : IConfiguration
+public class AppConfiguration : IAppConfiguration
 {
     public string SidecarFileName { get; } = ".sidecar.json";
-    
+
     public string RootPublicPath { get; } = "C:\\Temp";
 }

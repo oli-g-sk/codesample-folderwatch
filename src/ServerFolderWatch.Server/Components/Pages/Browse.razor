@@ -2,7 +2,7 @@
 @using System.IO
 @using ServerFolderWatch.Core
 @using ServerFolderWatch.Core.Model
-@inject IConfiguration Configuration
+@inject IAppConfiguration AppConfiguration
 @inject IBrowseService BrowseService
 @inject IFolderSnapshotService FolderSnapshotService
 @inject IFolderDiffService FolderDiffService
@@ -89,7 +89,7 @@
         if (Folder == string.Empty)
             NavigationManager.NavigateTo("/browse", replace: true);
 
-        var folderPath = Path.Combine(Configuration.RootPublicPath, Folder ?? string.Empty);
+        var folderPath = Path.Combine(AppConfiguration.RootPublicPath, Folder ?? string.Empty);
         var contents = FolderSnapshotService.GetCurrentContents(folderPath);
 
         var oldSnapshot = FolderSnapshotService.LoadPersistedSnapshot(folderPath);

@@ -1,6 +1,6 @@
 namespace ServerFolderWatch.Core;
 
-public interface IConfiguration
+public interface IAppConfiguration
 {
     string SidecarFileName { get; }
     

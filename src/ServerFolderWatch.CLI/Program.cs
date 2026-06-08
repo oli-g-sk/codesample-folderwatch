@@ -18,7 +18,7 @@ class Program
         });
         
         var fileSystemWrapper = new RealFileSystem();
-        var configuration = new Configuration();
+        var configuration = new AppConfiguration();
         
         var snapshotService = new JsonFolderSnapshotService(fileSystemWrapper, configuration, loggerFactory);
         var browseService = new BrowseService(configuration, fileSystemWrapper);

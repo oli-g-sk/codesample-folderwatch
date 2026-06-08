@@ -6,7 +6,7 @@ using File = ServerFolderWatch.Core.Model.File;
 
 namespace ServerFolderWatch.Core.Service;
 
-public abstract class BaseFolderSnapshotService(IConfiguration configuration, IFileSystem fileSystem, ILoggerFactory loggerFactory)
+public abstract class BaseFolderSnapshotService(IAppConfiguration configuration, IFileSystem fileSystem, ILoggerFactory loggerFactory)
     : IFolderSnapshotService
 {
     private readonly ILogger<BaseFolderSnapshotService> logger

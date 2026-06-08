@@ -10,10 +10,10 @@ namespace ServerFolderWatch.Core.Service;
 public class JsonFolderSnapshotService : BaseFolderSnapshotService
 {
     private readonly IFileSystem fileSystem;
-    private readonly IConfiguration configuration;
+    private readonly IAppConfiguration configuration;
     private readonly ILogger<JsonFolderSnapshotService> logger;
 
-    public JsonFolderSnapshotService(IFileSystem fileSystem, IConfiguration configuration, ILoggerFactory loggerFactory)
+    public JsonFolderSnapshotService(IFileSystem fileSystem, IAppConfiguration configuration, ILoggerFactory loggerFactory)
         : base(configuration, fileSystem, loggerFactory)
     {
         if (string.IsNullOrWhiteSpace(configuration.SidecarFileName))

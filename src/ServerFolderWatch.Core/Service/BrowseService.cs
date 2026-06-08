@@ -5,7 +5,7 @@ using File = ServerFolderWatch.Core.Model.File;
 
 namespace ServerFolderWatch.Core.Service;
 
-public class BrowseService(IConfiguration configuration, IFileSystem fileSystem)
+public class BrowseService(IAppConfiguration configuration, IFileSystem fileSystem)
     : IBrowseService
 {
     public bool IsPathValidAndBrowsable(string path)

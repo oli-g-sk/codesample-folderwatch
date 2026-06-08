@@ -12,7 +12,7 @@ public class JsonFolderSnapshotServiceTests
     private const string SidecarFileName = "metadata.txt";
 
     private readonly MockFileSystem mockFileSystem = new();
-    private readonly Mock<IConfiguration> configurationMock = new();
+    private readonly Mock<IAppConfiguration> configurationMock = new();
     private readonly Mock<ILoggerFactory> loggerFactoryMock;
 
     private readonly BaseFolderSnapshotService sut;

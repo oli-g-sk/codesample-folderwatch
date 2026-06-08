@@ -15,7 +15,7 @@ namespace ServerFolderWatch.Server.Controllers.ApiControllers;
 public class BrowseController(IBrowseService browseService,
     IFolderSnapshotService folderSnapshotService,
     IFolderDiffService folderDiffService,
-    IConfiguration configuration,
+    IAppConfiguration configuration,
     ILoggerFactory loggerFactory) : ControllerBase
 {
     private readonly ILogger<BrowseController> logger = loggerFactory.CreateLogger<BrowseController>();

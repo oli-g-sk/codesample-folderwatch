@@ -2,16 +2,16 @@ using System.IO.Abstractions;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using ServerFolderWatch.Core;
 using ServerFolderWatch.Core.Service;
 using ServerFolderWatch.Core.Service.Interfaces;
 using ServerFolderWatch.Server;
 using ServerFolderWatch.Server.Components;
 using Testably.Abstractions;
-using IConfiguration = ServerFolderWatch.Core.IConfiguration;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton<IFileSystem, RealFileSystem>();
-builder.Services.AddSingleton<IConfiguration, Configuration>();
+builder.Services.AddSingleton<IAppConfiguration, AppConfiguration>();
 // TODO use scoped lifecycles?
 builder.Services.AddSingleton<IBrowseService, BrowseService>();
 builder.Services.AddSingleton<IFolderDiffService, FolderDiffService>();
@@ -33,7 +33,7 @@ app.MapControllers();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
-var configuration = app.Services.GetRequiredService<IConfiguration>();
+var configuration = app.Services.GetRequiredService<IAppConfiguration>();
 var snapshotService = app.Services.GetRequiredService<IFolderSnapshotService>();
 string rootPath = configuration.RootPublicPath;
 snapshotService.InitializeFolder(rootPath, true);
