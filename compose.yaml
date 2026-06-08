@@ -1,8 +1,13 @@
 services:
-  myapp:
+  serverfolderwatch:
+    image: serverfolderwatch:0.3.0
     container_name: serverfolderwatch
+
     build:
+      context: .
       dockerfile: ./Dockerfile
+    environment:
+      - App__RootPublicPath=/public
     ports:
       - "8080:8080"
     

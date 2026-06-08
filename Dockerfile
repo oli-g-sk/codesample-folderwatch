@@ -14,12 +14,12 @@ RUN dotnet publish \
 # Runtime
 FROM mcr.microsoft.com/dotnet/aspnet:9.0
 
+RUN mkdir -p /public
+
 WORKDIR /app
 
 COPY --from=build /repo/publish .
 
 EXPOSE 8080
 
-# ENTRYPOINT ["dotnet", "ServerFolderWatch.Server.dll"]
-
-ENTRYPOINT ["sleep", "infinity"]
+ENTRYPOINT ["dotnet", "ServerFolderWatch.Server.dll"]
