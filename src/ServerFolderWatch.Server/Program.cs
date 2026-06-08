@@ -44,7 +44,7 @@ internal class Program
         ConfigureWebApp(app);
 
         TakeStartupSnapshot(
-            app.Services.GetRequiredService<IFileSystem>(),
+            app.Services.GetRequiredService<IFolderSnapshotService>(),
             app.Services.GetRequiredService<IAppConfiguration>().RootPublicPath);
 
         app.Run();
@@ -77,14 +77,8 @@ internal class Program
             logger.LogError("Public folder path defined in configuration is not writeable: {configurationPath}", rootPublicPath);
     }
     
-    private static void TakeStartupSnapshot(IFileSystem fileSystem, string rootPublicPath)
+    private static void TakeStartupSnapshot(IFolderSnapshotService snapshotService, string rootPublicPath)
     {
-        var snapshotService = new JsonFolderSnapshotService(
-            new BrowseService(new AppConfiguration(), fileSystem),
-            fileSystem,
-            new AppConfiguration(),
-            new LoggerFactory());
-     
         snapshotService.TakeSnapshot(rootPublicPath, true).Wait();
     }
 }
