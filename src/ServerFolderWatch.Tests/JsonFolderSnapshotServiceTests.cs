@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using ServerFolderWatch.Core;
 using ServerFolderWatch.Core.Service;
+using ServerFolderWatch.Core.Service.Interfaces;
 using Testably.Abstractions.Testing;
 
 namespace ServerFolderWatch.Tests;
@@ -10,8 +11,9 @@ public class JsonFolderSnapshotServiceTests
 {
     private const string FolderName = "test";
     private const string SidecarFileName = "metadata.txt";
-
+    
     private readonly MockFileSystem mockFileSystem = new();
+    private readonly Mock<BrowseService> browseServiceMock = new();
     private readonly Mock<IAppConfiguration> configurationMock = new();
     private readonly Mock<ILoggerFactory> loggerFactoryMock;
 
@@ -28,8 +30,8 @@ public class JsonFolderSnapshotServiceTests
         configurationMock.SetupGet(x => x.SidecarFileName)
             .Returns(SidecarFileName);
         
-        sut = new JsonFolderSnapshotService(mockFileSystem, configurationMock.Object,
-            loggerFactoryMock.Object);
+        sut = new JsonFolderSnapshotService(browseServiceMock.Object,
+            mockFileSystem, configurationMock.Object, loggerFactoryMock.Object);
         
         // TODO test that we're checking configuration file name
 
@@ -57,7 +59,7 @@ public class JsonFolderSnapshotServiceTests
             .Returns(sidecarFileName);
         
         Assert.Throws<ArgumentException>(() => 
-            new JsonFolderSnapshotService( mockFileSystem, configurationMock.Object,
+            new JsonFolderSnapshotService(browseServiceMock.Object, mockFileSystem, configurationMock.Object,
                 loggerFactoryMock.Object));
     }
     
@@ -71,7 +73,7 @@ public class JsonFolderSnapshotServiceTests
                 .Returns($"sidecar{invalidChar}");
             
             Assert.Throws<ArgumentException>(() => 
-                new JsonFolderSnapshotService(mockFileSystem, configurationMock.Object,
+                new JsonFolderSnapshotService(browseServiceMock.Object, mockFileSystem, configurationMock.Object,
                     loggerFactoryMock.Object));
         }
     }
