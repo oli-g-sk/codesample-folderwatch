@@ -7,7 +7,6 @@ using File = ServerFolderWatch.Core.Model.File;
 namespace ServerFolderWatch.Core.Service;
 
 public abstract class BaseFolderSnapshotService(
-    IBrowseService browseService,
     IAppConfiguration configuration,
     IFileSystem fileSystem,
     ILoggerFactory loggerFactory)
@@ -22,11 +21,11 @@ public abstract class BaseFolderSnapshotService(
         
         if (!IsFolderAlreadyMonitored(folderPath))
         {
-            if (!browseService.CanWriteToFolder(folderPath))
+            if (!CanMonitorFolder(folderPath))
             {
-                logger.LogWarning("Cannot write to folder: {folderPath}", folderPath);
+                logger.LogWarning("Cannot set up folder for monitoring: {folderPath}", folderPath);
                 
-                // early abort; assume if we cannot write here,
+                // early abort; assume if we cannot monitor this folder,
                 // there's no point continuing the recursion
                 return false;
             }
@@ -77,4 +76,6 @@ public abstract class BaseFolderSnapshotService(
     public abstract Task TakeSnapshot(string folderPath);
     
     protected abstract bool InitializeFolderInternal(string folderPath);
+    
+    protected abstract bool CanMonitorFolder(string folderPath);
 }

@@ -19,7 +19,7 @@ public class JsonFolderSnapshotService : BaseFolderSnapshotService
         IFileSystem fileSystem,
         IAppConfiguration configuration,
         ILoggerFactory loggerFactory)
-        : base(browseService, configuration, fileSystem, loggerFactory)
+        : base(configuration, fileSystem, loggerFactory)
     {
         if (string.IsNullOrWhiteSpace(configuration.SidecarFileName))
             throw new ArgumentException("Invalid configuration: Sidecar file name is not set");
@@ -79,16 +79,15 @@ public class JsonFolderSnapshotService : BaseFolderSnapshotService
 
     protected override bool InitializeFolderInternal(string folderPath)
     {
-        if (!browseService.CanWriteToFolder(folderPath))
-        {
-            logger.LogWarning("Cannot write to folder: {folderPath}", folderPath);
-            return false;
-        }
-        
         var filePath = GetSidecarFilePath(folderPath);
         var stream = fileSystem.File.Create(filePath);
         stream?.Close();
         return true;
+    }
+
+    protected override bool CanMonitorFolder(string folderPath)
+    {
+        return browseService.CanWriteToFolder(folderPath);
     }
 
     private string GetSidecarFilePath(string currentPath) =>
