@@ -13,7 +13,7 @@ public class JsonFolderSnapshotServiceTests
     private const string SidecarFileName = "metadata.txt";
     
     private readonly MockFileSystem mockFileSystem = new();
-    private readonly Mock<BrowseService> browseServiceMock = new();
+    private readonly Mock<IBrowseService> browseServiceMock = new();
     private readonly Mock<IAppConfiguration> configurationMock = new();
     private readonly Mock<ILoggerFactory> loggerFactoryMock;
 
@@ -29,6 +29,8 @@ public class JsonFolderSnapshotServiceTests
         
         configurationMock.SetupGet(x => x.SidecarFileName)
             .Returns(SidecarFileName);
+        browseServiceMock.Setup(x => x.CanWriteToFolder(It.IsAny<string>()))
+            .Returns(true);
         
         sut = new JsonFolderSnapshotService(browseServiceMock.Object,
             mockFileSystem, configurationMock.Object, loggerFactoryMock.Object);
@@ -91,33 +93,30 @@ public class JsonFolderSnapshotServiceTests
     }
 
     [Fact]
-    public void InitializeFolder_NotInitializedBefore_CreatesSidecarFile()
+    public async Task TakeSnapshot_NotInitializedBefore_CreatesSidecarFile()
     {
-        bool result = sut.InitializeFolder(FolderName, false);
+        await sut.TakeSnapshot(FolderName, false);
         
-        Assert.True(result);
         Assert.True(mockFileSystem.File.Exists(SidecarFilePath));
     }
     
     [Fact]
-    public void InitializeFolder_WasInitializedBefore_DoesNothing()
+    public async Task TakeSnapshot_WasInitializedBefore_OverwritesSidecarFile()
     {
         // Prepare a sidecar file with dummy content
         string tempFileContents = DateTime.Now.Ticks.ToString();
         mockFileSystem.File.WriteAllText(SidecarFilePath, tempFileContents);
         
-        bool result = sut.InitializeFolder(FolderName, false);
+        await sut.TakeSnapshot(FolderName, false);
         
-        // Verify sidecar file was not overwritten
-        Assert.False(result);
         string content = mockFileSystem.File.ReadAllText(SidecarFilePath);
-        Assert.Equal(tempFileContents, content);
+        Assert.NotEqual(tempFileContents, content);
     }
 
     [Theory]
     [InlineData(true)]
     [InlineData(false)]   
-    public void InitializeFolder_RunsRecursively(bool currentFolderWasInitializedBefore)
+    public async Task TakeSnapshot_RunsRecursively(bool currentFolderWasInitializedBefore)
     {
         if (currentFolderWasInitializedBefore)
             mockFileSystem.File.Create(SidecarFilePath);
@@ -128,11 +127,14 @@ public class JsonFolderSnapshotServiceTests
         mockFileSystem.Directory.CreateDirectory(mockFileSystem.Path.Combine(FolderName, subfolder1));
         mockFileSystem.Directory.CreateDirectory(mockFileSystem.Path.Combine(FolderName, subfolder2));
         
-        sut.InitializeFolder(FolderName, true);
+        await sut.TakeSnapshot(FolderName, true);
 
         string subfolderSidecarFile1 = mockFileSystem.Path.Combine(FolderName, subfolder1, SidecarFileName);
         Assert.True(mockFileSystem.File.Exists(subfolderSidecarFile1));
         string subfolderSidecarFile2 = mockFileSystem.Path.Combine(FolderName, subfolder2, SidecarFileName);
         Assert.True(mockFileSystem.File.Exists(subfolderSidecarFile2));
     }
+    
+    // TODO add test that TakeSnapshot doesn't overwrite something it's not meant to
+    //  like for example a subfolder
 }
