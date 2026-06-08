@@ -58,6 +58,19 @@ public class JsonFolderSnapshotService : BaseFolderSnapshotService
         return FolderSnapshot.Empty;
     }
 
+    protected override bool CanMonitorFolder(string folderPath)
+    {
+        return browseService.CanWriteToFolder(folderPath);
+    }
+
+    protected override bool InitializeFolderInternal(string folderPath)
+    {
+        var filePath = GetSidecarFilePath(folderPath);
+        var stream = fileSystem.File.Create(filePath);
+        stream?.Close();
+        return true;
+    }
+
     protected override Task TakeSnapshotInternal(string folderPath)
     {
         var filePath = GetSidecarFilePath(folderPath);
@@ -75,19 +88,6 @@ public class JsonFolderSnapshotService : BaseFolderSnapshotService
         }
 
         return Task.CompletedTask;
-    }
-
-    protected override bool InitializeFolderInternal(string folderPath)
-    {
-        var filePath = GetSidecarFilePath(folderPath);
-        var stream = fileSystem.File.Create(filePath);
-        stream?.Close();
-        return true;
-    }
-
-    protected override bool CanMonitorFolder(string folderPath)
-    {
-        return browseService.CanWriteToFolder(folderPath);
     }
 
     private string GetSidecarFilePath(string currentPath) =>
