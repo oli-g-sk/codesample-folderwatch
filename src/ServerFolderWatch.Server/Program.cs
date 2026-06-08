@@ -25,7 +25,8 @@ internal class Program
             throw new InvalidOperationException("Configuration could not be loaded."));
 
         builder.Services.AddSingleton<IFileSystem, RealFileSystem>();
-// TODO use scoped lifecycles?
+        
+        // TODO use scoped lifecycles?
         builder.Services.AddSingleton<IBrowseService, BrowseService>();
         builder.Services.AddSingleton<IFolderDiffService, FolderDiffService>();
         builder.Services.AddSingleton<IFolderSnapshotService, JsonFolderSnapshotService>();
@@ -39,6 +40,18 @@ internal class Program
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());        
             });
 
+        var app = BuildWebApp(builder);
+        ConfigureWebApp(app);
+
+        TakeStartupSnapshot(
+            app.Services.GetRequiredService<IFileSystem>(),
+            app.Services.GetRequiredService<IAppConfiguration>().RootPublicPath);
+
+        app.Run();
+    }
+
+    private static WebApplication BuildWebApp(WebApplicationBuilder builder)
+    {
         var app = builder.Build();
         app.UseStaticFiles();
         app.UseAntiforgery();
@@ -46,28 +59,33 @@ internal class Program
         app.MapRazorComponents<App>()
             .AddInteractiveServerRenderMode();
 
+        return app;
+    }
+
+    private static void ConfigureWebApp(WebApplication app)
+    {
         var configuration = app.Services.GetRequiredService<IAppConfiguration>();
-        var snapshotService = app.Services.GetRequiredService<IFolderSnapshotService>();
         string rootPublicPath = configuration.RootPublicPath;
 
         var browseService = app.Services.GetRequiredService<IBrowseService>();
-
         var logger = app.Services.GetRequiredService<ILogger<Program>>();
-
         var fileSystem = app.Services.GetRequiredService<IFileSystem>();
 
         if (!fileSystem.Directory.Exists(rootPublicPath))
-        {
             logger.LogError("Public folder path defined in configuration does not exist: {configurationPath}", rootPublicPath);
-            return;
-        }
         if (!browseService.CanWriteToFolder(rootPublicPath))
-        {
             logger.LogError("Public folder path defined in configuration is not writeable: {configurationPath}", rootPublicPath);
-            return;
-        }
-
+    }
+    
+    private static void TakeStartupSnapshot(IFileSystem fileSystem, string rootPublicPath)
+    {
+        var snapshotService = new JsonFolderSnapshotService(
+            new BrowseService(new AppConfiguration(), fileSystem),
+            fileSystem,
+            new AppConfiguration(),
+            new LoggerFactory());
+     
+        // TODO if not initialized, commit
         snapshotService.InitializeFolder(rootPublicPath, true);
-        app.Run();
     }
 }
