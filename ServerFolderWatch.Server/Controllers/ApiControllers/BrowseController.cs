@@ -41,13 +41,17 @@ public class BrowseController(IBrowseService browseService,
         if (!ValidateRequest(path, out var fullPath, out var error))
             return BadRequest(error);
 
-        var previousSnapshot = folderSnapshotService.LoadPersistedSnapshot(fullPath);
-        var currentContent = folderSnapshotService.GetCurrentContents(fullPath);
-        var diff = folderDiffService.Compare(previousSnapshot, currentContent, fullPath, out _);
+        var previousSnapshot =
+            folderSnapshotService.IsFolderAlreadyMonitored(fullPath) ?
+                folderSnapshotService.LoadPersistedSnapshot(fullPath)
+                : FolderSnapshot.Empty;
+
+        var currentContents = folderSnapshotService.GetCurrentContents(fullPath);
+        var diff = folderDiffService.Compare(previousSnapshot, currentContents, fullPath, out _);
 
         return Ok(new
         {
-            LastAnalyzed = currentContent.LastAnalyzed,
+            LastAnalyzed = currentContents.LastAnalyzed,
             Entries = MapDiffedEntries(diff)
         });
     }

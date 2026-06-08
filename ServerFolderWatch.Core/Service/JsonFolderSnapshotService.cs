@@ -52,11 +52,22 @@ public class JsonFolderSnapshotService : BaseFolderSnapshotService
         return FolderSnapshot.Empty;
     }
 
-    public override Task PersistSnapshot(string folderPath, Model.FolderSnapshot contents)
+    public override Task TakeSnapshot(string folderPath)
     {
-        var json = JsonConvert.SerializeObject(contents, Formatting.Indented);
         var filePath = GetSidecarFilePath(folderPath);
-        fileSystem.File.WriteAllText(filePath, json);
+        var contents = GetCurrentContents(folderPath);
+        
+        try
+        {
+            var json = JsonConvert.SerializeObject(contents, Formatting.Indented);
+            fileSystem.File.WriteAllText(filePath, json);
+            logger.LogDebug("Persisted snapshot of folder {FilePath}", folderPath);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error writing sidecar file in {FolderPath}: {Error}", folderPath, ex.Message);
+        }
+
         return Task.CompletedTask;
     }
 

@@ -18,12 +18,14 @@ public abstract class BaseFolderSnapshotService(IConfiguration configuration, IF
         
         if (!IsFolderAlreadyMonitored(folderPath))
         {
+            logger.LogInformation("Taking initial snapshot of folder: {folderPath}", folderPath);
+            
             InitializeFolderInternal(folderPath);
             wasInitialzed = true;
             
             var initialSnapshot = GetCurrentContents(folderPath);
             initialSnapshot.LastAnalyzed = DateTime.Now;
-            PersistSnapshot(folderPath, initialSnapshot).Wait();
+            TakeSnapshot(folderPath).Wait();
         }
 
         if (recursive)
@@ -55,7 +57,7 @@ public abstract class BaseFolderSnapshotService(IConfiguration configuration, IF
     
     public abstract FolderSnapshot LoadPersistedSnapshot(string folderPath);
 
-    public abstract Task PersistSnapshot(string folderPath, FolderSnapshot contents);
+    public abstract Task TakeSnapshot(string folderPath);
     
     protected abstract void InitializeFolderInternal(string folderPath);
 }

@@ -18,5 +18,5 @@ public interface IFolderSnapshotService
     
     FolderSnapshot LoadPersistedSnapshot(string folderPath);
     
-    Task PersistSnapshot(string folderPath, Model.FolderSnapshot contents);
+    Task TakeSnapshot(string folderPath);
 }
