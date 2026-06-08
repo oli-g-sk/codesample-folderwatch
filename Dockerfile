@@ -1,21 +1,25 @@
 # Build
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 
-WORKDIR /src
+WORKDIR /repo
 
 COPY src/ ./src/
 
-RUN dotnet publish src/ServerFolderWatch.Server/ServerFolderWatch.Server.csproj \
+WORKDIR /repo/src
+
+RUN dotnet publish \
     -c Release \
-    -o /app/publish
+    -o /repo/publish
 
 # Runtime
 FROM mcr.microsoft.com/dotnet/aspnet:9.0
 
 WORKDIR /app
 
-COPY --from=build /app/publish .
+COPY --from=build /repo/publish .
 
 EXPOSE 8080
 
-ENTRYPOINT ["dotnet", "ServerFolderWatch.Server.dll"]
+# ENTRYPOINT ["dotnet", "ServerFolderWatch.Server.dll"]
+
+ENTRYPOINT ["sleep", "infinity"]
