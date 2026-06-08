@@ -8,11 +8,33 @@ namespace ServerFolderWatch.Core.Service;
 public class BrowseService(IAppConfiguration configuration, IFileSystem fileSystem)
     : IBrowseService
 {
-    public bool IsPathValidAndBrowsable(string path)
+    public bool CanReadFolderContents(string path)
     {
-        // TODO disallow absolute paths
-        // TODO check if path "tries to exit" the root public folder
-        return fileSystem.Directory.Exists(path);
+        try
+        {
+            _ = fileSystem.Directory.EnumerateFiles(path);
+            return true;
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return false;
+        }
+    }
+
+    public bool CanWriteToFolder(string path)
+    {
+        try
+        {
+            string filePath = fileSystem.Path.Combine(path, ".test");
+            var handle = fileSystem.File.Create(filePath);
+            handle?.Close();
+            fileSystem.File.Delete(filePath);
+            return true;
+        }
+        catch (IOException)
+        {
+            return false;
+        }
     }
 
     public bool CanGoToParent(string path)
@@ -20,5 +42,10 @@ public class BrowseService(IAppConfiguration configuration, IFileSystem fileSyst
         var fullPath = Path.Combine(configuration.RootPublicPath, path);
         // TODO TEST
         return !fullPath.Equals(configuration.RootPublicPath);
+    }
+
+    public bool CanBrowsePath(string path)
+    {
+        return fileSystem.Directory.Exists(path);
     }
 }
