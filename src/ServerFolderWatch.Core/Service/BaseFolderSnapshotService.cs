@@ -23,7 +23,13 @@ public abstract class BaseFolderSnapshotService(
         if (!IsFolderAlreadyMonitored(folderPath))
         {
             if (!browseService.CanWriteToFolder(folderPath))
+            {
                 logger.LogWarning("Cannot write to folder: {folderPath}", folderPath);
+                
+                // early abort; assume if we cannot write here,
+                // there's no point continuing the recursion
+                return false;
+            }
 
             else
             {
