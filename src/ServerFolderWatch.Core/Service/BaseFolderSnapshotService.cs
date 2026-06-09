@@ -1,14 +1,11 @@
-using System.IO.Abstractions;
 using Microsoft.Extensions.Logging;
 using ServerFolderWatch.Core.Model;
 using ServerFolderWatch.Core.Service.Interfaces;
-using File = ServerFolderWatch.Core.Model.File;
 
 namespace ServerFolderWatch.Core.Service;
 
 public abstract class BaseFolderSnapshotService(
-    IAppConfiguration configuration,
-    IFileSystem fileSystem,
+    IBrowseService browseService,
     ILoggerFactory loggerFactory)
     : IFolderSnapshotService
 {
@@ -19,14 +16,8 @@ public abstract class BaseFolderSnapshotService(
     {
         return new FolderSnapshot
         {
-            Subfolders = fileSystem.Directory.EnumerateDirectories(folderPath)
-                .Select(fileSystem.Path.GetFileName).OfType<string>()
-                .Select(x => new Folder(x)).ToList(),
-            
-            VersionedFiles = fileSystem.Directory.EnumerateFiles(folderPath)
-                .Select(fileSystem.Path.GetFileName).OfType<string>()
-                .Where(x => !x.Equals(configuration.SidecarFileName))
-                .Select(x => new File(x)).ToList()
+            Subfolders = browseService.GetSubfolders(folderPath),
+            VersionedFiles = browseService.GetFiles(folderPath)
         };
     }
 
@@ -54,7 +45,7 @@ public abstract class BaseFolderSnapshotService(
         if (!recursive)
             return;
         
-        foreach (var subFolder in fileSystem.Directory.EnumerateDirectories(folderPath))
+        foreach (var subFolder in browseService.GetChildren(folderPath))
             await TakeSnapshot(subFolder, true);
     }
     

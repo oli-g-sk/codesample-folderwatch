@@ -1,10 +1,32 @@
+using ServerFolderWatch.Core.Model;
+using File = ServerFolderWatch.Core.Model.File;
+
 namespace ServerFolderWatch.Core.Service.Interfaces;
 
 public interface IBrowseService
 {
-    bool CanReadFolderContents(string path);
+    // TODO add tests for all paths being folders
     
-    bool CanWriteToFolder(string path);
+    bool CanReadFolderContents(string folderPath);
+    
+    bool CanWriteToFolder(string folderPath);
 
-    bool CanGoToParent(string path);
+    bool CanGoToParent(string folderPath);
+
+    /// <summary>
+    /// Returns fully qualified sub-entries of the given <see cref="folderPath"/>
+    /// </summary>
+    IEnumerable<string> GetChildren(string folderPath);
+
+    /// <summary>
+    /// Returns alphabetically sorted sub-folders of the given
+    /// <see cref="folderPath"/> as model <see cref="Folder"/> objects. 
+    /// </summary>
+    IList<Folder> GetSubfolders(string folderPath);
+    
+    /// <summary>
+    /// Returns alphabetically sorted files within the given
+    /// <see cref="folderPath"/> as model <see cref="File"/> objects. 
+    /// </summary>
+    IList<File> GetFiles(string folderPath);
 }

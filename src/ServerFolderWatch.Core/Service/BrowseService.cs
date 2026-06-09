@@ -48,4 +48,24 @@ public class BrowseService(IAppConfiguration configuration, IFileSystem fileSyst
     {
         return fileSystem.Directory.Exists(path);
     }
+
+    public IEnumerable<string> GetChildren(string folderPath)
+    {
+        return fileSystem.Directory.EnumerateDirectories(folderPath);
+    }
+    
+    public IList<Folder> GetSubfolders(string folderPath)
+    {
+        return fileSystem.Directory.EnumerateDirectories(folderPath)
+            .Select(fileSystem.Path.GetFileName).OfType<string>()
+            .Select(x => new Folder(x)).ToList();
+    }
+
+    public IList<File> GetFiles(string folderPath)
+    {
+        return fileSystem.Directory.EnumerateFiles(folderPath)
+            .Select(fileSystem.Path.GetFileName).OfType<string>()
+            .Where(x => !x.Equals(configuration.SidecarFileName))
+            .Select(x => new File(x)).ToList();
+    }
 }

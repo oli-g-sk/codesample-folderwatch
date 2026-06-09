@@ -16,10 +16,10 @@ public class JsonFolderSnapshotService : BaseFolderSnapshotService
 
     public JsonFolderSnapshotService(
         IBrowseService browseService,
-        IFileSystem fileSystem,
         IAppConfiguration configuration,
+        IFileSystem fileSystem,
         ILoggerFactory loggerFactory)
-        : base(configuration, fileSystem, loggerFactory)
+        : base(browseService, loggerFactory)
     {
         if (string.IsNullOrWhiteSpace(configuration.SidecarFileName))
             throw new ArgumentException("Invalid configuration: Sidecar file name is not set");
