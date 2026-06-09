@@ -40,7 +40,7 @@
 </div>
 
 @code {
-    private IDictionary<BaseEntry, DiffOperation>? diffEntries;
+    private IDictionary<FileSystemEntryBase, DiffOperation>? diffEntries;
     
     [SupplyParameterFromQuery]
     public string? Folder { get; set; }

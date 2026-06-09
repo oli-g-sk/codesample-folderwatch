@@ -7,14 +7,14 @@ using ServerFolderWatch.Core.Service.Interfaces;
 namespace ServerFolderWatch.Core.Service;
 
 // TODO composition over inheritance?
-public class SidecarSnapshotService : BaseFolderSnapshotService
+public class SidecarFolderSnapshotService : FolderSnapshotServiceBase
 {
     private readonly IBrowseService browseService;
     private readonly IFileSystem fileSystem;
     private readonly IAppConfiguration configuration;
-    private readonly ILogger<SidecarSnapshotService> logger;
+    private readonly ILogger<SidecarFolderSnapshotService> logger;
 
-    public SidecarSnapshotService(
+    public SidecarFolderSnapshotService(
         IBrowseService browseService,
         IAppConfiguration configuration,
         IFileSystem fileSystem,
@@ -29,7 +29,7 @@ public class SidecarSnapshotService : BaseFolderSnapshotService
         this.browseService = browseService;
         this.fileSystem = fileSystem;
         this.configuration = configuration;
-        logger = loggerFactory.CreateLogger<SidecarSnapshotService>();
+        logger = loggerFactory.CreateLogger<SidecarFolderSnapshotService>();
     }
     
     public override bool IsFolderAlreadyMonitored(string folderPath)

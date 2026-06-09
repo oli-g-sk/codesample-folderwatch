@@ -9,7 +9,7 @@ public class FolderSnapshot
     
     public IList<File> VersionedFiles { get; internal set; } = new List<File>();
     
-    public IList<BaseEntry> GetAllEntries() => Subfolders.OfType<BaseEntry>()
+    public IList<FileSystemEntryBase> GetAllEntries() => Subfolders.OfType<FileSystemEntryBase>()
         .Concat(VersionedFiles)
         .Order()
         .ToList();

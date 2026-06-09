@@ -13,11 +13,11 @@ public class FolderDiffService(
 {
     private readonly ILogger<FolderDiffService> logger = loggerFactory.CreateLogger<FolderDiffService>();
     
-    public Dictionary<BaseEntry, DiffOperation> Compare(FolderSnapshot? oldSnapshot, FolderSnapshot newSnapshot, string folderPath,
+    public Dictionary<FileSystemEntryBase, DiffOperation> Compare(FolderSnapshot? oldSnapshot, FolderSnapshot newSnapshot, string folderPath,
         out FolderSnapshotChanges changes)
     {
         changes = new FolderSnapshotChanges();
-        var diff = new Dictionary<BaseEntry, DiffOperation>();
+        var diff = new Dictionary<FileSystemEntryBase, DiffOperation>();
 
         if (oldSnapshot == null)
         {

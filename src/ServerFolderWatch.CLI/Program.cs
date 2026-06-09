@@ -10,7 +10,7 @@ namespace ServerFolderWatch.CLI;
 
 class Program
 {
-    private static IFolderSnapshotService snapshotService;
+    private static IFolderSnapshotService FolderSnapshotService;
     private static IFolderDiffService diffService;
     
     static void Main(string[] args)
@@ -29,21 +29,21 @@ class Program
         var configuration = new AppConfiguration();
         var browseService = new BrowseService(configuration, fileSystemWrapper);
         
-        snapshotService = new SidecarSnapshotService(browseService,
+        FolderSnapshotService = new SidecarFolderSnapshotService(browseService,
             configuration, fileSystemWrapper, loggerFactory);
         diffService = new FolderDiffService(fileSystemWrapper, browseService, loggerFactory);
        
         string path = configuration.RootPublicPath;
         string fullPath = browseService.GetFileSystemPath(path);
-        bool wasMonitored = snapshotService.IsFolderAlreadyMonitored(fullPath);
+        bool wasMonitored = FolderSnapshotService.IsFolderAlreadyMonitored(fullPath);
         
         PrintSingleLine("Folder" , fullPath);
 
-        var oldSnapshot = snapshotService.LoadPersistedSnapshot(path);
-        var currentContents = snapshotService.GetCurrentContents(path);
+        var oldSnapshot = FolderSnapshotService.LoadPersistedSnapshot(path);
+        var currentContents = FolderSnapshotService.GetCurrentContents(path);
         var diff = diffService.Compare(oldSnapshot!, currentContents, path, out var summary);
         
-        string lastAnalyzed = snapshotService.LoadPersistedSnapshot(fullPath)?.LastAnalyzed.ToString() ?? "NEVER";
+        string lastAnalyzed = FolderSnapshotService.LoadPersistedSnapshot(fullPath)?.LastAnalyzed.ToString() ?? "NEVER";
         PrintSingleLine("Last snapshot", lastAnalyzed);
         
         if (wasMonitored)
@@ -57,20 +57,20 @@ class Program
         {
             if (args[0] == "commit")
             {
-                var snapshot = snapshotService.TakeSnapshot(fullPath, false).Result;
+                var snapshot = FolderSnapshotService.TakeSnapshot(fullPath, false).Result;
                 PrintSingleLine("Saved snapshot at: ", snapshot.LastAnalyzed!.ToString()!);
             }
 
             if (args[0] == "commitr")
             {
                 Console.WriteLine($"Saving changes recursively...");
-                snapshotService.TakeSnapshot(fullPath, true);
+                FolderSnapshotService.TakeSnapshot(fullPath, true);
                 Console.WriteLine("Saved recursive folder snapshot");
             }
         }
     }
 
-    private static void PrintDiff(IDictionary<BaseEntry, DiffOperation> diff)
+    private static void PrintDiff(IDictionary<FileSystemEntryBase, DiffOperation> diff)
     {
         foreach (var kvp in diff)
         {

@@ -44,7 +44,7 @@ public class BrowsePageModel(
         return GetBrowseUrl(GetParentPath());
     }
 
-    public IDictionary<BaseEntry, DiffOperation> GetDiffEntries()
+    public IDictionary<FileSystemEntryBase, DiffOperation> GetDiffEntries()
     {
         var contents = folderSnapshotService.GetCurrentContents(currentFolder ?? string.Empty);
         var oldSnapshot = folderSnapshotService.LoadPersistedSnapshot(currentFolder);

@@ -6,9 +6,9 @@ namespace ServerFolderWatch.Core.Model;
 /// </summary>
 public class FolderSnapshotChanges
 {
-    public List<BaseEntry> AddedEntries { get; } = new ();
+    public List<FileSystemEntryBase> AddedEntries { get; } = new ();
 
-    public List<BaseEntry> ModifiedEntries { get; } = new();
+    public List<FileSystemEntryBase> ModifiedEntries { get; } = new();
 
-    public List<BaseEntry> DeletedEntries { get; } = new();
+    public List<FileSystemEntryBase> DeletedEntries { get; } = new();
 }

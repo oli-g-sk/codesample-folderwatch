@@ -60,7 +60,7 @@ internal class Program
         builder.Services.AddSingleton<IFileSystem, RealFileSystem>();
         
         builder.Services.AddSingleton<IBrowseService, BrowseService>();
-        builder.Services.AddSingleton<IFolderSnapshotService, SidecarSnapshotService>();
+        builder.Services.AddSingleton<IFolderSnapshotService, SidecarFolderSnapshotService>();
         
         builder.Services.AddScoped<IFolderDiffService, FolderDiffService>();
     }

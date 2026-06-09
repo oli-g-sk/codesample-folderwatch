@@ -4,13 +4,13 @@ using ServerFolderWatch.Core.Service.Interfaces;
 
 namespace ServerFolderWatch.Core.Service;
 
-public abstract class BaseFolderSnapshotService(
+public abstract class FolderSnapshotServiceBase(
     IBrowseService browseService,
     ILoggerFactory loggerFactory)
     : IFolderSnapshotService
 {
-    private readonly ILogger<BaseFolderSnapshotService> logger
-        = loggerFactory.CreateLogger<BaseFolderSnapshotService>();
+    private readonly ILogger<FolderSnapshotServiceBase> logger
+        = loggerFactory.CreateLogger<FolderSnapshotServiceBase>();
 
     public FolderSnapshot GetCurrentContents(string folderPath)
     {

@@ -62,7 +62,7 @@ public class BrowseController(IBrowseService browseService,
         });
     }
 
-    private static IEnumerable<FileSystemEntryDto> MapCurrentEntries(IEnumerable<BaseEntry> currentEntries)
+    private static IEnumerable<FileSystemEntryDto> MapCurrentEntries(IEnumerable<FileSystemEntryBase> currentEntries)
     {
         var ordered = currentEntries.Order();
         
@@ -77,7 +77,7 @@ public class BrowseController(IBrowseService browseService,
             ));
     }
     
-    private static IEnumerable<FileSystemEntryDiffDto> MapDiffedEntries(IDictionary<BaseEntry, DiffOperation> diff)
+    private static IEnumerable<FileSystemEntryDiffDto> MapDiffedEntries(IDictionary<FileSystemEntryBase, DiffOperation> diff)
     {
         var ordered = diff.OrderBy(x => x.Key);
         

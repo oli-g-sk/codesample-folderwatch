@@ -7,7 +7,7 @@ using Testably.Abstractions.Testing;
 
 namespace ServerFolderWatch.Tests;
 
-public class SidecarSnapshotServiceTests
+public class SidecarFolderSnapshotServiceTests
 {
     private const string FolderName = "test";
     private const string SidecarFileName = "metadata.txt";
@@ -17,11 +17,11 @@ public class SidecarSnapshotServiceTests
     private readonly Mock<IAppConfiguration> configurationMock = new();
     private readonly Mock<ILoggerFactory> loggerFactoryMock;
 
-    private readonly BaseFolderSnapshotService sut;
+    private readonly FolderSnapshotServiceBase sut;
 
     private string SidecarFilePath => mockFileSystem.Path.Combine(FolderName, SidecarFileName);
     
-    public SidecarSnapshotServiceTests()
+    public SidecarFolderSnapshotServiceTests()
     {
         loggerFactoryMock = new Mock<ILoggerFactory>();
         loggerFactoryMock.Setup(x => x.CreateLogger(It.IsAny<string>()))
@@ -34,7 +34,7 @@ public class SidecarSnapshotServiceTests
         browseServiceMock.Setup(x => x.GetFileSystemPath(It.IsAny<string>()))
             .Returns((string folderPath) => folderPath);
         
-        sut = new SidecarSnapshotService(browseServiceMock.Object,
+        sut = new SidecarFolderSnapshotService(browseServiceMock.Object,
             configurationMock.Object, mockFileSystem, loggerFactoryMock.Object);
         
         // TODO test that we're checking configuration file name
@@ -63,7 +63,7 @@ public class SidecarSnapshotServiceTests
             .Returns(sidecarFileName!);
         
         Assert.Throws<ArgumentException>(() => 
-            new SidecarSnapshotService(browseServiceMock.Object, configurationMock.Object, mockFileSystem,
+            new SidecarFolderSnapshotService(browseServiceMock.Object, configurationMock.Object, mockFileSystem,
                 loggerFactoryMock.Object));
     }
     
@@ -77,7 +77,7 @@ public class SidecarSnapshotServiceTests
                 .Returns($"sidecar{invalidChar}");
             
             Assert.Throws<ArgumentException>(() => 
-                new SidecarSnapshotService(browseServiceMock.Object, configurationMock.Object, mockFileSystem,
+                new SidecarFolderSnapshotService(browseServiceMock.Object, configurationMock.Object, mockFileSystem,
                     loggerFactoryMock.Object));
         }
     }
