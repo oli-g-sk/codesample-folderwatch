@@ -94,7 +94,6 @@ public class BrowseService(IAppConfiguration configuration, IFileSystem fileSyst
             .Select(x => new File(x)).ToList();
     }
 
-    // TODO move to ASP.NET middleware?
     private string NormalizePath(string? folderPath)
     {
         string fullRootFolderPath = GetRootPublicFileSystemPath();

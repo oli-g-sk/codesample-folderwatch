@@ -76,8 +76,6 @@ public class FolderDiffService(
         if (changes.ModifiedEntries.Any())
             logger.LogInformation("Items modified in {FolderPath}: {ModifiedFiles}", folderPath, changes.ModifiedEntries.Count);
 
-        newSnapshot.LastAnalyzed = DateTime.Now;
-        
         return diff;
     }
     
@@ -87,6 +85,9 @@ public class FolderDiffService(
         var modified = fileSystem.File.GetLastWriteTime(fullPath);
 
         // TODO other ways to detect changes? (size, MD5, etc.)
+        if (oldSnapshot.LastAnalyzed == null)
+            return false;
+        
         return modified > oldSnapshot.LastAnalyzed;
     }
 }
