@@ -75,18 +75,30 @@ class Program
         {
             if (entry.Operation == DiffOperation.Unchanged)
                 continue;
-            
+
+            string character = "";
             Console.ForegroundColor = ConsoleColor.White;
             if (entry.Operation == DiffOperation.Added)
+            {
                 Console.ForegroundColor = ConsoleColor.Green;
+                character = "+";
+            }
+
             if (entry.Operation == DiffOperation.Removed)
+            {
                 Console.ForegroundColor = ConsoleColor.Red;
+                character = "-";
+            }
+
             if (entry.Operation == DiffOperation.Modified)
+            {
                 Console.ForegroundColor = ConsoleColor.Yellow;
+                character = "^";
+            }
 
             string name = entry.FileSystemEntry is Folder
-                ? $"[{entry.FileSystemEntry.Name}]"
-                : entry.FileSystemEntry.Name;
+                ? $"{character} [{entry.FileSystemEntry.Name}]"
+                : $"{character} {entry.FileSystemEntry.Name}";
             
             Console.WriteLine(name);
         }
