@@ -23,7 +23,7 @@ public abstract class BaseFolderSnapshotService(
 
     public abstract bool IsFolderAlreadyMonitored(string folderPath);
     
-    public abstract FolderSnapshot LoadPersistedSnapshot(string folderPath);
+    public abstract FolderSnapshot? LoadPersistedSnapshot(string folderPath);
 
     public async Task TakeSnapshot(string folderPath, bool recursive)
     {

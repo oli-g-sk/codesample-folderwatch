@@ -37,7 +37,7 @@ public class SidecarSnapshotService : BaseFolderSnapshotService
         return fileSystem.File.Exists(GetSidecarFilePath(folderPath));
     }
     
-    public override FolderSnapshot LoadPersistedSnapshot(string folderPath)
+    public override FolderSnapshot? LoadPersistedSnapshot(string folderPath)
     {
         try
         {
@@ -54,8 +54,7 @@ public class SidecarSnapshotService : BaseFolderSnapshotService
             logger.LogError(ex, "Error reading sidecar file in {FolderPath}: {Error}", folderPath, ex.Message);
         }
         
-        // TODO return null
-        return FolderSnapshot.Empty;
+        return null;
     }
 
     protected override bool CanMonitorFolder(string folderPath)

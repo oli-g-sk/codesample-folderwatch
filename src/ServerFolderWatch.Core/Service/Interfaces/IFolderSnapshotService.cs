@@ -18,7 +18,7 @@ public interface IFolderSnapshotService
     /// </summary>
     /// <param name="folderPath" />
     /// <returns></returns>
-    FolderSnapshot LoadPersistedSnapshot(string folderPath);
+    FolderSnapshot? LoadPersistedSnapshot(string folderPath);
     
     /// <summary>
     /// Takes and stores a snapshot of the folder in its current state.

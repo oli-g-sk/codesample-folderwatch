@@ -1,32 +1,25 @@
 @page "/browse"
 @using ServerFolderWatch.Core.Model
-@inject IBrowseService BrowseService
-@inject IFolderSnapshotService FolderSnapshotService
-@inject IFolderDiffService FolderDiffService
+@using ServerFolderWatch.Server.PageModels
 @inject NavigationManager NavigationManager
-
-<!--
-<h1>Browse</h1>
-<p>Clicks: @clicks</p>
-<button @onclick="Increment">Increment</button>
--->
+@inject BrowsePageModel Model;
 
 <div id="browser">
     <ul>
-        @if (BrowseService.CanGoToParent(Folder ?? string.Empty))
+        @if (Model.CanGoToParent())
         {
             <li>
-                <a href="@GetParentUrl()">
+                <a href="@Model.GetParentUrl()">
                     <span><em class="icon">⇧</em> .. </span>
                 </a>
             </li>
         }
         @foreach (var child in diffEntries)
         {
-            <li class="@GetClassName(child.Item2)">
-                @if (child.Item1 is Folder)
+            <li class="@Model.GetClassName(child.Item2)">
+                @if (child.Item1 is Folder folder)
                 {
-                    <a href="/browse?folder=@GetChildPath(child.Item1)">
+                    <a href="/browse?folder=@Model.GetChildPath(folder)">
                         <span><em class="icon">🗀</em> @child.Item1.Name</span>
                     </a>
                 }
@@ -40,43 +33,10 @@
 </div>
 
 @code {
-    private IList<(BaseEntry, DiffOperation)> diffEntries;
+    private IList<(BaseEntry, DiffOperation)>? diffEntries;
     
     [SupplyParameterFromQuery]
     public string? Folder { get; set; }
-
-    // TODO fix for proper use (remove indexInList mostly)
-    string GetClassName(DiffOperation diffOperation)
-    {
-        return diffOperation switch
-        {
-            DiffOperation.Added => "diff-added",
-            DiffOperation.Removed => "diff-removed",
-            DiffOperation.Modified => "diff-modified",
-            _ => ""
-        };
-    }
-
-    string GetChildPath(BaseEntry entry)
-    {
-        return (string.IsNullOrWhiteSpace(Folder)
-            ? string.Empty
-            : $"{Folder}/") + entry.Name;
-    }
-
-    string GetParentPath()
-    {
-        if (string.IsNullOrWhiteSpace(Folder) || !Folder.Contains('/'))
-            return string.Empty;
-        
-        return Folder?[..Folder.IndexOf('/')] ?? "/";
-    }
-
-    string GetParentUrl()
-    {
-        var parentPath = GetParentPath();
-        return string.IsNullOrEmpty(parentPath) ? "/browse" : $"/browse?folder={parentPath}";
-    }
 
     protected override void OnParametersSet()
     {
@@ -84,11 +44,9 @@
 
         if (Folder == string.Empty)
             NavigationManager.NavigateTo("/browse", replace: true);
-
-        var contents = FolderSnapshotService.GetCurrentContents(Folder ?? string.Empty);
-        var oldSnapshot = FolderSnapshotService.LoadPersistedSnapshot(Folder);
-        var diff = FolderDiffService.Compare(oldSnapshot, contents, Folder, out _);
-        diffEntries = diff.Entries;
+        
+        Model.LoadFolder(Folder);
+        diffEntries = Model.GetDiffEntries();
     }
 
 }
