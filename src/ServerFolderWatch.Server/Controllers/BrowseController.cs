@@ -15,7 +15,8 @@ public class BrowseController(IBrowseService browseService,
     IFolderSnapshotService folderSnapshotService,
     IFolderDiffService folderDiffService,
     IAppConfiguration configuration,
-    ILoggerFactory loggerFactory) : ControllerBase
+    ILoggerFactory loggerFactory)
+    : BaseController(browseService, loggerFactory)
 {
     private readonly ILogger<BrowseController> logger = loggerFactory.CreateLogger<BrowseController>();
     
@@ -90,28 +91,5 @@ public class BrowseController(IBrowseService browseService,
                 ? file.Version
                 : null
         ));
-    }
-
-    // TODO find a common pattern to handle validation like this
-    private bool ValidateRequest(string path, out IActionResult? errorResult)
-    {
-        if (!browseService.FolderExists(path))
-        {
-            var error = $"Path does not exist";
-            logger.LogWarning("{Error}: {Path}", error, path);
-            errorResult = NotFound(error);
-            return false;
-        }
-        
-        if (!browseService.CanReadFolderContents(path))
-        {
-            var error = "Cannot read folder contents.";
-            logger.LogWarning("{Error} Path: {Path}", error, path);
-            errorResult = Forbid(error);
-            return false;
-        }
-        
-        errorResult = null;
-        return true;       
     }
 }
