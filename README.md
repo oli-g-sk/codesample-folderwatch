@@ -1,19 +1,18 @@
-## Getting started
+# Server Folder Diff
 
-## Server app
+## Starting the app
 
-- Use `dotnet run` in `src/ServerFolderWatch.Server` to start the server at http://localhost:5000/
-- Use `docker compose up` to start the server in a container exposed at http://localhost:8080/
-- Both point to the `shared` folder here; use it to test the app
-- *Snapshots are taken on startup*; restart is required 
-- *Blazor UI* available at http://localhost:8080/browse
+- Start the server in a container, exposed at http://localhost:8080/: `docker compose up`
+- The `shared` folder is **mounted as the root for change tracking**; use it to test the app
+- **Snapshots are taken on startup**; displayed _diffs_ compare the last snapshot with the current file system state
+
+## Web UI
+- When booted up with Docker Compose, **Blazor UI** is available at http://localhost:8080/browse
 
 ## API endpoints
 
-- GET `http://localhost:8080/api/browse`
-- GET `http://localhost:8080/api/browse?folder=path/to/folder`
+- GET `/api/browse`
+- GET `/api/browse?folder=path/to/folder`
 
-- GET `http://localhost:8080/api/diff`
-- GET `http://localhost:8080/api/diff?folder=path/to/folder`
-
-## CLI tool
+- GET `/api/diff`
+- GET `/api/diff?folder=path/to/folder`
