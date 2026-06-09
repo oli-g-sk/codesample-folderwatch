@@ -1,12 +1,16 @@
 ﻿using Microsoft.Extensions.Logging;
 using ServerFolderWatch.Core.Model;
 using ServerFolderWatch.Core.Service;
+using ServerFolderWatch.Core.Service.Interfaces;
 using Testably.Abstractions;
 
 namespace ServerFolderWatch.CLI;
 
 class Program
 {
+    private static IFolderSnapshotService snapshotService;
+    private static IFolderDiffService diffService;
+    
     static void Main(string[] args)
     {
         using ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
@@ -20,30 +24,45 @@ class Program
         var fileSystemWrapper = new RealFileSystem();
         var configuration = new AppConfiguration();
         var browseService = new BrowseService(configuration, fileSystemWrapper);
-        var snapshotService = new SidecarSnapshotService(browseService,
+        
+        snapshotService = new SidecarSnapshotService(browseService,
             configuration, fileSystemWrapper, loggerFactory);
-        var diffService = new FolderDiffService(fileSystemWrapper, browseService, loggerFactory);
+        diffService = new FolderDiffService(fileSystemWrapper, browseService, loggerFactory);
+       
+        string path = configuration.RootPublicPath;
+        string fullPath = browseService.GetFileSystemPath(path);
+        bool wasMonitored = snapshotService.IsFolderAlreadyMonitored(fullPath);
         
-        Console.WriteLine("Enter path (leave empty for default:");
+        Console.WriteLine("Folder: " + fullPath);
+        string lastAnalyzed = snapshotService.LoadPersistedSnapshot(fullPath)?.LastAnalyzed.ToString() ?? "NEVER";
+        Console.WriteLine("Last snapshot: " + lastAnalyzed);
+        Console.WriteLine();
         
-        var input = Console.ReadLine();
-        var path = TryReadPath(input, browseService);
-
-        if (path is null)
+        if (wasMonitored)
+            PrintDiff(fullPath);
+        
+        if (args.Length > 0 && !string.IsNullOrWhiteSpace(args[0]))
         {
-            Console.WriteLine("Path not provided or invalid; Using default.");
-            path = ".";
+            if (args[0] == "commit")
+            {
+                snapshotService.TakeSnapshot(fullPath, false);
+                Console.WriteLine("Saved folder snapshot");
+            }
+
+            if (args[0] == "commitr")
+            {
+                snapshotService.TakeSnapshot(fullPath, true);
+                Console.WriteLine("Saved recursive folder snapshot");
+            }
         }
+    }
 
-        if (!snapshotService.IsFolderAlreadyMonitored(path))
-        {
-            Console.WriteLine("Setup complete.");
-            return;
-        }
-
-        var diff = diffService.Compare(snapshotService.LoadPersistedSnapshot(path),
-            snapshotService.GetCurrentContents(path), path, out var diffs);
-
+    private static void PrintDiff(string path)
+    {
+        var oldSnapshot = snapshotService.LoadPersistedSnapshot(path);
+        var currentContents = snapshotService.GetCurrentContents(path);
+        var diff = diffService.Compare(oldSnapshot, currentContents, path, out _);
+        
         foreach (var entry in diff.Entries)
         {
             Console.ForegroundColor = ConsoleColor.White;
@@ -60,22 +79,5 @@ class Program
             
             Console.WriteLine(name);
         }
-        
-        snapshotService.TakeSnapshot(path, true).Wait();
-        
-        Console.WriteLine();
-        Console.WriteLine("Press any key to exit.");
-        Console.ReadKey();
-    }
-
-    static string? TryReadPath(string? input, BrowseService browseService)
-    {
-        if (string.IsNullOrWhiteSpace(input))
-            return null;
-
-        if (!browseService.FolderExists(input))
-            return null;
-
-        return input;
     }
 }
