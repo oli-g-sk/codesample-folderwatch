@@ -14,6 +14,8 @@ using Testably.Abstractions;
 
 internal class Program
 {
+    private static ILogger<Program> logger;
+    
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
@@ -40,17 +42,20 @@ internal class Program
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());        
             });
 
-        var app = BuildWebApp(builder);
-        ConfigureWebApp(app);
+        var app = BuildWebAppplication(builder);
+        logger = app.Services.GetRequiredService<ILogger<Program>>();
 
-        TakeStartupSnapshot(
-            app.Services.GetRequiredService<IFolderSnapshotService>(),
-            app.Services.GetRequiredService<IAppConfiguration>().RootPublicPath);
+        if (InitializeApplication(app))
+        {
+            TakeStartupSnapshot(
+                app.Services.GetRequiredService<IFolderSnapshotService>(),
+                app.Services.GetRequiredService<IAppConfiguration>().RootPublicPath);
 
-        app.Run();
+            app.Run();
+        }
     }
 
-    private static WebApplication BuildWebApp(WebApplicationBuilder builder)
+    private static WebApplication BuildWebAppplication(WebApplicationBuilder builder)
     {
         var app = builder.Build();
         app.UseStaticFiles();
@@ -62,23 +67,34 @@ internal class Program
         return app;
     }
 
-    private static void ConfigureWebApp(WebApplication app)
+    private static bool InitializeApplication(WebApplication app)
     {
         var configuration = app.Services.GetRequiredService<IAppConfiguration>();
         string rootPublicPath = configuration.RootPublicPath;
 
-        var browseService = app.Services.GetRequiredService<IBrowseService>();
-        var logger = app.Services.GetRequiredService<ILogger<Program>>();
         var fileSystem = app.Services.GetRequiredService<IFileSystem>();
+        var browseService = app.Services.GetRequiredService<IBrowseService>();
 
         if (!fileSystem.Directory.Exists(rootPublicPath))
-            logger.LogError("Public folder path defined in configuration does not exist: {configurationPath}", rootPublicPath);
+        {
+            logger.LogError("Public folder path defined in configuration does not exist: {configurationPath}",
+                rootPublicPath);
+            return false;
+        }
+
         if (!browseService.CanWriteToFolder(rootPublicPath))
-            logger.LogError("Public folder path defined in configuration is not writeable: {configurationPath}", rootPublicPath);
+        {
+            logger.LogError("Public folder path defined in configuration is not writeable: {configurationPath}",
+                rootPublicPath);
+            return false;
+        }
+
+        return true;
     }
     
     private static void TakeStartupSnapshot(IFolderSnapshotService snapshotService, string rootPublicPath)
     {
+        logger.LogInformation("Taking recursive snapshot of public folder: {rootPublicPath}", rootPublicPath);
         snapshotService.TakeSnapshot(rootPublicPath, true).Wait();
     }
 }
