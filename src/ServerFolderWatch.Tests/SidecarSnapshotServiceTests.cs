@@ -33,7 +33,7 @@ public class SidecarSnapshotServiceTests
             .Returns(true);
         
         sut = new SidecarSnapshotService(browseServiceMock.Object,
-            mockFileSystem, configurationMock.Object, loggerFactoryMock.Object);
+            configurationMock.Object, mockFileSystem, loggerFactoryMock.Object);
         
         // TODO test that we're checking configuration file name
 
@@ -61,7 +61,7 @@ public class SidecarSnapshotServiceTests
             .Returns(sidecarFileName);
         
         Assert.Throws<ArgumentException>(() => 
-            new SidecarSnapshotService(browseServiceMock.Object, mockFileSystem, configurationMock.Object,
+            new SidecarSnapshotService(browseServiceMock.Object, configurationMock.Object, mockFileSystem,
                 loggerFactoryMock.Object));
     }
     
@@ -75,7 +75,7 @@ public class SidecarSnapshotServiceTests
                 .Returns($"sidecar{invalidChar}");
             
             Assert.Throws<ArgumentException>(() => 
-                new SidecarSnapshotService(browseServiceMock.Object, mockFileSystem, configurationMock.Object,
+                new SidecarSnapshotService(browseServiceMock.Object, configurationMock.Object, mockFileSystem,
                     loggerFactoryMock.Object));
         }
     }
