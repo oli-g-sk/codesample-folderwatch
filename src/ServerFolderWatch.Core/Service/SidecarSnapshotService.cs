@@ -70,7 +70,6 @@ public class SidecarSnapshotService : BaseFolderSnapshotService
         {
             var json = JsonConvert.SerializeObject(snapshot, Formatting.Indented);
             fileSystem.File.WriteAllText(filePath, json);
-            logger.LogDebug("Persisted snapshot of folder {FilePath}", folderPath);
         }
         catch (Exception ex)
         {

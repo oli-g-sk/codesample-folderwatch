@@ -13,9 +13,11 @@ class Program
     
     static void Main(string[] args)
     {
+        Console.ResetColor();
+        
         using ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
         {
-            builder.AddConsole();
+            // builder.AddConsole();
 #if DEBUG
             builder.SetMinimumLevel(LogLevel.Trace);
 #endif
@@ -33,9 +35,7 @@ class Program
         string fullPath = browseService.GetFileSystemPath(path);
         bool wasMonitored = snapshotService.IsFolderAlreadyMonitored(fullPath);
         
-        Console.WriteLine("Folder: " + fullPath);
-        string lastAnalyzed = snapshotService.LoadPersistedSnapshot(fullPath)?.LastAnalyzed.ToString() ?? "NEVER";
-        Console.WriteLine("Last snapshot: " + lastAnalyzed);
+        PrintSingleLine("Folder" , fullPath);
 
         if (wasMonitored)
         {
@@ -43,34 +43,41 @@ class Program
             var currentContents = snapshotService.GetCurrentContents(path);
             var diff = diffService.Compare(oldSnapshot!, currentContents, path, out var summary);
             
-            Console.Write("Summary: ");
-
-            if (!summary.AddedEntries.Any() && !summary.DeletedEntries.Any() && !summary.ModifiedEntries.Any())
-                Console.WriteLine("No changes detected.");
-            
+            if (!HasChanges(diff))
+                PrintSingleLine("Summary","No changes");
             else
             {
-                Console.ForegroundColor = ConsoleColor.Green;
-                if (summary.AddedEntries.Any())
-                    Console.Write($"ADD {summary.AddedEntries.Count} files ");
-                Console.ForegroundColor = ConsoleColor.Red;
-                if (summary.DeletedEntries.Any())
-                    Console.Write($"REM {summary.DeletedEntries.Count} files ");
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                if (summary.ModifiedEntries.Any())
-                    Console.Write($"MOD {summary.ModifiedEntries.Count} files ");
+                Console.Write("Summary: ");
 
-                Console.ResetColor();
-                Console.WriteLine();
-                
-                Console.ResetColor();
-                Console.WriteLine();
-                
-                PrintDiff(diff);   
+                if (!summary.AddedEntries.Any() && !summary.DeletedEntries.Any() && !summary.ModifiedEntries.Any())
+                {
+                    Console.ForegroundColor = ConsoleColor.DarkCyan;
+                    Console.WriteLine("No changes");
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    if (summary.AddedEntries.Any())
+                        Console.Write($"ADD {summary.AddedEntries.Count} files ");
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    if (summary.DeletedEntries.Any())
+                        Console.Write($"REM {summary.DeletedEntries.Count} files ");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    if (summary.ModifiedEntries.Any())
+                        Console.Write($"MOD {summary.ModifiedEntries.Count} files ");
+
+                    Console.ResetColor();
+                    PrintDiff(diff);
+                    Console.ResetColor();
+                }
             }
-            
-            Console.ResetColor();
         }
+        
+        string lastAnalyzed = snapshotService.LoadPersistedSnapshot(fullPath)?.LastAnalyzed.ToString() ?? "NEVER";
+        PrintSingleLine("Last snapshot", lastAnalyzed);
+        
+        Console.ResetColor();
+        Console.WriteLine();
         
         if (args.Length > 0 && !string.IsNullOrWhiteSpace(args[0]))
         {
@@ -92,6 +99,8 @@ class Program
 
     private static void PrintDiff(FolderSnapshotDiff diff)
     {
+        Console.WriteLine();
+
         foreach (var entry in diff.Entries)
         {
             if (entry.Operation == DiffOperation.Unchanged)
@@ -111,5 +120,20 @@ class Program
             
             Console.WriteLine(name);
         }
+    }
+
+    private static void PrintSingleLine(string heading, string content)
+    {
+        Console.ResetColor();
+        Console.Write($"{heading}: ");
+        Console.ForegroundColor = ConsoleColor.DarkCyan;
+        Console.Write($" {content}");
+        Console.WriteLine();
+        Console.ResetColor();
+    }
+
+    private static bool HasChanges(FolderSnapshotDiff diff)
+    {
+        return diff.Entries.Any(x => x.Operation != DiffOperation.Unchanged);
     }
 }

@@ -66,15 +66,15 @@ public class FolderDiffService(
         }
         
         if (!changes.AddedEntries.Any() && !changes.DeletedEntries.Any() && !changes.ModifiedEntries.Any())
-            logger.LogInformation("No changes detected in {FolderPath}", folderPath);
+            logger.LogDebug("No changes detected in {FolderPath}", folderPath);
         else
         
         if (changes.AddedEntries.Any())
-            logger.LogInformation("Items added in {FolderPath}: {AddedFiles}", folderPath, changes.AddedEntries.Count);
+            logger.LogDebug("Items added in {FolderPath}: {AddedFiles}", folderPath, changes.AddedEntries.Count);
         if (changes.DeletedEntries.Any())
-            logger.LogInformation("Items deleted in {FolderPath}: {DeletedFiles}", folderPath, changes.DeletedEntries.Count);
+            logger.LogDebug("Items deleted in {FolderPath}: {DeletedFiles}", folderPath, changes.DeletedEntries.Count);
         if (changes.ModifiedEntries.Any())
-            logger.LogInformation("Items modified in {FolderPath}: {ModifiedFiles}", folderPath, changes.ModifiedEntries.Count);
+            logger.LogDebug("Items modified in {FolderPath}: {ModifiedFiles}", folderPath, changes.ModifiedEntries.Count);
 
         return diff;
     }
