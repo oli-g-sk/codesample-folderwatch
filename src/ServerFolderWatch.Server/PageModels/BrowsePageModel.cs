@@ -54,7 +54,8 @@ public class BrowsePageModel(
 
     public string GetChildPath(Folder childFolder)
     {
-        return $"{currentFolder}/{HttpUtility.UrlEncode(childFolder.Name)}";
+        string basePath = string.IsNullOrWhiteSpace(currentFolder) ? "" : currentFolder + "/";
+        return $"{basePath}{HttpUtility.UrlEncode(childFolder.Name)}";
     }
 
     public bool CanGoToParent()
