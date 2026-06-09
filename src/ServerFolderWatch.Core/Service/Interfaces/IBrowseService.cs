@@ -5,6 +5,8 @@ namespace ServerFolderWatch.Core.Service.Interfaces;
 
 public interface IBrowseService
 {
+    string GetFileSystemPath(string? folderPath);
+    
     bool FolderExists(string folderPath);
     
     /// <summary>
