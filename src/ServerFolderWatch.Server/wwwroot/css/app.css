@@ -19,14 +19,23 @@ body {
     li {
         list-style: none;
         
-        span {
+        a {
             padding: 0.5em 1em;
             display: block;
             opacity: 0.85;
         }
         
-        a:hover span {
+        a:hover {
             opacity: 1;
+        }
+        
+        strong {
+            display: inline-block;
+        }
+        strong:before {
+            color: white;;
+            content: '@';
+            margin-left: 0.5em;
         }
     }
     li:hover {
