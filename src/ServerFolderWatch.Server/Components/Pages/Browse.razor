@@ -26,7 +26,7 @@
         }
         @foreach (var child in diffEntries)
         {
-            <li class="@GetClassName(child.Item1, diffEntries.IndexOf(child))">
+            <li class="@GetClassName(child.Item2)">
                 @if (child.Item1 is Folder)
                 {
                     <a href="/browse?folder=@GetChildPath(child.Item1)">
@@ -43,20 +43,19 @@
 </div>
 
 @code {
-    private List<BaseEntry> currentContents;
     private IList<(BaseEntry, DiffOperation)> diffEntries;
     
     [SupplyParameterFromQuery]
     public string? Folder { get; set; }
 
     // TODO fix for proper use (remove indexInList mostly)
-    string GetClassName(BaseEntry entry, int indexInList)
+    string GetClassName(DiffOperation diffOperation)
     {
-        return indexInList switch
+        return diffOperation switch
         {
-            1 => "diff-added",
-            3 => "diff-removed",
-            5 => "diff-modified",
+            DiffOperation.Added => "diff-added",
+            DiffOperation.Removed => "diff-removed",
+            DiffOperation.Modified => "diff-modified",
             _ => ""
         };
     }
@@ -94,8 +93,7 @@
 
         var oldSnapshot = FolderSnapshotService.LoadPersistedSnapshot(folderPath);
         var diff = FolderDiffService.Compare(oldSnapshot, contents, folderPath, out _);
-        
-        currentContents = contents.GetAllEntries().ToList();
+
         diffEntries = diff.Entries;
     }
 
