@@ -23,14 +23,17 @@ public class BrowseController(IBrowseService browseService,
     [HttpGet("api/browse")]
     public IActionResult Browse([FromQuery(Name = "folder")] string? path)
     {
-        if (!ValidateRequest(path, out var fullPath, out var error))
-            return BadRequest(error);
+        // TODO is it okay to coerce this here?
+        path ??= configuration.RootPublicPath;
+        
+        if (!ValidateRequest(path, out var error))
+            return error!;
 
-        var currentContent = folderSnapshotService.GetCurrentContents(fullPath);
+        var currentContent = folderSnapshotService.GetCurrentContents(path);
         
         return Ok(new
         {
-            LastAnalyzed = currentContent.LastAnalyzed,
+            Path = path,
             Entries = MapCurrentEntries(currentContent.GetAllEntries())
         });
     }
@@ -38,16 +41,19 @@ public class BrowseController(IBrowseService browseService,
     [HttpGet("api/diff")]
     public IActionResult Diff([FromQuery(Name = "folder")] string? path)
     {
-        if (!ValidateRequest(path, out var fullPath, out var error))
-            return BadRequest(error);
+        // TODO is it okay to coerce this here?
+        path ??= configuration.RootPublicPath;
+        
+        if (!ValidateRequest(path, out var error))
+            return error!;
 
         var previousSnapshot =
-            folderSnapshotService.IsFolderAlreadyMonitored(fullPath) ?
-                folderSnapshotService.LoadPersistedSnapshot(fullPath)
+            folderSnapshotService.IsFolderAlreadyMonitored(path) ?
+                folderSnapshotService.LoadPersistedSnapshot(path)
                 : FolderSnapshot.Empty;
 
-        var currentContents = folderSnapshotService.GetCurrentContents(fullPath);
-        var diff = folderDiffService.Compare(previousSnapshot, currentContents, fullPath, out _);
+        var currentContents = folderSnapshotService.GetCurrentContents(path);
+        var diff = folderDiffService.Compare(previousSnapshot, currentContents, path, out _);
 
         return Ok(new
         {
@@ -88,18 +94,25 @@ public class BrowseController(IBrowseService browseService,
     }
 
     // TODO find a common pattern to handle validation like this
-    private bool ValidateRequest(string? path, out string fullPath, out string? error)
+    private bool ValidateRequest(string path, out IActionResult? errorResult)
     {
-        fullPath = Path.Combine(configuration.RootPublicPath, path ?? string.Empty);
-
-        if (!browseService.CanReadFolderContents(fullPath))
+        if (!browseService.FolderExists(path))
         {
-            error = "Cannot read folder contents.";
-            logger.LogWarning("{Error} Path: {Path}", error, fullPath);
+            var error = $"Path does not exist";
+            logger.LogWarning("{Error}: {Path}", error, path);
+            errorResult = NotFound(error);
             return false;
         }
-
-        error = null;
+        
+        if (!browseService.CanReadFolderContents(path))
+        {
+            var error = "Cannot read folder contents.";
+            logger.LogWarning("{Error} Path: {Path}", error, path);
+            errorResult = Forbid(error);
+            return false;
+        }
+        
+        errorResult = null;
         return true;       
     }
 }
