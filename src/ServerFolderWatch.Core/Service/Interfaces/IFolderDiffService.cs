@@ -4,7 +4,7 @@ namespace ServerFolderWatch.Core.Service.Interfaces;
 
 /// <summary>
 /// Provides the ability to compare two snapshots of the same folder.
-/// TODO make folder name a part of the snapshot, so we don't compare Foo and Bar?
+/// TODO make original folder name a part of the snapshot
 /// </summary>
 public interface IFolderDiffService
 {

@@ -9,7 +9,6 @@ public interface IFolderSnapshotService
     /// <summary>
     /// Lists the current contents of a given folder
     /// (as seen by the file system) in the <see cref="FolderSnapshot"/> format.
-    /// TODO not sure if here, or BrowseService is a better place for this
     /// </summary>
     FolderSnapshot GetCurrentContents(string folderPath);
     

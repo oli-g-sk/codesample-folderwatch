@@ -1,6 +1,4 @@
-﻿using System.Drawing;
-using System.IO.Abstractions;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using ServerFolderWatch.Core.Model;
 using ServerFolderWatch.Core.Service;
 using Testably.Abstractions;
@@ -37,10 +35,7 @@ class Program
             path = ".";
         }
 
-        // TODO await
-        var wasAlreadySetup = snapshotService.IsFolderAlreadyMonitored(path);
-        
-        if (!wasAlreadySetup)
+        if (!snapshotService.IsFolderAlreadyMonitored(path))
         {
             Console.WriteLine("Setup complete.");
             return;

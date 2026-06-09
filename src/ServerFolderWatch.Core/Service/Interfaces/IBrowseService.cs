@@ -26,7 +26,7 @@ public interface IBrowseService
     /// </summary>
     IList<File> GetFiles(string folderPath);
     
-    // TODO add tests for all paths being folders
+    // TODO add tests for all actually paths being folders
     
     bool CanReadFolderContents(string folderPath);
     
