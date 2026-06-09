@@ -29,7 +29,7 @@ public class FolderDiffService(IFileSystem fileSystem, ILoggerFactory loggerFact
 
         var currentEntries = newSnapshot.GetAllEntries();
         var previousEntries = oldSnapshot.GetAllEntries();
-        var combined = currentEntries.Union(previousEntries);
+        var combined = currentEntries.Union(previousEntries).Order();
         
         foreach (var entry in combined)
         {
