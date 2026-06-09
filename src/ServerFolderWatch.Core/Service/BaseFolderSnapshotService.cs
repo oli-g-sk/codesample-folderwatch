@@ -35,7 +35,10 @@ public abstract class BaseFolderSnapshotService(
             return;
         }
 
-        await TakeSnapshotInternal(folderPath);
+        var currentContents = GetCurrentContents(folderPath);
+        currentContents.LastAnalyzed = DateTime.Now; // TODO test
+        await PersistSnapshot(folderPath, currentContents);
+        
         logger.LogInformation(
             wasAlreadyMonitored
                 ? "Persisted snapshot of folder: {folderPath}"
@@ -48,8 +51,8 @@ public abstract class BaseFolderSnapshotService(
         foreach (var subFolder in browseService.GetChildren(folderPath))
             await TakeSnapshot(subFolder, true);
     }
-    
-    protected abstract Task TakeSnapshotInternal(string folderPath);
+
+    protected abstract Task PersistSnapshot(string folderPath, FolderSnapshot snapshot);
 
     protected abstract bool CanMonitorFolder(string folderPath);
 }

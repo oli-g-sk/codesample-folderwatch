@@ -63,14 +63,13 @@ public class SidecarSnapshotService : BaseFolderSnapshotService
         return browseService.CanWriteToFolder(folderPath);
     }
 
-    protected override Task TakeSnapshotInternal(string folderPath)
+    protected override Task PersistSnapshot(string folderPath, FolderSnapshot snapshot)
     {
         var filePath = GetSidecarFilePath(folderPath);
-        var contents = GetCurrentContents(folderPath);
         
         try
         {
-            var json = JsonConvert.SerializeObject(contents, Formatting.Indented);
+            var json = JsonConvert.SerializeObject(snapshot, Formatting.Indented);
             fileSystem.File.WriteAllText(filePath, json);
             logger.LogDebug("Persisted snapshot of folder {FilePath}", folderPath);
         }
