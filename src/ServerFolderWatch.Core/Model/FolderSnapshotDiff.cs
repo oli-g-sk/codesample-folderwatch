@@ -8,5 +8,6 @@ namespace ServerFolderWatch.Core.Model;
 /// TODO is this class needed, or can the service return list of tuples directly?
 public class FolderSnapshotDiff
 {
+    // TODO use Dictionary
     public List<(BaseEntry FileSystemEntry, DiffOperation Operation)> Entries { get; } = new();
 }

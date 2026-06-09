@@ -82,5 +82,5 @@ public class SidecarSnapshotService : BaseFolderSnapshotService
     }
 
     private string GetSidecarFilePath(string currentPath) =>
-        fileSystem.Path.Combine(currentPath, configuration.SidecarFileName);
+        fileSystem.Path.Combine(browseService.GetFileSystemPath(currentPath), configuration.SidecarFileName);
 }

@@ -6,7 +6,10 @@ using File = ServerFolderWatch.Core.Model.File;
 
 namespace ServerFolderWatch.Core.Service;
 
-public class FolderDiffService(IFileSystem fileSystem, ILoggerFactory loggerFactory) : IFolderDiffService
+public class FolderDiffService(
+    IFileSystem fileSystem,
+    IBrowseService browseService,
+    ILoggerFactory loggerFactory) : IFolderDiffService
 {
     private readonly ILogger<FolderDiffService> logger = loggerFactory.CreateLogger<FolderDiffService>();
     
@@ -80,7 +83,7 @@ public class FolderDiffService(IFileSystem fileSystem, ILoggerFactory loggerFact
     
     private bool FileHasChanged(File fileEntry, FolderSnapshot oldSnapshot, string folderPath)
     {
-        var fullPath = fileSystem.Path.Combine(folderPath, fileEntry.Name);
+        var fullPath = fileSystem.Path.Combine(browseService.GetFileSystemPath(folderPath), fileEntry.Name);
         var modified = fileSystem.File.GetLastWriteTime(fullPath);
 
         // TODO other ways to detect changes? (size, MD5, etc.)
