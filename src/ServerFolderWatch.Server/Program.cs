@@ -10,6 +10,7 @@ using ServerFolderWatch.Core.Service;
 using ServerFolderWatch.Core.Service.Interfaces;
 using ServerFolderWatch.Server;
 using ServerFolderWatch.Server.Components;
+using ServerFolderWatch.Server.PageModels;
 using Testably.Abstractions;
 
 internal class Program
@@ -19,13 +20,46 @@ internal class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+        
+        AddConfiguration(builder);
+        RegisterServices(builder);
+        RegisterControllers(builder);
+        RegisterPageModels(builder);
 
+        var app = BuildWebAppplication(builder);
+        logger = app.Services.GetRequiredService<ILogger<Program>>();
+
+        if (!InitializeApplication(app))
+            return;
+
+        logger.LogInformation("Taking recursive snapshot of public folder root.");
+        app.Services.GetRequiredService<IFolderSnapshotService>()
+            .TakeSnapshot(".", true);
+        
+        app.Run();
+    }
+
+    private static void AddConfiguration(WebApplicationBuilder builder)
+    {
         builder.Services.AddSingleton<IAppConfiguration>(sp =>
             builder.Configuration
                 .GetSection("App")
                 .Get<AppConfiguration>() ??
             throw new InvalidOperationException("Configuration could not be loaded."));
+    }
 
+    private static void RegisterControllers(WebApplicationBuilder builder)
+    {
+        builder.Services.AddControllers()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());        
+            });
+    }
+
+    private static void RegisterServices(WebApplicationBuilder builder)
+    {
         builder.Services.AddSingleton<IFileSystem, RealFileSystem>();
         
         // TODO use scoped lifecycles?
@@ -35,27 +69,13 @@ internal class Program
         builder.Services.AddRazorComponents()
             .AddInteractiveServerComponents();
 
-        builder.Services.AddControllers()
-            .AddJsonOptions(options =>
-            {
-                options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());        
-            });
-
-        var app = BuildWebAppplication(builder);
-        logger = app.Services.GetRequiredService<ILogger<Program>>();
-
-        if (InitializeApplication(app))
-        {
-            logger.LogInformation("Taking recursive snapshot of public folder root.");
-            
-            app.Services.GetRequiredService<IFolderSnapshotService>()
-                .TakeSnapshot(".", true);
-
-            app.Run();
-        }
     }
-
+    
+    private static void RegisterPageModels(WebApplicationBuilder builder)
+    {
+        builder.Services.AddScoped<BrowsePageModel>();
+    }
+    
     private static WebApplication BuildWebAppplication(WebApplicationBuilder builder)
     {
         var app = builder.Build();
