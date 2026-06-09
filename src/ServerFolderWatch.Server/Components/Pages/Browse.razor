@@ -16,18 +16,18 @@
         }
         @foreach (var child in diffEntries)
         {
-            <li class="@Model.GetClassName(child.Item2)">
-                @if (child.Item1 is Folder folder)
+            <li class="@Model.GetClassName(child.Value)">
+                @if (child.Key is Folder folder)
                 {
                     <a href="@Model.GetFolderUrl(folder)">
-                        <em class="icon">🗀</em> @child.Item1.Name
+                        <em class="icon">🗀</em> @child.Key.Name
                     </a>
                 }
-                else if (child.Item1 is File file)
+                else if (child.Key is File file)
                 {
                     <a>
                         <em class="icon">🗎</em>
-                        @child.Item1.Name
+                        @child.Key.Name
                         @if (file.Version > 1)
                         {
                             <strong>@file.Version </strong>
@@ -40,7 +40,7 @@
 </div>
 
 @code {
-    private IList<(BaseEntry, DiffOperation)>? diffEntries;
+    private IDictionary<BaseEntry, DiffOperation>? diffEntries;
     
     [SupplyParameterFromQuery]
     public string? Folder { get; set; }

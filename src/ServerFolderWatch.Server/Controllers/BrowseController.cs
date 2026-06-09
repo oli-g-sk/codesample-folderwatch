@@ -77,17 +77,17 @@ public class BrowseController(IBrowseService browseService,
             ));
     }
     
-    private static IEnumerable<FileSystemEntryDiffDto> MapDiffedEntries(FolderSnapshotDiff diff)
+    private static IEnumerable<FileSystemEntryDiffDto> MapDiffedEntries(IDictionary<BaseEntry, DiffOperation> diff)
     {
-        var ordered = diff.Entries.Order();
+        var ordered = diff.OrderBy(x => x.Key);
         
         return ordered.Select(entry => new FileSystemEntryDiffDto(
-            entry.FileSystemEntry.Name,
-            entry.FileSystemEntry is File
+            entry.Key.Name,
+            entry.Key is File
                 ? FileSystemEntityType.File
                 : FileSystemEntityType.Directory,
-            entry.Operation,
-            entry.FileSystemEntry is File file
+            entry.Value,
+            entry.Key is File file
                 ? file.Version
                 : null
         ));

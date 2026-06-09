@@ -44,14 +44,13 @@ public class BrowsePageModel(
         return GetBrowseUrl(GetParentPath());
     }
 
-    public List<(BaseEntry FileSystemEntry, DiffOperation Operation)> GetDiffEntries()
+    public IDictionary<BaseEntry, DiffOperation> GetDiffEntries()
     {
         var contents = folderSnapshotService.GetCurrentContents(currentFolder ?? string.Empty);
         var oldSnapshot = folderSnapshotService.LoadPersistedSnapshot(currentFolder);
         
         // TODO show stats in status bar
-        return folderDiffService.Compare(oldSnapshot, contents, currentFolder, out var stats)
-            .Entries;
+        return folderDiffService.Compare(oldSnapshot, contents, currentFolder, out var stats);
     }
 
     public string GetFolderUrl(Folder childFolder)

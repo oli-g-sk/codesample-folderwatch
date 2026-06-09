@@ -13,21 +13,19 @@ public class FolderDiffService(
 {
     private readonly ILogger<FolderDiffService> logger = loggerFactory.CreateLogger<FolderDiffService>();
     
-    public FolderSnapshotDiff Compare(FolderSnapshot? oldSnapshot, FolderSnapshot newSnapshot, string folderPath,
+    public Dictionary<BaseEntry, DiffOperation> Compare(FolderSnapshot? oldSnapshot, FolderSnapshot newSnapshot, string folderPath,
         out FolderSnapshotChanges changes)
     {
         changes = new FolderSnapshotChanges();
-        var diff = new FolderSnapshotDiff();
+        var diff = new Dictionary<BaseEntry, DiffOperation>();
 
         if (oldSnapshot == null)
         {
             // No previous snapshot; diff will simply contain
             // all current items with the operation listed as "unchangeD"
             
-            diff.Entries.AddRange(newSnapshot.GetAllEntries()
-                .Select(x => (x, DiffOperation.Unchanged)));
-            
-            return diff;
+            return newSnapshot.GetAllEntries()
+                .ToDictionary(x => x, x => DiffOperation.Unchanged);
         }
 
         var currentEntries = newSnapshot.GetAllEntries();
@@ -62,7 +60,7 @@ public class FolderDiffService(
                 }
             }
             
-            diff.Entries.Add((entry, operation));
+            diff.Add(entry, operation);
         }
         
         if (!changes.AddedEntries.Any() && !changes.DeletedEntries.Any() && !changes.ModifiedEntries.Any())

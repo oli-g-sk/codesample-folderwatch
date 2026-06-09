@@ -22,6 +22,6 @@ public interface IFolderDiffService
     /// Changes between the two snapshots in the form of an unified list
     /// mapping file system entries to their diff operation.
     /// </returns>
-    FolderSnapshotDiff Compare(FolderSnapshot oldSnapshot, FolderSnapshot newSnapshot,
+    public Dictionary<BaseEntry, DiffOperation> Compare(FolderSnapshot oldSnapshot, FolderSnapshot newSnapshot,
         string folderPath, out FolderSnapshotChanges changes);
 }

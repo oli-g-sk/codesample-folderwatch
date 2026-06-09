@@ -70,41 +70,40 @@ class Program
         }
     }
 
-    private static void PrintDiff(FolderSnapshotDiff diff)
+    private static void PrintDiff(IDictionary<BaseEntry, DiffOperation> diff)
     {
-        foreach (var entry in diff.Entries)
+        foreach (var kvp in diff)
         {
-            if (entry.Operation == DiffOperation.Unchanged)
+            if (kvp.Value == DiffOperation.Unchanged)
                 continue;
 
             string character = "";
             Console.ForegroundColor = ConsoleColor.White;
-            if (entry.Operation == DiffOperation.Added)
+            if (kvp.Value == DiffOperation.Added)
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 character = "+";
             }
 
-            if (entry.Operation == DiffOperation.Removed)
+            if (kvp.Value == DiffOperation.Removed)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 character = "-";
             }
 
-            if (entry.Operation == DiffOperation.Modified)
+            if (kvp.Value == DiffOperation.Modified)
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 character = "^";
             }
 
-            string output = entry.FileSystemEntry is Folder
-                ? $"{character} [{entry.FileSystemEntry.Name}]"
-                : $"{character} {entry.FileSystemEntry.Name}";
+            string output = kvp.Key is Folder
+                ? $"{character} [{kvp.Key.Name}]"
+                : $"{character} {kvp.Key.Name}";
             
             Console.Write(output);
             
-            if (entry.Operation == DiffOperation.Modified
-                && entry.FileSystemEntry is File file)
+            if (kvp is { Key: File file, Value: DiffOperation.Modified })
             {
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.Write(" @v");
