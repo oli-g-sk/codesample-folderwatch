@@ -48,13 +48,15 @@ public abstract class BaseFolderSnapshotService(
         if (!recursive)
         {
 #if DEBUG
-            await Task.Delay(TimeSpan.FromSeconds(5));            
+            // await Task.Delay(TimeSpan.FromSeconds(5));            
 #endif
         }
-        
-        foreach (var subFolder in browseService.GetChildren(folderPath))
-            await TakeSnapshot(subFolder, true);
-        
+        else
+        {
+            foreach (var subFolder in browseService.GetChildren(folderPath))
+                await TakeSnapshot(subFolder, true);
+        }
+
         return currentContents;            
     }
 

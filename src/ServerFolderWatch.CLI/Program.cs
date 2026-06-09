@@ -15,7 +15,7 @@ class Program
     {
         using ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
         {
-            // builder.AddConsole();
+            builder.AddConsole();
 #if DEBUG
             builder.SetMinimumLevel(LogLevel.Trace);
 #endif
@@ -83,7 +83,7 @@ class Program
 
             if (args[0] == "commitr")
             {
-                Console.WriteLine($"Saving changes...");
+                Console.WriteLine($"Saving changes recursively...");
                 snapshotService.TakeSnapshot(fullPath, true);
                 Console.WriteLine("Saved recursive folder snapshot");
             }

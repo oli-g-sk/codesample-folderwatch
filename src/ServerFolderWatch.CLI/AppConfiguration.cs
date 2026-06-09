@@ -6,5 +6,5 @@ public class AppConfiguration : IAppConfiguration
 {
     public string SidecarFileName => ".sidecar";
     
-    public string RootPublicPath => ".";
+    public string RootPublicPath => Directory.GetCurrentDirectory();
 }
