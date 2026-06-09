@@ -6,5 +6,5 @@ public class AppConfiguration : IAppConfiguration
 {
     public string SidecarFileName { get; } = ".sidecar.json";
 
-    public string RootPublicPath { get; } = "C:\\Temp";
+    public string RootPublicPath { get; } = "../../shared";
 }
