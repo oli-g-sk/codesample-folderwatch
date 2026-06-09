@@ -26,5 +26,5 @@ public interface IFolderSnapshotService
     /// <param name="recursive">
     /// If true, traverses the subfolder tree, taking or overwriting snapshots.
     /// </param>
-    Task TakeSnapshot(string folderPath, bool recursive);
+    Task<FolderSnapshot> TakeSnapshot(string folderPath, bool recursive);
 }

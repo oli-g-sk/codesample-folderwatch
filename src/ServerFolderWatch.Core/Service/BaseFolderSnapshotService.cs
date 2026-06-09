@@ -25,14 +25,14 @@ public abstract class BaseFolderSnapshotService(
     
     public abstract FolderSnapshot? LoadPersistedSnapshot(string folderPath);
 
-    public async Task TakeSnapshot(string folderPath, bool recursive)
+    public async Task<FolderSnapshot> TakeSnapshot(string folderPath, bool recursive)
     {
         bool wasAlreadyMonitored = IsFolderAlreadyMonitored(folderPath);
 
         if (!wasAlreadyMonitored && !CanMonitorFolder(folderPath))
         {
             logger.LogWarning("Cannot take snapshot of folder: {folderPath}", folderPath);
-            return;
+            throw new InvalidOperationException($"Cannot take snapshot of folder: {folderPath}");           
         }
 
         var currentContents = GetCurrentContents(folderPath);
@@ -50,11 +50,12 @@ public abstract class BaseFolderSnapshotService(
 #if DEBUG
             await Task.Delay(TimeSpan.FromSeconds(5));            
 #endif
-            return;            
         }
         
         foreach (var subFolder in browseService.GetChildren(folderPath))
             await TakeSnapshot(subFolder, true);
+        
+        return currentContents;            
     }
 
     protected abstract Task PersistSnapshot(string folderPath, FolderSnapshot snapshot);

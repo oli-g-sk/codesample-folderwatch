@@ -36,35 +36,67 @@ class Program
         Console.WriteLine("Folder: " + fullPath);
         string lastAnalyzed = snapshotService.LoadPersistedSnapshot(fullPath)?.LastAnalyzed.ToString() ?? "NEVER";
         Console.WriteLine("Last snapshot: " + lastAnalyzed);
-        Console.WriteLine();
-        
+
         if (wasMonitored)
-            PrintDiff(fullPath);
+        {
+            var oldSnapshot = snapshotService.LoadPersistedSnapshot(path);
+            var currentContents = snapshotService.GetCurrentContents(path);
+            var diff = diffService.Compare(oldSnapshot!, currentContents, path, out var summary);
+            
+            Console.Write("Summary: ");
+
+            if (!summary.AddedEntries.Any() && !summary.DeletedEntries.Any() && !summary.ModifiedEntries.Any())
+                Console.WriteLine("No changes detected.");
+            
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                if (summary.AddedEntries.Any())
+                    Console.Write($"ADD {summary.AddedEntries.Count} files ");
+                Console.ForegroundColor = ConsoleColor.Red;
+                if (summary.DeletedEntries.Any())
+                    Console.Write($"REM {summary.DeletedEntries.Count} files ");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                if (summary.ModifiedEntries.Any())
+                    Console.Write($"MOD {summary.ModifiedEntries.Count} files ");
+
+                Console.ResetColor();
+                Console.WriteLine();
+                
+                Console.ResetColor();
+                Console.WriteLine();
+                
+                PrintDiff(diff);   
+            }
+            
+            Console.ResetColor();
+        }
         
         if (args.Length > 0 && !string.IsNullOrWhiteSpace(args[0]))
         {
             if (args[0] == "commit")
             {
-                snapshotService.TakeSnapshot(fullPath, false);
-                Console.WriteLine("Saved folder snapshot");
+                Console.WriteLine($"Saving changes...");
+                var snapshot = snapshotService.TakeSnapshot(fullPath, false).Result;
+                Console.WriteLine($"Saved folder snapshot at: {snapshot}");
             }
 
             if (args[0] == "commitr")
             {
+                Console.WriteLine($"Saving changes...");
                 snapshotService.TakeSnapshot(fullPath, true);
                 Console.WriteLine("Saved recursive folder snapshot");
             }
         }
     }
 
-    private static void PrintDiff(string path)
+    private static void PrintDiff(FolderSnapshotDiff diff)
     {
-        var oldSnapshot = snapshotService.LoadPersistedSnapshot(path);
-        var currentContents = snapshotService.GetCurrentContents(path);
-        var diff = diffService.Compare(oldSnapshot, currentContents, path, out _);
-        
         foreach (var entry in diff.Entries)
         {
+            if (entry.Operation == DiffOperation.Unchanged)
+                continue;
+            
             Console.ForegroundColor = ConsoleColor.White;
             if (entry.Operation == DiffOperation.Added)
                 Console.ForegroundColor = ConsoleColor.Green;
