@@ -37,47 +37,19 @@ class Program
         
         PrintSingleLine("Folder" , fullPath);
 
-        if (wasMonitored)
-        {
-            var oldSnapshot = snapshotService.LoadPersistedSnapshot(path);
-            var currentContents = snapshotService.GetCurrentContents(path);
-            var diff = diffService.Compare(oldSnapshot!, currentContents, path, out var summary);
-            
-            if (!HasChanges(diff))
-                PrintSingleLine("Summary","No changes");
-            else
-            {
-                Console.Write("Summary: ");
-
-                if (!summary.AddedEntries.Any() && !summary.DeletedEntries.Any() && !summary.ModifiedEntries.Any())
-                {
-                    Console.ForegroundColor = ConsoleColor.DarkCyan;
-                    Console.WriteLine("No changes");
-                }
-                else
-                {
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    if (summary.AddedEntries.Any())
-                        Console.Write($"ADD {summary.AddedEntries.Count} files ");
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    if (summary.DeletedEntries.Any())
-                        Console.Write($"REM {summary.DeletedEntries.Count} files ");
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    if (summary.ModifiedEntries.Any())
-                        Console.Write($"MOD {summary.ModifiedEntries.Count} files ");
-
-                    Console.ResetColor();
-                    PrintDiff(diff);
-                    Console.ResetColor();
-                }
-            }
-        }
+        var oldSnapshot = snapshotService.LoadPersistedSnapshot(path);
+        var currentContents = snapshotService.GetCurrentContents(path);
+        var diff = diffService.Compare(oldSnapshot!, currentContents, path, out var summary);
         
         string lastAnalyzed = snapshotService.LoadPersistedSnapshot(fullPath)?.LastAnalyzed.ToString() ?? "NEVER";
         PrintSingleLine("Last snapshot", lastAnalyzed);
         
+        if (wasMonitored)
+            PrintSummaryLine(summary);
+        
+        PrintDiff(diff);
+        
         Console.ResetColor();
-        Console.WriteLine();
         
         if (args.Length > 0 && !string.IsNullOrWhiteSpace(args[0]))
         {
@@ -99,8 +71,6 @@ class Program
 
     private static void PrintDiff(FolderSnapshotDiff diff)
     {
-        Console.WriteLine();
-
         foreach (var entry in diff.Entries)
         {
             if (entry.Operation == DiffOperation.Unchanged)
@@ -127,13 +97,47 @@ class Program
         Console.ResetColor();
         Console.Write($"{heading}: ");
         Console.ForegroundColor = ConsoleColor.DarkCyan;
-        Console.Write($" {content}");
+        Console.Write($"{content}");
         Console.WriteLine();
         Console.ResetColor();
     }
 
-    private static bool HasChanges(FolderSnapshotDiff diff)
+    private static void PrintSummaryLine(FolderSnapshotChanges changes)
     {
-        return diff.Entries.Any(x => x.Operation != DiffOperation.Unchanged);
+        if (!HasChanges(changes))
+            PrintSingleLine("Summary","No changes");
+        
+        else
+        {
+            Console.Write("Summary: ");
+
+            if (!changes.AddedEntries.Any() && !changes.DeletedEntries.Any() && !changes.ModifiedEntries.Any())
+            {
+                Console.ForegroundColor = ConsoleColor.DarkCyan;
+                Console.WriteLine("No changes");
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                if (changes.AddedEntries.Any())
+                    Console.Write($"ADD {changes.AddedEntries.Count} files ");
+                Console.ForegroundColor = ConsoleColor.Red;
+                if (changes.DeletedEntries.Any())
+                    Console.Write($"REM {changes.DeletedEntries.Count} files ");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                if (changes.ModifiedEntries.Any())
+                    Console.Write($"MOD {changes.ModifiedEntries.Count} files ");
+
+                Console.ResetColor();
+                Console.WriteLine();
+            }
+        }
+    }
+
+    private static bool HasChanges(FolderSnapshotChanges diff)
+    {
+        return diff.AddedEntries.Count != 0
+               || diff.DeletedEntries.Count != 0
+               || diff.ModifiedEntries.Count != 0;
     }
 }
