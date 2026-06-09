@@ -1,5 +1,5 @@
+using System;
 using System.Collections.Generic;
-using System.Web;
 using ServerFolderWatch.Core.Model;
 using ServerFolderWatch.Core.Service.Interfaces;
 
@@ -14,7 +14,7 @@ public class BrowsePageModel(
     
     public void LoadFolder(string? folderParam)
     {
-        currentFolder = folderParam ?? string.Empty;
+        currentFolder = folderParam;
     }
     
     public string GetClassName(DiffOperation diffOperation)
@@ -30,16 +30,18 @@ public class BrowsePageModel(
 
     public string GetParentPath()
     {
-        if (string.IsNullOrWhiteSpace(currentFolder) || !currentFolder.Contains('/'))
+        if (string.IsNullOrWhiteSpace(currentFolder))
             return string.Empty;
-        
-        return currentFolder?[..currentFolder.IndexOf('/')] ?? "/";
+
+        var lastSeparator = currentFolder.LastIndexOf('/');
+        return lastSeparator < 0
+            ? string.Empty
+            : currentFolder[..lastSeparator];
     }
 
     public string GetParentUrl()
     {
-        var parentPath = GetParentPath();
-        return string.IsNullOrEmpty(parentPath) ? "/browse" : $"/browse?folder={parentPath}";
+        return GetBrowseUrl(GetParentPath());
     }
 
     public List<(BaseEntry FileSystemEntry, DiffOperation Operation)> GetDiffEntries()
@@ -52,14 +54,25 @@ public class BrowsePageModel(
             .Entries;
     }
 
-    public string GetChildPath(Folder childFolder)
+    public string GetFolderUrl(Folder childFolder)
     {
-        string basePath = string.IsNullOrWhiteSpace(currentFolder) ? "" : currentFolder + "/";
-        return $"{basePath}{HttpUtility.UrlEncode(childFolder.Name)}";
+        var childPath = string.IsNullOrWhiteSpace(currentFolder)
+            ? childFolder.Name
+            : $"{currentFolder}/{childFolder.Name}";
+
+        return GetBrowseUrl(childPath);
     }
 
     public bool CanGoToParent()
     {
         return browseService.CanGoToParent(currentFolder ?? string.Empty);
+    }
+
+    private static string GetBrowseUrl(string? folderPath)
+    {
+        if (string.IsNullOrWhiteSpace(folderPath))
+            return "/browse";
+
+        return $"/browse?folder={Uri.EscapeDataString(folderPath)}";
     }
 }

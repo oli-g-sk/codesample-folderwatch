@@ -19,7 +19,7 @@
             <li class="@Model.GetClassName(child.Item2)">
                 @if (child.Item1 is Folder folder)
                 {
-                    <a href="/browse?folder=@Model.GetChildPath(folder)">
+                    <a href="@Model.GetFolderUrl(folder)">
                         <span><em class="icon">🗀</em> @child.Item1.Name</span>
                     </a>
                 }
