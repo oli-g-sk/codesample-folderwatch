@@ -17,7 +17,6 @@ public class BrowsePageModel(
         currentFolder = folderParam ?? string.Empty;
     }
     
-    // TODO fix for proper use (remove indexInList mostly)
     public string GetClassName(DiffOperation diffOperation)
     {
         return diffOperation switch

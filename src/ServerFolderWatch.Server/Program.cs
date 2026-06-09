@@ -25,7 +25,7 @@ internal class Program
         AddConfiguration(builder);
         RegisterServices(builder);
         RegisterControllers(builder);
-        RegisterPageModels(builder);
+        RegisterRazorPages(builder);
 
         var app = BuildWebAppplication(builder);
         logger = app.Services.GetRequiredService<ILogger<Program>>();
@@ -63,17 +63,17 @@ internal class Program
     {
         builder.Services.AddSingleton<IFileSystem, RealFileSystem>();
         
-        // TODO use scoped lifecycles?
         builder.Services.AddSingleton<IBrowseService, BrowseService>();
-        builder.Services.AddSingleton<IFolderDiffService, FolderDiffService>();
         builder.Services.AddSingleton<IFolderSnapshotService, SidecarSnapshotService>();
-        builder.Services.AddRazorComponents()
-            .AddInteractiveServerComponents();
-
+        
+        builder.Services.AddScoped<IFolderDiffService, FolderDiffService>();
     }
     
-    private static void RegisterPageModels(WebApplicationBuilder builder)
+    private static void RegisterRazorPages(WebApplicationBuilder builder)
     {
+        builder.Services.AddRazorComponents()
+            .AddInteractiveServerComponents();
+        
         builder.Services.AddScoped<BrowsePageModel>();
     }
     

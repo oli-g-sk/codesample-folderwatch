@@ -45,7 +45,6 @@ body {
         width: 2em;
     }
     
-    /* TODO fixup CSS so we don't need the explicit 'a' targeting */
     li.diff-added,
     li.diff-added a {
         color: #3bd83b !important;
