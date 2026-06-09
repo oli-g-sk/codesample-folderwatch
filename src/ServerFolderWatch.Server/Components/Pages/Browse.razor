@@ -1,8 +1,5 @@
 @page "/browse"
-@using System.IO
-@using ServerFolderWatch.Core
 @using ServerFolderWatch.Core.Model
-@inject IAppConfiguration AppConfiguration
 @inject IBrowseService BrowseService
 @inject IFolderSnapshotService FolderSnapshotService
 @inject IFolderDiffService FolderDiffService
@@ -84,16 +81,13 @@
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
-        
+
         if (Folder == string.Empty)
             NavigationManager.NavigateTo("/browse", replace: true);
 
-        var folderPath = Path.Combine(AppConfiguration.RootPublicPath, Folder ?? string.Empty);
-        var contents = FolderSnapshotService.GetCurrentContents(folderPath);
-
-        var oldSnapshot = FolderSnapshotService.LoadPersistedSnapshot(folderPath);
-        var diff = FolderDiffService.Compare(oldSnapshot, contents, folderPath, out _);
-
+        var contents = FolderSnapshotService.GetCurrentContents(Folder ?? string.Empty);
+        var oldSnapshot = FolderSnapshotService.LoadPersistedSnapshot(Folder);
+        var diff = FolderDiffService.Compare(oldSnapshot, contents, Folder, out _);
         diffEntries = diff.Entries;
     }
 
