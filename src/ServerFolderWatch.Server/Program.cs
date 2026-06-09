@@ -51,12 +51,8 @@ internal class Program
 
     private static void RegisterControllers(WebApplicationBuilder builder)
     {
-        builder.Services.AddControllers()
-            .AddJsonOptions(options =>
-            {
-                options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());        
-            });
+        builder.Services.AddControllers().AddJsonOptions(options =>
+            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
     }
 
     private static void RegisterServices(WebApplicationBuilder builder)
