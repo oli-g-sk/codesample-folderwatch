@@ -31,6 +31,8 @@ public class SidecarSnapshotServiceTests
             .Returns(SidecarFileName);
         browseServiceMock.Setup(x => x.CanWriteToFolder(It.IsAny<string>()))
             .Returns(true);
+        browseServiceMock.Setup(x => x.GetFileSystemPath(It.IsAny<string>()))
+            .Returns((string folderPath) => folderPath);
         
         sut = new SidecarSnapshotService(browseServiceMock.Object,
             configurationMock.Object, mockFileSystem, loggerFactoryMock.Object);
@@ -58,7 +60,7 @@ public class SidecarSnapshotServiceTests
     {
         configurationMock.Reset();
         configurationMock.SetupGet(x => x.SidecarFileName)
-            .Returns(sidecarFileName);
+            .Returns(sidecarFileName!);
         
         Assert.Throws<ArgumentException>(() => 
             new SidecarSnapshotService(browseServiceMock.Object, configurationMock.Object, mockFileSystem,
@@ -126,6 +128,11 @@ public class SidecarSnapshotServiceTests
 
         mockFileSystem.Directory.CreateDirectory(mockFileSystem.Path.Combine(FolderName, subfolder1));
         mockFileSystem.Directory.CreateDirectory(mockFileSystem.Path.Combine(FolderName, subfolder2));
+        browseServiceMock.Setup(x => x.GetChildren(FolderName))
+            .Returns([
+                mockFileSystem.Path.Combine(FolderName, subfolder1),
+                mockFileSystem.Path.Combine(FolderName, subfolder2)
+            ]);
         
         await sut.TakeSnapshot(FolderName, true);
 
