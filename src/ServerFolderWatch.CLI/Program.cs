@@ -1,8 +1,10 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Net;
+using Microsoft.Extensions.Logging;
 using ServerFolderWatch.Core.Model;
 using ServerFolderWatch.Core.Service;
 using ServerFolderWatch.Core.Service.Interfaces;
 using Testably.Abstractions;
+using File = ServerFolderWatch.Core.Model.File;
 
 namespace ServerFolderWatch.CLI;
 
@@ -17,9 +19,9 @@ class Program
         
         using ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
         {
-            // builder.AddConsole();
+            builder.AddConsole();
 #if DEBUG
-            builder.SetMinimumLevel(LogLevel.Trace);
+            builder.SetMinimumLevel(LogLevel.Warning);
 #endif
         });
         
@@ -55,9 +57,8 @@ class Program
         {
             if (args[0] == "commit")
             {
-                Console.WriteLine($"Saving changes...");
                 var snapshot = snapshotService.TakeSnapshot(fullPath, false).Result;
-                Console.WriteLine($"Saved folder snapshot at: {snapshot}");
+                PrintSingleLine("Saved snapshot at: ", snapshot.LastAnalyzed!.ToString()!);
             }
 
             if (args[0] == "commitr")
@@ -96,11 +97,22 @@ class Program
                 character = "^";
             }
 
-            string name = entry.FileSystemEntry is Folder
+            string output = entry.FileSystemEntry is Folder
                 ? $"{character} [{entry.FileSystemEntry.Name}]"
                 : $"{character} {entry.FileSystemEntry.Name}";
             
-            Console.WriteLine(name);
+            Console.Write(output);
+            
+            if (entry.Operation == DiffOperation.Modified
+                && entry.FileSystemEntry is File file)
+            {
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write(" @v");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.Write(file.Version);
+            }
+
+            Console.WriteLine();
         }
     }
 
