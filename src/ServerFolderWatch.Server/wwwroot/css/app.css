@@ -34,7 +34,7 @@ body {
         }
         strong:before {
             color: white;;
-            content: '@';
+            content: '@v';
             margin-left: 0.5em;
         }
     }
