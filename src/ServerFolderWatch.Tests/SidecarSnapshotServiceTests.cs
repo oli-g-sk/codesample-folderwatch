@@ -7,7 +7,7 @@ using Testably.Abstractions.Testing;
 
 namespace ServerFolderWatch.Tests;
 
-public class JsonFolderSnapshotServiceTests
+public class SidecarSnapshotServiceTests
 {
     private const string FolderName = "test";
     private const string SidecarFileName = "metadata.txt";
@@ -21,7 +21,7 @@ public class JsonFolderSnapshotServiceTests
 
     private string SidecarFilePath => mockFileSystem.Path.Combine(FolderName, SidecarFileName);
     
-    public JsonFolderSnapshotServiceTests()
+    public SidecarSnapshotServiceTests()
     {
         loggerFactoryMock = new Mock<ILoggerFactory>();
         loggerFactoryMock.Setup(x => x.CreateLogger(It.IsAny<string>()))
@@ -32,7 +32,7 @@ public class JsonFolderSnapshotServiceTests
         browseServiceMock.Setup(x => x.CanWriteToFolder(It.IsAny<string>()))
             .Returns(true);
         
-        sut = new JsonFolderSnapshotService(browseServiceMock.Object,
+        sut = new SidecarSnapshotService(browseServiceMock.Object,
             mockFileSystem, configurationMock.Object, loggerFactoryMock.Object);
         
         // TODO test that we're checking configuration file name
@@ -61,7 +61,7 @@ public class JsonFolderSnapshotServiceTests
             .Returns(sidecarFileName);
         
         Assert.Throws<ArgumentException>(() => 
-            new JsonFolderSnapshotService(browseServiceMock.Object, mockFileSystem, configurationMock.Object,
+            new SidecarSnapshotService(browseServiceMock.Object, mockFileSystem, configurationMock.Object,
                 loggerFactoryMock.Object));
     }
     
@@ -75,7 +75,7 @@ public class JsonFolderSnapshotServiceTests
                 .Returns($"sidecar{invalidChar}");
             
             Assert.Throws<ArgumentException>(() => 
-                new JsonFolderSnapshotService(browseServiceMock.Object, mockFileSystem, configurationMock.Object,
+                new SidecarSnapshotService(browseServiceMock.Object, mockFileSystem, configurationMock.Object,
                     loggerFactoryMock.Object));
         }
     }

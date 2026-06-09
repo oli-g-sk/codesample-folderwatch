@@ -20,7 +20,7 @@ class Program
         var fileSystemWrapper = new RealFileSystem();
         var configuration = new AppConfiguration();
         var browseService = new BrowseService(configuration, fileSystemWrapper);
-        var snapshotService = new JsonFolderSnapshotService(browseService, fileSystemWrapper, configuration, loggerFactory);
+        var snapshotService = new SidecarSnapshotService(browseService, fileSystemWrapper, configuration, loggerFactory);
         
         
         Console.WriteLine("Enter path (defaults to C:\\Temp):");

@@ -31,7 +31,7 @@ internal class Program
         // TODO use scoped lifecycles?
         builder.Services.AddSingleton<IBrowseService, BrowseService>();
         builder.Services.AddSingleton<IFolderDiffService, FolderDiffService>();
-        builder.Services.AddSingleton<IFolderSnapshotService, JsonFolderSnapshotService>();
+        builder.Services.AddSingleton<IFolderSnapshotService, SidecarSnapshotService>();
         builder.Services.AddRazorComponents()
             .AddInteractiveServerComponents();
 
