@@ -8,10 +8,11 @@ using Microsoft.Extensions.Logging;
 using ServerFolderWatch.Core;
 using ServerFolderWatch.Core.Service;
 using ServerFolderWatch.Core.Service.Interfaces;
-using ServerFolderWatch.Server;
 using ServerFolderWatch.Server.Components;
 using ServerFolderWatch.Server.PageModels;
 using Testably.Abstractions;
+
+namespace ServerFolderWatch.Server;
 
 internal class Program
 {

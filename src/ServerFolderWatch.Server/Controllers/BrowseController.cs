@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -9,7 +8,7 @@ using ServerFolderWatch.Core.Service.Interfaces;
 using ServerFolderWatch.Server.DTOs;
 using File = ServerFolderWatch.Core.Model.File;
 
-namespace ServerFolderWatch.Server.Controllers.ApiControllers;
+namespace ServerFolderWatch.Server.Controllers;
 
 [ApiController]
 public class BrowseController(IBrowseService browseService,

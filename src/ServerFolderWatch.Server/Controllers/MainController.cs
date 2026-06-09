@@ -1,7 +1,7 @@
 using System;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ServerFolderWatch.Server.Controllers.ApiControllers;
+namespace ServerFolderWatch.Server.Controllers;
 
 [ApiController]
 [Route("api")]
