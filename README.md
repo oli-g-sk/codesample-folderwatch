@@ -16,3 +16,24 @@
 
 - GET `/api/diff`
 - GET `/api/diff?folder=path/to/folder`
+
+## CLI tool
+
+- **Go to the output folder** and **add it to your PATH** so you can easily execute it from anywhere 
+
+```[powershell]
+cd .\build\Debug\
+```
+
+```[powershell]
+[Environment]::SetEnvironmentVariable(
+    "PATH",
+    [Environment]::GetEnvironmentVariable("PATH", "User") + ";$PWD",
+    "User"
+)
+```
+
+- Restart your Terminal
+- From any folder, type `fdif` to see any changes in the current folder
+- Type `fdif commit` to either **start tracking** the folder or **commit changes**
+- Use `fdif commitr` same as above, but to run recursively on all subfolders
