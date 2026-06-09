@@ -8,6 +8,11 @@ namespace ServerFolderWatch.Core.Service;
 public class BrowseService(IAppConfiguration configuration, IFileSystem fileSystem)
     : IBrowseService
 {
+    public bool FolderExists(string folderPath)
+    {
+        return fileSystem.Directory.Exists(folderPath);
+    }
+    
     public bool CanReadFolderContents(string path)
     {
         try

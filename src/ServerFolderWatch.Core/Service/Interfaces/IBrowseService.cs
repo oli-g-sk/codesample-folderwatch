@@ -5,6 +5,7 @@ namespace ServerFolderWatch.Core.Service.Interfaces;
 
 public interface IBrowseService
 {
+    bool FolderExists(string folderPath);
     
     /// <summary>
     /// Returns fully qualified sub-entries of the given <see cref="folderPath"/>
