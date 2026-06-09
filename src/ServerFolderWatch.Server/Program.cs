@@ -72,10 +72,9 @@ internal class Program
         var configuration = app.Services.GetRequiredService<IAppConfiguration>();
         string rootPublicPath = configuration.RootPublicPath;
 
-        var fileSystem = app.Services.GetRequiredService<IFileSystem>();
         var browseService = app.Services.GetRequiredService<IBrowseService>();
 
-        if (!fileSystem.Directory.Exists(rootPublicPath))
+        if (!browseService.FolderExists(rootPublicPath))
         {
             logger.LogError("Public folder path defined in configuration does not exist: {configurationPath}",
                 rootPublicPath);
