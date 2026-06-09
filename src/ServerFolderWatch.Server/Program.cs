@@ -47,9 +47,10 @@ internal class Program
 
         if (InitializeApplication(app))
         {
-            TakeStartupSnapshot(
-                app.Services.GetRequiredService<IFolderSnapshotService>(),
-                app.Services.GetRequiredService<IAppConfiguration>().RootPublicPath);
+            logger.LogInformation("Taking recursive snapshot of public folder root.");
+            
+            app.Services.GetRequiredService<IFolderSnapshotService>()
+                .TakeSnapshot(".", true);
 
             app.Run();
         }
@@ -69,10 +70,8 @@ internal class Program
 
     private static bool InitializeApplication(WebApplication app)
     {
-        var configuration = app.Services.GetRequiredService<IAppConfiguration>();
-        string rootPublicPath = configuration.RootPublicPath;
-
         var browseService = app.Services.GetRequiredService<IBrowseService>();
+        string rootPublicPath = browseService.GetFileSystemPath(".");
 
         if (!browseService.FolderExists(rootPublicPath))
         {
@@ -89,11 +88,5 @@ internal class Program
         }
 
         return true;
-    }
-    
-    private static void TakeStartupSnapshot(IFolderSnapshotService snapshotService, string rootPublicPath)
-    {
-        logger.LogInformation("Taking recursive snapshot of public folder: {rootPublicPath}", rootPublicPath);
-        snapshotService.TakeSnapshot(rootPublicPath, true).Wait();
     }
 }

@@ -34,7 +34,7 @@ class Program
         if (path is null)
         {
             Console.WriteLine("Path not provided or invalid; Using default.");
-            path = configuration.RootPublicPath;
+            path = ".";
         }
 
         // TODO await
