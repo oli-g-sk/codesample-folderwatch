@@ -5,14 +5,7 @@ namespace ServerFolderWatch.Core.Service.Interfaces;
 
 public interface IBrowseService
 {
-    // TODO add tests for all paths being folders
     
-    bool CanReadFolderContents(string folderPath);
-    
-    bool CanWriteToFolder(string folderPath);
-
-    bool CanGoToParent(string folderPath);
-
     /// <summary>
     /// Returns fully qualified sub-entries of the given <see cref="folderPath"/>
     /// </summary>
@@ -29,4 +22,12 @@ public interface IBrowseService
     /// <see cref="folderPath"/> as model <see cref="File"/> objects. 
     /// </summary>
     IList<File> GetFiles(string folderPath);
+    
+    // TODO add tests for all paths being folders
+    
+    bool CanReadFolderContents(string folderPath);
+    
+    bool CanWriteToFolder(string folderPath);
+
+    bool CanGoToParent(string folderPath);
 }
