@@ -2,8 +2,9 @@
 
 ## Starting the app
 
-- Start the server in a container, exposed at http://localhost:8080/: `docker compose up`
-- The `shared` folder is **mounted as the root for change tracking**; use it to test the app
+- Either use `dotnet run` in the `ServerFolderWatch.Server` folder
+- Or start in a container exposed at http://localhost:8080/ using `docker compose up`
+- The `shared` folder in this repo is **mounted as the root for change tracking**; you can use it to test the app
 - **Snapshots are taken on startup**; displayed _diffs_ compare the last snapshot with the current file system state
 
 ## Web UI
@@ -19,13 +20,14 @@
 
 ## CLI tool
 
+- Build the `ServerFolderWatch.CLI` in _Debug_ or _Release_ mode
 - **Go to the output folder** and **add it to your PATH** so you can easily execute it from anywhere 
 
-```[powershell]
+```powershell
 cd .\build\Debug\
 ```
 
-```[powershell]
+```powershell
 [Environment]::SetEnvironmentVariable(
     "PATH",
     [Environment]::GetEnvironmentVariable("PATH", "User") + ";$PWD",
@@ -33,7 +35,7 @@ cd .\build\Debug\
 )
 ```
 
-- Restart your Terminal
+- Restart your terminal
 - From any folder, type `fdif` to see any changes in the current folder
 - Type `fdif commit` to either **start tracking** the folder or **commit changes**
 - Use `fdif commitr` same as above, but to run recursively on all subfolders
