@@ -38,21 +38,27 @@ class Program
         bool wasMonitored = FolderSnapshotService.IsFolderAlreadyMonitored(fullPath);
         
         PrintSingleLine("Folder" , fullPath);
-
         var oldSnapshot = FolderSnapshotService.LoadPersistedSnapshot(path);
-        var currentContents = FolderSnapshotService.GetCurrentContents(path);
-        var diff = diffService.Compare(oldSnapshot!, currentContents, path, out var summary);
-        
-        string lastAnalyzed = FolderSnapshotService.LoadPersistedSnapshot(fullPath)?.LastAnalyzed.ToString() ?? "NEVER";
+        var lastAnalyzed = oldSnapshot?.LastAnalyzed.ToString() ?? "NEVER";
         PrintSingleLine("Last snapshot", lastAnalyzed);
-        
+
         if (wasMonitored)
+        {
+            var currentContents = FolderSnapshotService.GetCurrentContents(path);
+            var diff = diffService.Compare(oldSnapshot!, currentContents, path, out var summary);
             PrintSummaryLine(summary);
-        
-        PrintDiff(diff);
-        
+            
+            PrintDiff(diff);
+        }
+
+        TakeSnapshotIfRequested(fullPath, args);
+
         Console.ResetColor();
-        
+    }
+
+    private static void TakeSnapshotIfRequested(string fullPath, string[] args)
+    {
+                
         if (args.Length > 0 && !string.IsNullOrWhiteSpace(args[0]))
         {
             if (args[0] == "commit")

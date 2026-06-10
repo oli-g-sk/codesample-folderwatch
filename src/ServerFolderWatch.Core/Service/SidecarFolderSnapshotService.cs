@@ -39,15 +39,20 @@ public class SidecarFolderSnapshotService : FolderSnapshotServiceBase
     
     public override FolderSnapshot? LoadPersistedSnapshot(string folderPath)
     {
+        if (!IsFolderAlreadyMonitored(folderPath))
+            return null;
+        
         try
         {
-            var sidecarFileContents = JsonConvert.DeserializeObject<Model.FolderSnapshot>
-            (fileSystem.File.ReadAllText(GetSidecarFilePath(folderPath)), new JsonSerializerSettings()
+            string sidecarFilePath = GetSidecarFilePath(folderPath);
+            string sidecarFileContents = fileSystem.File.ReadAllText(sidecarFilePath);
+            var deserialized = JsonConvert.DeserializeObject<FolderSnapshot>(sidecarFileContents,
+                new JsonSerializerSettings()
             {
                 ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor,
             });
 
-            return sidecarFileContents ?? FolderSnapshot.Empty;
+            return deserialized ?? FolderSnapshot.Empty;
         }
         catch (Exception ex)
         {
