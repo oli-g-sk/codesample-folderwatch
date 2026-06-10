@@ -9,77 +9,19 @@ using File = ServerFolderWatch.Core.Model.File;
 
 namespace ServerFolderWatch.Server.Tests;
 
-public class BrowseControllerTests
+public class BrowseControllerTests : PathScopedControllersTests<BrowseController>
 {
-    private const string ConfiguredRootPath = "M:\\Public";
-    
-    private readonly Mock<IBrowseService> browseServiceMock = new();
-    private readonly Mock<IFolderSnapshotService> folderSnapshotServiceMock = new();
-    private readonly Mock<IFolderDiffService> folderDiffServiceMock = new();
-    private readonly Mock<IAppConfiguration> configurationMock = new();
-    private readonly Mock<ILoggerFactory> loggerFactoryMock = new();
-    
-    private readonly BrowseController sut;
-    
-    public BrowseControllerTests()
+    protected override BrowseController CreateController()
     {
-        loggerFactoryMock.Setup(x => x.CreateLogger(It.IsAny<string>()))
-            .Returns(new Mock<ILogger>().Object);
-        configurationMock.SetupGet(x => x.RootPublicPath)
-            .Returns(ConfiguredRootPath);
-        configurationMock.SetupGet(x => x.SidecarFileName)
-            .Returns(".sidecar.json");
-        
-        sut = new BrowseController(browseServiceMock.Object,
-            folderSnapshotServiceMock.Object, folderDiffServiceMock.Object,
-            configurationMock.Object, loggerFactoryMock.Object);
+        return new BrowseController(BrowseServiceMock.Object, FolderSnapshotServiceMock.Object,
+            FolderDiffServiceMock.Object, ConfigurationMock.Object, LoggerFactoryMock.Object);
     }
 
-    [Theory]
-    [InlineData(null)]
-    [InlineData("")]
-    [InlineData(" ")]
-    public void Browse_NoParameter_ListsConfiguredRoot(string? path)
+    protected override IEnumerable<ControllerDelegate> Endpoints { get; } = new List<ControllerDelegate>
     {
-        string rootFolderRelativePath = string.Empty;
+        BrowseEndpoint
+    };
 
-        browseServiceMock.Setup(x => x.FolderExists(rootFolderRelativePath))
-            .Returns(true);
-        browseServiceMock.Setup(x => x.CanReadFolderContents(rootFolderRelativePath))
-            .Returns(true);
-        folderSnapshotServiceMock.Setup(x => x.GetCurrentContents(rootFolderRelativePath))
-            .Returns(new FolderSnapshot());
-        
-        var result = sut.Browse(path);
-        
-        folderSnapshotServiceMock.Verify(x =>
-            x.GetCurrentContents(rootFolderRelativePath), Times.Once);
-        
-        var ok = Assert.IsType<OkObjectResult>(result);
-        Assert.NotNull(ok.Value);
-    }
-
-    [Fact]
-    public void Browse_ValidPath_ReturnsFolderContents()
-    {
-
-    }
-
-    [Fact]
-    public void Browse_InvalidPath_ReturnsBadRequest()
-    {
-        
-    }
-    
-    [Fact]
-    public void Browse_PathDoesNotExist_ReturnsNotFound()
-    {
-        
-    }
-
-    [Fact]
-    public void Browse_PathOutsideRoot_ReturnsUnauthorized()
-    {
-        
-    }
+    private static IActionResult BrowseEndpoint(BrowseController controller, string? path)
+        => controller.Browse(path);
 }
