@@ -52,7 +52,6 @@ class Program
         }
 
         TakeSnapshotIfRequested(fullPath, args);
-
         Console.ResetColor();
     }
 
@@ -77,6 +76,7 @@ class Program
     }
 
     private static void PrintDiff(IDictionary<FileSystemEntryBase, DiffOperation> diff)
+    
     {
         foreach (var kvp in diff)
         {
@@ -119,11 +119,12 @@ class Program
 
             Console.WriteLine();
         }
+        
+        Console.ResetColor();
     }
 
     private static void PrintSingleLine(string heading, string content)
     {
-        Console.ResetColor();
         Console.Write($"{heading}: ");
         Console.ForegroundColor = ConsoleColor.DarkCyan;
         Console.Write($"{content}");
@@ -156,11 +157,11 @@ class Program
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 if (changes.ModifiedEntries.Any())
                     Console.Write($"MOD {changes.ModifiedEntries.Count} files ");
-
-                Console.ResetColor();
                 Console.WriteLine();
             }
         }
+        
+        Console.ResetColor();
     }
 
     private static bool HasChanges(FolderSnapshotChanges diff)
