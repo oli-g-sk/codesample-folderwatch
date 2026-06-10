@@ -1,11 +1,25 @@
 # Server Folder Diff
 
-## Starting the app
+A pair of .NET Core applications which allow on-demand detection of folder content changes.
+
+The *ASP.NET server app* sets up folder monitoring within a predefined file system subtree
+and provides REST endpoints and a web UI to compare the current file system state
+against the last snapshot.
+
+An accompanying *CLI tool* can be used to perform the same operations from within the
+command line, at any location within the file system.
+
+## Starting the server
 
 - Either use `dotnet run` in the `ServerFolderWatch.Server` folder
 - Or start in a container exposed at http://localhost:8080/ using `docker compose up`
+
+### Notes
+
 - The `shared` folder in this repo is **mounted as the root for change tracking**; you can use it to test the app
 - **Snapshots are taken on startup**; displayed _diffs_ compare the last snapshot with the current file system state
+- The root path to be monitored is defined in `appsettings.json` in the Server project
+- For deployment, it can be overridden by setting the `App__RootPublicPath` environment variable (as does `compose.yaml`)
 
 ## Web UI
 - When booted up with Docker Compose, **Blazor UI** is available at http://localhost:8080/browse
