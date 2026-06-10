@@ -20,9 +20,7 @@ class Program
         using ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
         {
             builder.AddConsole();
-#if DEBUG
             builder.SetMinimumLevel(LogLevel.Warning);
-#endif
         });
         
         var fileSystemWrapper = new RealFileSystem();
