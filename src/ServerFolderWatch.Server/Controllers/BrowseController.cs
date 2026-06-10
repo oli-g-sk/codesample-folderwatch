@@ -24,7 +24,7 @@ public class BrowseController(IBrowseService browseService,
     public IActionResult Browse([FromQuery(Name = "folder")] string? path)
     {
         // TODO is it okay to coerce this here?
-        path ??= configuration.RootPublicPath;
+        path ??= ".";
         
         if (!ValidateRequest(path, out var error))
             return error!;
@@ -34,7 +34,7 @@ public class BrowseController(IBrowseService browseService,
         return Ok(new
         {
             Path = path,
-            Entries = MapCurrentEntries(currentContent.GetAllEntries())
+            Contents = MapCurrentEntries(currentContent.GetAllEntries())
         });
     }
         
@@ -42,23 +42,26 @@ public class BrowseController(IBrowseService browseService,
     public IActionResult Diff([FromQuery(Name = "folder")] string? path)
     {
         // TODO is it okay to coerce this here?
-        path ??= configuration.RootPublicPath;
+        path ??= "./";
         
         if (!ValidateRequest(path, out var error))
             return error!;
 
         var previousSnapshot =
-            folderSnapshotService.IsFolderAlreadyMonitored(path) ?
-                folderSnapshotService.LoadPersistedSnapshot(path)
-                : FolderSnapshot.Empty;
+            folderSnapshotService.IsFolderAlreadyMonitored(path)
+                ? folderSnapshotService.LoadPersistedSnapshot(path)
+                : null;
 
         var currentContents = folderSnapshotService.GetCurrentContents(path);
-        var diff = folderDiffService.Compare(previousSnapshot, currentContents, path, out _);
+        var diff = previousSnapshot == null
+            ? new Dictionary<FileSystemEntryBase, DiffOperation>()
+            : folderDiffService.Compare(previousSnapshot, currentContents, path, out _);
 
         return Ok(new
         {
-            LastAnalyzed = currentContents.LastAnalyzed,
-            Entries = MapDiffedEntries(diff)
+            Path = path,
+            LastAnalyzed = previousSnapshot?.LastAnalyzed,
+            Changes = MapDiffedEntries(diff)
         });
     }
 
