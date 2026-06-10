@@ -5,7 +5,7 @@ using ServerFolderWatch.Core.Service;
 using ServerFolderWatch.Core.Service.Interfaces;
 using Testably.Abstractions.Testing;
 
-namespace ServerFolderWatch.Tests;
+namespace ServerFolderWatch.Core.Tests;
 
 public class SidecarFolderSnapshotServiceTests
 {

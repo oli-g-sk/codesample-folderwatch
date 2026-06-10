@@ -1,7 +1,7 @@
 using System.IO.Abstractions;
 using Moq;
 
-namespace ServerFolderWatch.Tests;
+namespace ServerFolderWatch.Core.Tests;
 
 internal static class TestHelpers
 {
