@@ -24,4 +24,28 @@ public class BrowseControllerTests : PathScopedControllersTests<BrowseController
 
     private static IActionResult BrowseEndpoint(BrowseController controller, string? path)
         => controller.Browse(path);
+    
+        
+    [Fact]
+    public void Browse_ValidPath_ReturnsFolderContents()
+    {
+        string path = "some/path";
+        
+        var expected = new FolderSnapshot()
+        {
+            Subfolders = { new Folder("foo") },
+            VersionedFiles = { new File("bar") }
+        };
+            
+        SetupFolder(path);
+        
+        FolderSnapshotServiceMock.Setup(x => x.GetCurrentContents(path))
+            .Returns(expected);
+        
+        var sut = CreateController();
+        var result = sut.Browse(path);
+        
+        var ok = Assert.IsType<OkObjectResult>(result);
+        Assert.Equal(expected, ok.Value);
+    }
 }

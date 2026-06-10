@@ -7,7 +7,7 @@ public interface IBrowseService
 {
     string GetFileSystemPath(string? folderPath);
     
-    bool FolderExists(string folderPath);
+    bool FolderExists(string? folderPath);
     
     /// <summary>
     /// Returns fully qualified sub-entries of the given <see cref="folderPath"/>
@@ -28,7 +28,7 @@ public interface IBrowseService
     
     // TODO add tests for all actually paths being folders
     
-    bool CanReadFolderContents(string folderPath);
+    bool CanReadFolderContents(string? folderPath);
     
     bool CanWriteToFolder(string folderPath);
 
