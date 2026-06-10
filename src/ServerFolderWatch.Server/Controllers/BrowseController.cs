@@ -23,8 +23,7 @@ public class BrowseController(IBrowseService browseService,
     [HttpGet("api/browse")]
     public IActionResult Browse([FromQuery(Name = "folder")] string? path)
     {
-        // TODO is it okay to coerce this here?
-        path ??= ".";
+        path = CoercePath(path);
         
         if (!ValidateRequest(path, out var error))
             return error!;
@@ -41,8 +40,7 @@ public class BrowseController(IBrowseService browseService,
     [HttpGet("api/diff")]
     public IActionResult Diff([FromQuery(Name = "folder")] string? path)
     {
-        // TODO is it okay to coerce this here?
-        path ??= "./";
+        path = CoercePath(path);
         
         if (!ValidateRequest(path, out var error))
             return error!;

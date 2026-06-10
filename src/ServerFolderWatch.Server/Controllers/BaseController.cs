@@ -33,4 +33,9 @@ public abstract class BaseController(
         errorResult = null;
         return true;       
     }
+    
+    protected static string CoercePath(string? path)
+    {
+        return path == null ? string.Empty : path.Trim();
+    }
 }
