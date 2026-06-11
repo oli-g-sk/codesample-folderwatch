@@ -39,6 +39,11 @@ cd .\build\Debug\
 )
 ```
 
+- Restart your terminal
+- From any folder, type `fdif` to see any changes in the current folder
+- Type `fdif commit` to either **start tracking** the folder or **commit changes**
+- Use `fdif commitr` same as above, but to run recursively on all subfolders
+
 ## API endpoints
 
 ### Browse folder contents (flat)
@@ -104,11 +109,6 @@ GET /api/diff?folder=path/to/folder
   "path": "new folder/"
 }
 ```
-
-- Restart your terminal
-- From any folder, type `fdif` to see any changes in the current folder
-- Type `fdif commit` to either **start tracking** the folder or **commit changes**
-- Use `fdif commitr` same as above, but to run recursively on all subfolders
 
 ## TODO
 
