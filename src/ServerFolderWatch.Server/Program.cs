@@ -130,7 +130,7 @@ internal class Program
         TypeAdapterConfig<KeyValuePair<FileSystemEntryBase, DiffOperation>, FileSystemEntryDiffDto>
             .NewConfig()
             .Map(dest => dest.Name, src => src.Key.Name)
-            .Map(dest => dest.Type, src => src is File
+            .Map(dest => dest.Type, src => src.Key is File
                 ? FileSystemEntityType.File
                 : FileSystemEntityType.Directory)
             .Map(dest => dest.DiffOperation, src => src.Value)
