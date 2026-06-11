@@ -3,11 +3,16 @@ using File = ServerFolderWatch.Core.Model.File;
 
 namespace ServerFolderWatch.Core.Service.Interfaces;
 
+// TODO add tests for all actually paths being folders
 public interface IBrowseService
 {
+    bool FolderExists(string? folderPath);
+ 
+    /// <summary>
+    /// Trasnforms the provided relative or "URL-like" path
+    /// into a fully qualified filesystem location."
+    /// </summary>
     string GetFileSystemPath(string? folderPath);
-    
-    bool FolderExists(string folderPath);
     
     /// <summary>
     /// Returns fully qualified sub-entries of the given <see cref="folderPath"/>
@@ -26,9 +31,7 @@ public interface IBrowseService
     /// </summary>
     IList<File> GetFiles(string folderPath);
     
-    // TODO add tests for all actually paths being folders
-    
-    bool CanReadFolderContents(string folderPath);
+    bool CanReadFolderContents(string? folderPath);
     
     bool CanWriteToFolder(string folderPath);
 

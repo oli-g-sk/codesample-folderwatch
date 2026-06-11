@@ -4,9 +4,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerFolderWatch.Core", "S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerFolderWatch.CLI", "ServerFolderWatch.CLI\ServerFolderWatch.CLI.csproj", "{84233D37-1271-4D92-A663-50570E6E94B4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerFolderWatch.Tests", "ServerFolderWatch.Tests\ServerFolderWatch.Tests.csproj", "{69DFFCEF-2D55-4626-97C7-AF8B1F8FAFA1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerFolderWatch.Core.Tests", "ServerFolderWatch.Core.Tests\ServerFolderWatch.Core.Tests.csproj", "{69DFFCEF-2D55-4626-97C7-AF8B1F8FAFA1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerFolderWatch.Server", "ServerFolderWatch.Server\ServerFolderWatch.Server.csproj", "{53AECE7B-38A3-40D4-86DD-91858AAF2AA1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerFolderWatch.Server.Tests", "ServerFolderWatch.Server.Tests\ServerFolderWatch.Server.Tests.csproj", "{BD68A3F5-177C-450E-A1B2-98CB9F5FFE65}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{BC7B57CC-D8F1-4270-9A11-CE6DE993D935}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,5 +34,13 @@ Global
 		{53AECE7B-38A3-40D4-86DD-91858AAF2AA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{53AECE7B-38A3-40D4-86DD-91858AAF2AA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{53AECE7B-38A3-40D4-86DD-91858AAF2AA1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD68A3F5-177C-450E-A1B2-98CB9F5FFE65}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD68A3F5-177C-450E-A1B2-98CB9F5FFE65}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD68A3F5-177C-450E-A1B2-98CB9F5FFE65}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD68A3F5-177C-450E-A1B2-98CB9F5FFE65}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{BD68A3F5-177C-450E-A1B2-98CB9F5FFE65} = {BC7B57CC-D8F1-4270-9A11-CE6DE993D935}
+		{69DFFCEF-2D55-4626-97C7-AF8B1F8FAFA1} = {BC7B57CC-D8F1-4270-9A11-CE6DE993D935}
 	EndGlobalSection
 EndGlobal

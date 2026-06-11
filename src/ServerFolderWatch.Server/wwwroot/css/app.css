@@ -67,3 +67,19 @@ body {
         color: #dfcc00 !important;
     }
 }
+
+.error-page {
+    margin: 0;
+    background-color: blue;
+    color: #FFF;
+    height: 90vh;
+    padding: 5vh;
+    
+    p { margin: 0; }
+    
+    p.heading {
+        text-transform: uppercase;
+        font-weight: bold;
+        margin-bottom: 1em;
+    }
+}

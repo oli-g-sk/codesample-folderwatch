@@ -15,11 +15,12 @@ public class SidecarFolderSnapshotService : FolderSnapshotServiceBase
     private readonly ILogger<SidecarFolderSnapshotService> logger;
 
     public SidecarFolderSnapshotService(
+        IFolderDiffService folderDiffService,
         IBrowseService browseService,
         IAppConfiguration configuration,
         IFileSystem fileSystem,
         ILoggerFactory loggerFactory)
-        : base(browseService, loggerFactory)
+        : base(browseService, folderDiffService, loggerFactory)
     {
         if (string.IsNullOrWhiteSpace(configuration.SidecarFileName))
             throw new ArgumentException("Invalid configuration: Sidecar file name is not set");
@@ -52,7 +53,7 @@ public class SidecarFolderSnapshotService : FolderSnapshotServiceBase
                 ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor,
             });
 
-            return deserialized ?? FolderSnapshot.Empty;
+            return deserialized;
         }
         catch (Exception ex)
         {

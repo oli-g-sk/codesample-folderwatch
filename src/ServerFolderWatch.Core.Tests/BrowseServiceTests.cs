@@ -4,7 +4,7 @@ using ServerFolderWatch.Core;
 using ServerFolderWatch.Core.Service;
 using Testably.Abstractions;
 
-namespace ServerFolderWatch.Tests;
+namespace ServerFolderWatch.Core.Tests;
 
 public class BrowseServiceTests
 {

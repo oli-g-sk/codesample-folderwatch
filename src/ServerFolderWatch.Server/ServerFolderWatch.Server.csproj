@@ -9,4 +9,8 @@
       <ProjectReference Include="..\ServerFolderWatch.Core\ServerFolderWatch.Core.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Mapster" />
+    </ItemGroup>
+
 </Project>

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Mapster;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ServerFolderWatch.Core;
@@ -16,80 +17,25 @@ public class BrowseController(IBrowseService browseService,
     IFolderDiffService folderDiffService,
     IAppConfiguration configuration,
     ILoggerFactory loggerFactory)
-    : BaseController(browseService, loggerFactory)
+    : PathControllerBase(browseService, loggerFactory)
 {
     private readonly ILogger<BrowseController> logger = loggerFactory.CreateLogger<BrowseController>();
     
     [HttpGet("api/browse")]
     public IActionResult Browse([FromQuery(Name = "folder")] string? path)
     {
-        // TODO is it okay to coerce this here?
-        path ??= configuration.RootPublicPath;
+        path = CoercePath(path);
         
         if (!ValidateRequest(path, out var error))
             return error!;
 
         var currentContent = folderSnapshotService.GetCurrentContents(path);
+        var entries = currentContent.GetAllEntries().Order();
         
-        return Ok(new
+        return Ok(new BrowseResponseDto()
         {
             Path = path,
-            Entries = MapCurrentEntries(currentContent.GetAllEntries())
+            Contents = entries.Select(x => x.Adapt<FileSystemEntryDto>()),
         });
-    }
-        
-    [HttpGet("api/diff")]
-    public IActionResult Diff([FromQuery(Name = "folder")] string? path)
-    {
-        // TODO is it okay to coerce this here?
-        path ??= configuration.RootPublicPath;
-        
-        if (!ValidateRequest(path, out var error))
-            return error!;
-
-        var previousSnapshot =
-            folderSnapshotService.IsFolderAlreadyMonitored(path) ?
-                folderSnapshotService.LoadPersistedSnapshot(path)
-                : FolderSnapshot.Empty;
-
-        var currentContents = folderSnapshotService.GetCurrentContents(path);
-        var diff = folderDiffService.Compare(previousSnapshot, currentContents, path, out _);
-
-        return Ok(new
-        {
-            LastAnalyzed = currentContents.LastAnalyzed,
-            Entries = MapDiffedEntries(diff)
-        });
-    }
-
-    private static IEnumerable<FileSystemEntryDto> MapCurrentEntries(IEnumerable<FileSystemEntryBase> currentEntries)
-    {
-        var ordered = currentEntries.Order();
-        
-        return ordered.Select(entry => new FileSystemEntryDto(
-                entry.Name,
-                entry is File
-                    ? FileSystemEntityType.File
-                    : FileSystemEntityType.Directory,
-                entry is File file
-                    ? file.Version
-                    : null
-            ));
-    }
-    
-    private static IEnumerable<FileSystemEntryDiffDto> MapDiffedEntries(IDictionary<FileSystemEntryBase, DiffOperation> diff)
-    {
-        var ordered = diff.OrderBy(x => x.Key);
-        
-        return ordered.Select(entry => new FileSystemEntryDiffDto(
-            entry.Key.Name,
-            entry.Key is File
-                ? FileSystemEntityType.File
-                : FileSystemEntityType.Directory,
-            entry.Value,
-            entry.Key is File file
-                ? file.Version
-                : null
-        ));
     }
 }

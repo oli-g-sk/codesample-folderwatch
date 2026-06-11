@@ -8,7 +8,7 @@ namespace ServerFolderWatch.Server.Controllers;
 public class MainController : ControllerBase
 {
     [HttpGet("/")]
-    public IActionResult Index() => Ok("Hello World");
+    public IActionResult Index() => Redirect("/browse");
     
     [HttpGet("health")]
     public IActionResult Health()

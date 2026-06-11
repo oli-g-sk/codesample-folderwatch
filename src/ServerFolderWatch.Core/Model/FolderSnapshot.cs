@@ -13,7 +13,4 @@ public class FolderSnapshot
         .Concat(VersionedFiles)
         .Order()
         .ToList();
-
-    // TODO remove - confusing - equals empty folder
-    public static FolderSnapshot Empty { get; } = new();
 }

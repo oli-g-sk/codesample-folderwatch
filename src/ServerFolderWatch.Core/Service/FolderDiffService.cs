@@ -52,11 +52,10 @@ public class FolderDiffService(
                 var currentEntry = currentEntries.First(x => x.Equals(entry)) as File;
                 currentEntry!.Version = previousEntry!.Version;
 
-                if (FileHasChanged(currentEntry, oldSnapshot, folderPath))
+                if (FileHasChanged(currentEntry.Name, folderPath, oldSnapshot.LastAnalyzed))
                 {
                     operation = DiffOperation.Modified;
                     changes.ModifiedEntries.Add(currentEntry);
-                    currentEntry!.Version++;
                 }
             }
             
@@ -77,15 +76,12 @@ public class FolderDiffService(
         return diff;
     }
     
-    private bool FileHasChanged(File fileEntry, FolderSnapshot oldSnapshot, string folderPath)
+    public bool FileHasChanged(string fileName, string folderPath, DateTime? lastAnalyzed)
     {
-        var fullPath = fileSystem.Path.Combine(browseService.GetFileSystemPath(folderPath), fileEntry.Name);
+        var fullPath = fileSystem.Path.Combine(browseService.GetFileSystemPath(folderPath), fileName);
         var modified = fileSystem.File.GetLastWriteTime(fullPath);
 
         // TODO other ways to detect changes? (size, MD5, etc.)
-        if (oldSnapshot.LastAnalyzed == null)
-            return false;
-        
-        return modified > oldSnapshot.LastAnalyzed;
+        return modified > lastAnalyzed;
     }
 }

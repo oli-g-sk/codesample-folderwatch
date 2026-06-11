@@ -1,11 +1,13 @@
 using Microsoft.Extensions.Logging;
 using ServerFolderWatch.Core.Model;
 using ServerFolderWatch.Core.Service.Interfaces;
+using File = ServerFolderWatch.Core.Model.File;
 
 namespace ServerFolderWatch.Core.Service;
 
 public abstract class FolderSnapshotServiceBase(
     IBrowseService browseService,
+    IFolderDiffService folderDiffService,
     ILoggerFactory loggerFactory)
     : IFolderSnapshotService
 {
@@ -14,11 +16,21 @@ public abstract class FolderSnapshotServiceBase(
 
     public FolderSnapshot GetCurrentContents(string folderPath)
     {
-        return new FolderSnapshot
+        var currentState = new FolderSnapshot
         {
             Subfolders = browseService.GetSubfolders(folderPath),
             VersionedFiles = browseService.GetFiles(folderPath)
         };
+
+        var previousState = LoadPersistedSnapshot(folderPath);
+        
+        foreach (var previousFile in previousState?.VersionedFiles ?? Enumerable.Empty<File>())
+        {
+            if (currentState.VersionedFiles.FirstOrDefault(x => x.Name == previousFile.Name) is { } currentFile)
+                currentFile.Version = previousFile.Version;
+        }
+        
+        return currentState;
     }
 
     public abstract bool IsFolderAlreadyMonitored(string folderPath);
@@ -36,7 +48,18 @@ public abstract class FolderSnapshotServiceBase(
         }
 
         var currentContents = GetCurrentContents(folderPath);
-        currentContents.LastAnalyzed = DateTime.Now; // TODO test
+        
+        var lastAnalyzed = wasAlreadyMonitored
+            ? LoadPersistedSnapshot(folderPath)?.LastAnalyzed
+            : null;
+
+        foreach (var file in currentContents.VersionedFiles)
+        {
+            if (folderDiffService.FileHasChanged(file.Name, folderPath, lastAnalyzed))
+                file.Version++;
+        }
+        
+        currentContents.LastAnalyzed = DateTime.Now;
         await PersistSnapshot(folderPath, currentContents);
         
         logger.LogInformation(

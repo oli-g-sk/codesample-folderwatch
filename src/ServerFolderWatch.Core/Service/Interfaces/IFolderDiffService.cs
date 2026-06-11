@@ -1,3 +1,4 @@
+using System.Net;
 using ServerFolderWatch.Core.Model;
 
 namespace ServerFolderWatch.Core.Service.Interfaces;
@@ -24,4 +25,6 @@ public interface IFolderDiffService
     /// </returns>
     public Dictionary<FileSystemEntryBase, DiffOperation> Compare(FolderSnapshot oldSnapshot, FolderSnapshot newSnapshot,
         string folderPath, out FolderSnapshotChanges changes);
+    
+    bool FileHasChanged(string fileName, string folderPath, DateTime? lastAnalyzed);
 }
