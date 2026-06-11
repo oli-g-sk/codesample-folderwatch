@@ -23,6 +23,7 @@ command line, at any location within the file system.
 
 ## Web UI
 - When booted up with Docker Compose, **Blazor UI** is available at http://localhost:8080/browse
+- Please note that *version is only shown* if it's *greater than 1* and modifying a file while the app is running will require a restart
 
 ## API endpoints
 
