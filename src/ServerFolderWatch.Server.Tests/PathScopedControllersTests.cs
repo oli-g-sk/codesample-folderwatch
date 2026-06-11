@@ -92,7 +92,7 @@ public abstract class PathScopedControllersTests<T>
 
         foreach (var endpoint in Endpoints)
         {
-            var result = endpoint.Invoke(sut, validPath);
+            var result = endpoint.Invoke(sut, nonExistentPath);
             var notFound = Assert.IsType<NotFoundObjectResult>(result);
             Assert.IsType<PathErrorResponseDto>(notFound.Value);
         }
