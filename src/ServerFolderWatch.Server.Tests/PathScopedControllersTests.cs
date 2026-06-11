@@ -42,8 +42,7 @@ public abstract class PathScopedControllersTests<T>
     public void Browse_NoParameter_ListsConfiguredRoot(string? path)
     {
         string rootFolderRelativePath = string.Empty;
-
-        SetupFolder(path);
+        SetupFolder(rootFolderRelativePath);
         
         FolderSnapshotServiceMock.Setup(x => x.GetCurrentContents(rootFolderRelativePath))
             .Returns(new FolderSnapshot());
@@ -72,7 +71,6 @@ public abstract class PathScopedControllersTests<T>
     [Fact]
     public void Browse_InvalidPath_ReturnsBadRequest()
     {
-        
     }
     
     [Fact]
