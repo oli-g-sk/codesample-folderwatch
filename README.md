@@ -32,9 +32,6 @@ command line, at any location within the file system.
 
 ```powershell
 cd .\build\Debug\
-```
-
-```powershell
 [Environment]::SetEnvironmentVariable(
     "PATH",
     [Environment]::GetEnvironmentVariable("PATH", "User") + ";$PWD",
@@ -46,7 +43,7 @@ cd .\build\Debug\
 
 ### Browse folder contents (flat)
 
-```
+```http
 GET /api/browse
 GET /api/browse?folder=path/to/folder
 ```
@@ -70,7 +67,7 @@ GET /api/browse?folder=path/to/folder
 
 ### Show diff compared to last snapshot
 
-```
+```http
 GET /api/diff
 GET /api/diff?folder=path/to/folder
 ```
