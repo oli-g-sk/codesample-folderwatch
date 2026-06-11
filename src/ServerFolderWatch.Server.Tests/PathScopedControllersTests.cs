@@ -39,7 +39,7 @@ public abstract class PathScopedControllersTests<T>
     [InlineData(null)]
     [InlineData("")]
     [InlineData(" ")]
-    public void Browse_NoParameter_ListsConfiguredRoot(string? path)
+    public void PathAccess_NoParameter_ListsConfiguredRoot(string? path)
     {
         string rootFolderRelativePath = string.Empty;
         
@@ -69,13 +69,13 @@ public abstract class PathScopedControllersTests<T>
     [InlineData("foo>bar")]
     [InlineData("foo|bar")]
     [InlineData("foo:bar")]
-    public void Browse_InvalidPath_ReturnsBadRequest(string path)
+    public void PathAccess_InvalidPath_ReturnsBadRequest(string path)
     {
         // TODO implement BadRequest response for malformed paths
     }
     
     [Fact]
-    public void Browse_PathDoesNotExist_ReturnsNotFound()
+    public void PathAccess_PathDoesNotExist_ReturnsNotFound()
     {
         string validPath = "foo";
         string nonExistentPath = "foo/bar";
@@ -98,7 +98,7 @@ public abstract class PathScopedControllersTests<T>
     [InlineData("foo/../bar")]
     [InlineData("/etc")]
     [InlineData("C:\\")]
-    public void Browse_PathOutsideRoot_ReturnsUnauthorized(string path)
+    public void PathAccess_PathOutsideRoot_ReturnsUnauthorized(string path)
     {
         BrowseServiceMock.Setup(x => x.FolderExists(path))
             .Returns(true);
