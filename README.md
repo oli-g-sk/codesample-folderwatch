@@ -32,9 +32,6 @@ command line, at any location within the file system.
 
 ```powershell
 cd .\build\Debug\
-```
-
-```powershell
 [Environment]::SetEnvironmentVariable(
     "PATH",
     [Environment]::GetEnvironmentVariable("PATH", "User") + ";$PWD",
@@ -42,11 +39,16 @@ cd .\build\Debug\
 )
 ```
 
+- Restart your terminal
+- From any folder, type `fdif` to see any changes in the current folder
+- Type `fdif commit` to either **start tracking** the folder or **commit changes**
+- Use `fdif commitr` same as above, but to run recursively on all subfolders
+
 ## API endpoints
 
 ### Browse folder contents (flat)
 
-```
+```http
 GET /api/browse
 GET /api/browse?folder=path/to/folder
 ```
@@ -70,7 +72,7 @@ GET /api/browse?folder=path/to/folder
 
 ### Show diff compared to last snapshot
 
-```
+```http
 GET /api/diff
 GET /api/diff?folder=path/to/folder
 ```
@@ -107,11 +109,6 @@ GET /api/diff?folder=path/to/folder
   "path": "new folder/"
 }
 ```
-
-- Restart your terminal
-- From any folder, type `fdif` to see any changes in the current folder
-- Type `fdif commit` to either **start tracking** the folder or **commit changes**
-- Use `fdif commitr` same as above, but to run recursively on all subfolders
 
 ## TODO
 
