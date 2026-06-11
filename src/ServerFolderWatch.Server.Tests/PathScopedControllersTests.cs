@@ -64,15 +64,33 @@ public abstract class PathScopedControllersTests<T>
         }
     }
 
-    [Fact]
-    public void Browse_InvalidPath_ReturnsBadRequest()
+    [Theory]
+    [InlineData("foo<bar")]
+    [InlineData("foo>bar")]
+    [InlineData("foo|bar")]
+    [InlineData("foo:bar")]
+    public void Browse_InvalidPath_ReturnsBadRequest(string path)
     {
+        // TODO implement BadRequest response for malformed paths
     }
     
     [Fact]
     public void Browse_PathDoesNotExist_ReturnsNotFound()
     {
+        string validPath = "foo";
+        string nonExistentPath = "foo/bar";
         
+        BrowseServiceMock.Setup(x => x.FolderExists(validPath))
+            .Returns(true);
+        BrowseServiceMock.Setup(x => x.CanReadFolderContents(validPath))
+            .Returns(true);
+        BrowseServiceMock.Setup(x => x.FolderExists(nonExistentPath))
+            .Returns(false);
+        
+        var sut = CreateController();
+        
+        foreach (var endpoint in Endpoints)
+            Assert.IsType<NotFoundObjectResult>(endpoint.Invoke(sut, nonExistentPath));
     }
 
     [Theory]
