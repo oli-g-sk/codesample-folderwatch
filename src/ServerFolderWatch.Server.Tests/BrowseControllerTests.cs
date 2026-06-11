@@ -1,9 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Moq;
-using ServerFolderWatch.Core;
 using ServerFolderWatch.Core.Model;
-using ServerFolderWatch.Core.Service.Interfaces;
 using ServerFolderWatch.Server.Controllers;
 using ServerFolderWatch.Server.DTOs;
 using File = ServerFolderWatch.Core.Model.File;
@@ -26,7 +22,6 @@ public class BrowseControllerTests : PathScopedControllersTests<BrowseController
     private static IActionResult BrowseEndpoint(BrowseController controller, string? path)
         => controller.Browse(path);
     
-        
     [Fact]
     public void Browse_ValidPath_ReturnsFolderContents()
     {
