@@ -53,7 +53,7 @@ public class SidecarFolderSnapshotService : FolderSnapshotServiceBase
                 ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor,
             });
 
-            return deserialized ?? FolderSnapshot.Empty;
+            return deserialized;
         }
         catch (Exception ex)
         {

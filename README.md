@@ -2,11 +2,11 @@
 
 A pair of .NET Core applications which allow on-demand detection of folder content changes.
 
-The *ASP.NET server app* sets up folder monitoring within a predefined file system subtree
+The **ASP.NET server app** sets up folder monitoring within a predefined file system subtree
 and provides REST endpoints and a web UI to compare the current file system state
 against the last snapshot.
 
-An accompanying *CLI tool* can be used to perform the same operations from within the
+An accompanying **CLI tool** can be used to perform the same operations from within the
 command line, at any location within the file system.
 
 ## Starting the server
@@ -54,3 +54,28 @@ cd .\build\Debug\
 - From any folder, type `fdif` to see any changes in the current folder
 - Type `fdif commit` to either **start tracking** the folder or **commit changes**
 - Use `fdif commitr` same as above, but to run recursively on all subfolders
+
+## TODO
+
+### Features
+
+- [ ] More robust way of detecting file content changes (size, hash)
+- [ ] Loading state in the web UI
+- [ ] A /commit API endpoint
+- [ ] Ability to detect _rename_
+- [ ] Show file sizes in UI
+- [ ] Show a status bar
+
+### Code quality
+
+- [ ] Use scoped services where possible
+- [ ] Composition instead of inheritance for _snapshot service_
+- [ ] Don't allow comparison of different folders
+
+
+### Test coverage
+
+- [ ] Snapshot date is always saved
+- [ ] File version gets incremented
+- [ ] Browse service only accepts folder paths
+- [ ] Browse service always only lists _names_
