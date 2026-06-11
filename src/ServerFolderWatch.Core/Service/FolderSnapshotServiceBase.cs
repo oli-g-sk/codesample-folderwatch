@@ -6,6 +6,7 @@ namespace ServerFolderWatch.Core.Service;
 
 public abstract class FolderSnapshotServiceBase(
     IBrowseService browseService,
+    IFolderDiffService folderDiffService,
     ILoggerFactory loggerFactory)
     : IFolderSnapshotService
 {
@@ -36,7 +37,17 @@ public abstract class FolderSnapshotServiceBase(
         }
 
         var currentContents = GetCurrentContents(folderPath);
-        currentContents.LastAnalyzed = DateTime.Now; // TODO test
+        var lastAnalyzed = wasAlreadyMonitored
+            ? LoadPersistedSnapshot(folderPath)?.LastAnalyzed
+            : null;
+
+        foreach (var file in currentContents.VersionedFiles)
+        {
+            if (folderDiffService.FileHasChanged(file.Name, folderPath, lastAnalyzed))
+                file.Version++;
+        }
+        
+        currentContents.LastAnalyzed = DateTime.Now;
         await PersistSnapshot(folderPath, currentContents);
         
         logger.LogInformation(

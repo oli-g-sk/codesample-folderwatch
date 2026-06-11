@@ -67,7 +67,8 @@ internal class Program
         builder.Services.AddSingleton<IBrowseService, BrowseService>();
         builder.Services.AddSingleton<IFolderSnapshotService, SidecarFolderSnapshotService>();
         
-        builder.Services.AddScoped<IFolderDiffService, FolderDiffService>();
+        // TODO refactor to make this scoped
+        builder.Services.AddSingleton<IFolderDiffService, FolderDiffService>();
     }
     
     private static void RegisterRazorPages(WebApplicationBuilder builder)
