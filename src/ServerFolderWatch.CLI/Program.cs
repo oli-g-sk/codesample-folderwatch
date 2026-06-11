@@ -27,8 +27,8 @@ class Program
         var configuration = new AppConfiguration();
         var browseService = new BrowseService(configuration, fileSystemWrapper);
         
-        FolderSnapshotService = new SidecarFolderSnapshotService(browseService,
-            configuration, fileSystemWrapper, loggerFactory);
+        FolderSnapshotService = new SidecarFolderSnapshotService(diffService,
+            browseService, configuration, fileSystemWrapper, loggerFactory);
         diffService = new FolderDiffService(fileSystemWrapper, browseService, loggerFactory);
        
         string path = configuration.RootPublicPath;
