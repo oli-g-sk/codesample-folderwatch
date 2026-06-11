@@ -32,7 +32,12 @@ public class BrowseControllerTests : PathScopedControllersTests<BrowseController
             Subfolders = { new Folder("foo") },
             VersionedFiles = { new File("bar") }
         };
-            
+
+        BrowseServiceMock.Setup(x => x.FolderExists(path))
+            .Returns(true);
+        BrowseServiceMock.Setup(x => x.CanReadFolderContents(path))
+            .Returns(true);
+
         FolderSnapshotServiceMock.Setup(x => x.GetCurrentContents(path))
             .Returns(expected);
         
