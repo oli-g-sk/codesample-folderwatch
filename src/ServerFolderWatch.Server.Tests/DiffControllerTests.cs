@@ -3,7 +3,7 @@ using ServerFolderWatch.Server.Controllers;
 
 namespace ServerFolderWatch.Server.Tests;
 
-public class DiffControllerTests : PathScopedControllersTests<DiffController>
+public class DiffControllerTests : PathControllerBaseTests<DiffController>
 {
     protected override DiffController CreateController()
     {

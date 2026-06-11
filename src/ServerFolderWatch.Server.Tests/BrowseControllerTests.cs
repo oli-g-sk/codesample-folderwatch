@@ -6,7 +6,7 @@ using File = ServerFolderWatch.Core.Model.File;
 
 namespace ServerFolderWatch.Server.Tests;
 
-public class BrowseControllerTests : PathScopedControllersTests<BrowseController>
+public class BrowseControllerTests : PathControllerBaseTests<BrowseController>
 {
     protected override BrowseController CreateController()
     {

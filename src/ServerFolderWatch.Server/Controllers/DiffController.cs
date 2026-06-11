@@ -12,7 +12,7 @@ public class DiffController(IBrowseService browseService,
     IFolderSnapshotService folderSnapshotService,
     IFolderDiffService folderDiffService,
     ILoggerFactory loggerFactory)
-    : BaseController(browseService, loggerFactory)
+    : PathControllerBase(browseService, loggerFactory)
 {
             
     [HttpGet("api/diff")]

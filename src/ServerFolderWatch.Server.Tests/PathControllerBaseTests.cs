@@ -9,8 +9,8 @@ using ServerFolderWatch.Server.DTOs;
 
 namespace ServerFolderWatch.Server.Tests;
 
-public abstract class PathScopedControllersTests<T>
-    where T : BaseController
+public abstract class PathControllerBaseTests<T>
+    where T : PathControllerBase
 {
     private const string ConfiguredRootPath = "M:\\Public";
     
@@ -20,7 +20,7 @@ public abstract class PathScopedControllersTests<T>
     protected readonly Mock<IAppConfiguration> ConfigurationMock = new();
     protected readonly Mock<ILoggerFactory> LoggerFactoryMock = new();
     
-    public PathScopedControllersTests()
+    public PathControllerBaseTests()
     {
         LoggerFactoryMock.Setup(x => x.CreateLogger(It.IsAny<string>()))
             .Returns(new Mock<ILogger>().Object);

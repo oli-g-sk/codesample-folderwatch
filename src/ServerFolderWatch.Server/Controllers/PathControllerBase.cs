@@ -6,12 +6,12 @@ using ServerFolderWatch.Server.DTOs;
 namespace ServerFolderWatch.Server.Controllers;
 
 [ApiController]
-public abstract class BaseController(
+public abstract class PathControllerBase(
     IBrowseService browseService,
     ILoggerFactory loggerFactory)
     : ControllerBase
 {
-    private readonly ILogger<BaseController> logger = loggerFactory.CreateLogger<BaseController>();
+    private readonly ILogger<PathControllerBase> logger = loggerFactory.CreateLogger<PathControllerBase>();
 
     protected bool ValidateRequest(string path, out IActionResult? errorResult)
     {

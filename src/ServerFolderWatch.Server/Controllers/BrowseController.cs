@@ -16,7 +16,7 @@ public class BrowseController(IBrowseService browseService,
     IFolderDiffService folderDiffService,
     IAppConfiguration configuration,
     ILoggerFactory loggerFactory)
-    : BaseController(browseService, loggerFactory)
+    : PathControllerBase(browseService, loggerFactory)
 {
     private readonly ILogger<BrowseController> logger = loggerFactory.CreateLogger<BrowseController>();
     
