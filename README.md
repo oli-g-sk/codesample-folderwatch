@@ -9,7 +9,7 @@ against the last snapshot.
 An accompanying **CLI tool** can be used to perform the same operations from within the
 command line, at any location within the file system.
 
-## Starting the server
+## Server app
 
 - Either use `dotnet run` in the `ServerFolderWatch.Server` folder
 - Or start in a container exposed at http://localhost:8080/ using `docker compose up`
@@ -24,14 +24,6 @@ command line, at any location within the file system.
 ## Web UI
 - When booted up with Docker Compose, **Blazor UI** is available at http://localhost:8080/browse
 - Please note that *version is only shown* if it's *greater than 1* and modifying a file while the app is running will require a restart
-
-## API endpoints
-
-- GET `/api/browse`
-- GET `/api/browse?folder=path/to/folder`
-
-- GET `/api/diff`
-- GET `/api/diff?folder=path/to/folder`
 
 ## CLI tool
 
@@ -48,6 +40,72 @@ cd .\build\Debug\
     [Environment]::GetEnvironmentVariable("PATH", "User") + ";$PWD",
     "User"
 )
+```
+
+## API endpoints
+
+### Browse folder contents (flat)
+
+```
+GET /api/browse
+GET /api/browse?folder=path/to/folder
+```
+
+```json
+{
+  "contents": [
+    {
+      "name": "folder-name",
+      "type": "Directory",
+      "version": null
+    },
+    {
+      "name": "file-name.txt",
+      "type": "File",
+      "version": 1
+    },
+  ]
+}
+```
+
+### Show diff compared to last snapshot
+
+```
+GET /api/diff
+GET /api/diff?folder=path/to/folder
+```
+
+```json
+{
+  "lastAnalyzed": "2026-06-11T07:54:41.3752154+02:00",
+  "changes": [
+    {
+      "name": "some-folder",
+      "type": "Directory",
+      "diffOperation": "Unchanged",
+      "version": null
+    },
+    {
+      "name": "file.txt",
+      "type": "File",
+      "diffOperation": "Added",
+      "version": 1
+    },
+    {
+      "name": "hello.world",
+      "type": "File",
+      "diffOperation": "Modified",
+      "version": 2
+    },
+    {
+      "name": "justcreated",
+      "type": "File",
+      "diffOperation": "Removed",
+      "version": 3
+    }
+  ],
+  "path": "new folder/"
+}
 ```
 
 - Restart your terminal
