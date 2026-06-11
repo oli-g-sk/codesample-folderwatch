@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Mapster;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ServerFolderWatch.Core;
@@ -29,29 +30,12 @@ public class BrowseController(IBrowseService browseService,
             return error!;
 
         var currentContent = folderSnapshotService.GetCurrentContents(path);
+        var entries = currentContent.GetAllEntries().Order();
         
         return Ok(new BrowseResponseDto()
         {
             Path = path,
-            Contents = MapCurrentEntries(currentContent.GetAllEntries())
+            Contents = entries.Select(x => x.Adapt<FileSystemEntryDto>()),
         });
-    }
-
-    private static IEnumerable<FileSystemEntryDto> MapCurrentEntries(IEnumerable<FileSystemEntryBase>? currentEntries)
-    {
-        if (currentEntries == null)
-            return Enumerable.Empty<FileSystemEntryDto>();
-        
-        var ordered = currentEntries.Order();
-        
-        return ordered.Select(entry => new FileSystemEntryDto(
-                entry.Name,
-                entry is File
-                    ? FileSystemEntityType.File
-                    : FileSystemEntityType.Directory,
-                entry is File file
-                    ? file.Version
-                    : null
-            ));
     }
 }

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Mapster;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ServerFolderWatch.Core.Model;
@@ -37,23 +38,9 @@ public class DiffController(IBrowseService browseService,
         {
             Path = path,
             LastAnalyzed = previousSnapshot?.LastAnalyzed,
-            Changes = MapDiffedEntries(diff)
+            Changes = diff.Select(kvp => kvp.Adapt<FileSystemEntryDiffDto>())
+                .OrderBy(x => x.Name)
+                .ToList()
         });
-    }    
-    
-    private static IEnumerable<FileSystemEntryDiffDto> MapDiffedEntries(IDictionary<FileSystemEntryBase, DiffOperation> diff)
-    {
-        var ordered = diff.OrderBy(x => x.Key);
-        
-        return ordered.Select(entry => new FileSystemEntryDiffDto(
-            entry.Key.Name,
-            entry.Key is File
-                ? FileSystemEntityType.File
-                : FileSystemEntityType.Directory,
-            entry.Value,
-            entry.Key is File file
-                ? file.Version
-                : null
-        ));
     }
 }
