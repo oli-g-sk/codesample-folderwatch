@@ -5,6 +5,7 @@ using ServerFolderWatch.Core;
 using ServerFolderWatch.Core.Model;
 using ServerFolderWatch.Core.Service.Interfaces;
 using ServerFolderWatch.Server.Controllers;
+using ServerFolderWatch.Server.DTOs;
 using File = ServerFolderWatch.Core.Model.File;
 
 namespace ServerFolderWatch.Server.Tests;
@@ -46,6 +47,9 @@ public class BrowseControllerTests : PathScopedControllersTests<BrowseController
         var result = sut.Browse(path);
         
         var ok = Assert.IsType<OkObjectResult>(result);
-        Assert.Equal(expected, ok.Value);
+        Assert.IsType<BrowseResponseDto>(ok.Value);
+        
+        var dto = (BrowseResponseDto) ok.Value;
+        Assert.Equal(path, dto.Path);
     }
 }
