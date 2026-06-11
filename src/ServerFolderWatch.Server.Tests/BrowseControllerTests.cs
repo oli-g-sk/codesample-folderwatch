@@ -33,8 +33,6 @@ public class BrowseControllerTests : PathScopedControllersTests<BrowseController
             VersionedFiles = { new File("bar") }
         };
             
-        SetupFolder(path);
-        
         FolderSnapshotServiceMock.Setup(x => x.GetCurrentContents(path))
             .Returns(expected);
         

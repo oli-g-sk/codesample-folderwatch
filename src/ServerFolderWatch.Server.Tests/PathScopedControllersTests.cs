@@ -42,7 +42,11 @@ public abstract class PathScopedControllersTests<T>
     public void Browse_NoParameter_ListsConfiguredRoot(string? path)
     {
         string rootFolderRelativePath = string.Empty;
-        SetupFolder(rootFolderRelativePath);
+        
+        BrowseServiceMock.Setup(x => x.FolderExists(path))
+            .Returns(true);
+        BrowseServiceMock.Setup(x => x.CanReadFolderContents(path))
+            .Returns(true);
         
         FolderSnapshotServiceMock.Setup(x => x.GetCurrentContents(rootFolderRelativePath))
             .Returns(new FolderSnapshot());
@@ -60,14 +64,6 @@ public abstract class PathScopedControllersTests<T>
         }
     }
 
-    protected void SetupFolder(string? path)
-    {
-        BrowseServiceMock.Setup(x => x.FolderExists(path))
-            .Returns(true);
-        BrowseServiceMock.Setup(x => x.CanReadFolderContents(path))
-            .Returns(true);
-    }
-
     [Fact]
     public void Browse_InvalidPath_ReturnsBadRequest()
     {
@@ -79,9 +75,21 @@ public abstract class PathScopedControllersTests<T>
         
     }
 
-    [Fact]
-    public void Browse_PathOutsideRoot_ReturnsUnauthorized()
+    [Theory]
+    [InlineData("../")]
+    [InlineData("foo/../bar")]
+    [InlineData("/etc")]
+    [InlineData("C:\\")]
+    public void Browse_PathOutsideRoot_ReturnsUnauthorized(string path)
     {
+        BrowseServiceMock.Setup(x => x.FolderExists(path))
+            .Returns(true);
+        BrowseServiceMock.Setup(x => x.CanReadFolderContents(path))
+            .Returns(false);
         
+        var sut = CreateController();
+        
+        foreach (var endpoint in Endpoints)
+            Assert.IsType<ForbidResult>(endpoint.Invoke(sut, path));
     }
 }
