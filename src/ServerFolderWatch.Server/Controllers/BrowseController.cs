@@ -37,8 +37,11 @@ public class BrowseController(IBrowseService browseService,
         });
     }
 
-    private static IEnumerable<FileSystemEntryDto> MapCurrentEntries(IEnumerable<FileSystemEntryBase> currentEntries)
+    private static IEnumerable<FileSystemEntryDto> MapCurrentEntries(IEnumerable<FileSystemEntryBase>? currentEntries)
     {
+        if (currentEntries == null)
+            return Enumerable.Empty<FileSystemEntryDto>();
+        
         var ordered = currentEntries.Order();
         
         return ordered.Select(entry => new FileSystemEntryDto(

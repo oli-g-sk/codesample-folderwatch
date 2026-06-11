@@ -5,6 +5,7 @@ using ServerFolderWatch.Core;
 using ServerFolderWatch.Core.Model;
 using ServerFolderWatch.Core.Service.Interfaces;
 using ServerFolderWatch.Server.Controllers;
+using ServerFolderWatch.Server.DTOs;
 
 namespace ServerFolderWatch.Server.Tests;
 
@@ -88,9 +89,13 @@ public abstract class PathScopedControllersTests<T>
             .Returns(false);
         
         var sut = CreateController();
-        
+
         foreach (var endpoint in Endpoints)
-            Assert.IsType<NotFoundObjectResult>(endpoint.Invoke(sut, nonExistentPath));
+        {
+            var result = endpoint.Invoke(sut, validPath);
+            var notFound = Assert.IsType<NotFoundObjectResult>(result);
+            Assert.IsType<PathErrorResponseDto>(notFound.Value);
+        }
     }
 
     [Theory]
@@ -106,8 +111,12 @@ public abstract class PathScopedControllersTests<T>
             .Returns(false);
         
         var sut = CreateController();
-        
+
         foreach (var endpoint in Endpoints)
-            Assert.IsType<ForbidResult>(endpoint.Invoke(sut, path));
+        {
+            var result = endpoint.Invoke(sut, path);
+            var unauthorized = Assert.IsType<UnauthorizedObjectResult>(result);
+            Assert.IsType<PathErrorResponseDto>(unauthorized.Value);
+        }
     }
 }
