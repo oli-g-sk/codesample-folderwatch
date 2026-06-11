@@ -43,9 +43,9 @@ public abstract class PathScopedControllersTests<T>
     {
         string rootFolderRelativePath = string.Empty;
         
-        BrowseServiceMock.Setup(x => x.FolderExists(path))
+        BrowseServiceMock.Setup(x => x.FolderExists(rootFolderRelativePath))
             .Returns(true);
-        BrowseServiceMock.Setup(x => x.CanReadFolderContents(path))
+        BrowseServiceMock.Setup(x => x.CanReadFolderContents(rootFolderRelativePath))
             .Returns(true);
         
         FolderSnapshotServiceMock.Setup(x => x.GetCurrentContents(rootFolderRelativePath))
