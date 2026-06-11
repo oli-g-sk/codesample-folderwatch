@@ -30,7 +30,7 @@ public class BrowseController(IBrowseService browseService,
 
         var currentContent = folderSnapshotService.GetCurrentContents(path);
         
-        return Ok(new
+        return Ok(new BrowseResponseDto()
         {
             Path = path,
             Contents = MapCurrentEntries(currentContent.GetAllEntries())
@@ -55,7 +55,8 @@ public class BrowseController(IBrowseService browseService,
             ? new Dictionary<FileSystemEntryBase, DiffOperation>()
             : folderDiffService.Compare(previousSnapshot, currentContents, path, out _);
 
-        return Ok(new
+    
+        return Ok(new DiffResponseDto()
         {
             Path = path,
             LastAnalyzed = previousSnapshot?.LastAnalyzed,
