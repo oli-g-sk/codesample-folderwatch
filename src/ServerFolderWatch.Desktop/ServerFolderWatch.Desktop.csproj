@@ -10,4 +10,8 @@
       <ProjectReference Include="..\ServerFolderWatch.Core\ServerFolderWatch.Core.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="CommunityToolkit.Mvvm" />
+    </ItemGroup>
+
 </Project>

@@ -9,7 +9,7 @@
         d:DataContext="{d:DesignInstance viewModels:BrowseViewModel}"
         DataContext="{local:Service ServiceType={x:Type viewModels:BrowseViewModel}}"
         Title="MainWindow" Height="450" Width="800">
-    <Grid Margin="10">
+    <Grid Margin="8">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" MinWidth="160" />
             <ColumnDefinition Width="Auto" />
@@ -17,6 +17,7 @@
         </Grid.ColumnDefinitions>
 
         <Border Background="#22000000" Grid.Column="0"
+                CornerRadius="4,0,0,4"
                 DataContext="{Binding FolderTree}">
             <TreeView ItemsSource="{Binding Folders}">
                 <TreeView.ItemTemplate>
@@ -40,7 +41,8 @@
                       ResizeBehavior="PreviousAndNext"
                       ResizeDirection="Columns" />
         
-        <Border Background="#22000000" Grid.Column="2" />
+        <Border Background="#22000000" Grid.Column="2"
+                CornerRadius="0,4,4,0"/>
         
     </Grid>
 </Window>
