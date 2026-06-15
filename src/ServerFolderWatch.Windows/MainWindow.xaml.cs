@@ -40,7 +40,7 @@ public partial class MainWindow : Window
 
     private void TreeView_OnSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
     {
-        if (sender is FrameworkElement { DataContext: FolderViewModel folder })
+        if (e.NewValue is FolderViewModel folder)
             viewModel.FolderTree.SelectedFolder = folder;
     }
 }

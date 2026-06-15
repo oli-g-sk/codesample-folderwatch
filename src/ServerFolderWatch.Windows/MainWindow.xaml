@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ServerFolderWatch.Windows"
         xmlns:viewModels="clr-namespace:ServerFolderWatch.Desktop.ViewModels;assembly=ServerFolderWatch.Desktop"
+        xmlns:items="clr-namespace:ServerFolderWatch.Desktop.ViewModels.Items;assembly=ServerFolderWatch.Desktop"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance viewModels:BrowseViewModel}"
         DataContext="{local:Service ServiceType={x:Type viewModels:BrowseViewModel}}"
@@ -46,7 +47,23 @@
                 DataContext="{Binding FolderContents}"
                 CornerRadius="0,4,4,0">
             
-            <ListBox ItemsSource="{Binding }"></ListBox>
+            <ListBox ItemsSource="{Binding Entries}">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel />
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="{x:Type items:BaseEntryViewModel}">
+                        <Border>
+                            <StackPanel Orientation="Vertical">
+                                <Border Width="96" Height="96" />
+                                <TextBlock Text="{Binding Entry.Name}" />
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
             
         </Border>
         
