@@ -17,8 +17,8 @@
             <ColumnDefinition Width="4*" MinWidth="360" />
         </Grid.ColumnDefinitions>
 
-        <Border Background="#22000000" Grid.Column="0"
-                CornerRadius="4,0,0,4"
+        <Border Background="#44000000" Grid.Column="0"
+                CornerRadius="8,0,0,8"
                 DataContext="{Binding FolderTree}">
             <TreeView ItemsSource="{Binding Folders}"
                       SelectedItemChanged="TreeView_OnSelectedItemChanged">
@@ -43,11 +43,12 @@
                       ResizeBehavior="PreviousAndNext"
                       ResizeDirection="Columns" />
         
-        <Border Background="#22000000" Grid.Column="2"
+        <Border Background="#44000000" Grid.Column="2"
                 DataContext="{Binding FolderContents}"
-                CornerRadius="0,4,4,0">
+                CornerRadius="0,8,8,0">
             
-            <ListBox ItemsSource="{Binding Entries}">
+            <ListBox ItemsSource="{Binding Entries}"
+                     Background="Transparent">
                 <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
                         <WrapPanel />
@@ -55,17 +56,25 @@
                 </ListBox.ItemsPanel>
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type items:BaseEntryViewModel}">
-                        <Border>
-                            <StackPanel Orientation="Vertical">
-                                <Border Width="96" Height="96" />
-                                <TextBlock Text="{Binding Entry.Name}" />
-                            </StackPanel>
-                        </Border>
+                        <Grid Width="128"
+                              Height="128">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="3*" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="📁"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       FontWeight="ExtraLight"
+                                       FontSize="64"/>
+                            <TextBlock Grid.Row="1"
+                                       Margin="0,8,0,0"
+                                       HorizontalAlignment="Center"
+                                       Text="{Binding Entry.Name}" />
+                        </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-            
         </Border>
-        
     </Grid>
 </Window>
