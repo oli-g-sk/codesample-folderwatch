@@ -14,6 +14,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{BC7B57CC
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerFolderWatch.Windows", "ServerFolderWatch.Windows\ServerFolderWatch.Windows.csproj", "{638E2200-9200-4CB5-9F97-829CE3A2387C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerFolderWatch.Desktop", "ServerFolderWatch.Desktop\ServerFolderWatch.Desktop.csproj", "{36C327D1-EA2A-45B4-A977-BA1DE397739D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,6 +46,10 @@ Global
 		{638E2200-9200-4CB5-9F97-829CE3A2387C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{638E2200-9200-4CB5-9F97-829CE3A2387C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{638E2200-9200-4CB5-9F97-829CE3A2387C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36C327D1-EA2A-45B4-A977-BA1DE397739D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36C327D1-EA2A-45B4-A977-BA1DE397739D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36C327D1-EA2A-45B4-A977-BA1DE397739D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36C327D1-EA2A-45B4-A977-BA1DE397739D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{BD68A3F5-177C-450E-A1B2-98CB9F5FFE65} = {BC7B57CC-D8F1-4270-9A11-CE6DE993D935}
