@@ -10,16 +10,15 @@ namespace ServerFolderWatch.Desktop.ViewModels;
 public class FolderContentsViewModel : ObservableObject,
     IRecipient<SelectedFolderChangedMsg>
 {
-    private readonly IBrowseService browseService;
     private readonly IFolderSnapshotService folderSnapshotService;
 
-    public ObservableCollection<FileSystemEntryBase> Entries { get; }
+    public ObservableCollection<FileSystemEntryBase> Entries { get; } = [];
 
-    public FolderContentsViewModel(IBrowseService browseService, IFolderSnapshotService folderSnapshotService)
+    public FolderContentsViewModel(IFolderSnapshotService folderSnapshotService)
     {
-        this.browseService = browseService;
         this.folderSnapshotService = folderSnapshotService;
-        Entries = new ObservableCollection<FileSystemEntryBase>();
+        
+        WeakReferenceMessenger.Default.Register(this);
     }
 
     public void Receive(SelectedFolderChangedMsg message)
