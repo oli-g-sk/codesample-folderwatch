@@ -16,11 +16,27 @@
             <ColumnDefinition Width="4*" MinWidth="360" />
         </Grid.ColumnDefinitions>
 
-        <Border Background="#22000000" Grid.Column="0">
-            <TreeView />
+        <Border Background="#22000000" Grid.Column="0"
+                DataContext="{Binding FolderTree}">
+            <TreeView ItemsSource="{Binding Folders}">
+                <TreeView.ItemTemplate>
+                    <HierarchicalDataTemplate>
+                        <Border Padding="8">
+                            <DockPanel>
+                                <TextBlock DockPanel.Dock="Left"
+                                           Margin="0,0,16,0"
+                                           Foreground="LightSeaGreen"
+                                           Text="📁" />
+                                <TextBlock Text="{Binding Name}" />
+                            </DockPanel>
+                        </Border>
+                    </HierarchicalDataTemplate>
+                </TreeView.ItemTemplate>
+            </TreeView>
         </Border>
         
-        <GridSplitter Width="12" Grid.Column="1"
+        <GridSplitter Width="8" Grid.Column="1"
+                      Background="Transparent"
                       ResizeBehavior="PreviousAndNext"
                       ResizeDirection="Columns" />
         
