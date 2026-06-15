@@ -126,8 +126,15 @@ public class BrowseService(IAppConfiguration configuration, IFileSystem fileSyst
         folderPath = fileSystem.Path.TrimEndingDirectorySeparator(folderPath);
         rootPath = fileSystem.Path.TrimEndingDirectorySeparator(rootPath);
 
+        if (rootPath.EndsWith(fileSystem.Path.DirectorySeparatorChar))
+        {
+            // if the configured root path actually happened to be C:\
+            // TrimEndingDirectorySeparator would NOT trim the trailing slash
+            rootPath = rootPath.Substring(0, rootPath.Length - 1);
+        }
+
         return folderPath.Equals(rootPath, StringComparison.OrdinalIgnoreCase)
-            || folderPath.StartsWith(rootPath + fileSystem.Path.DirectorySeparatorChar,
-                StringComparison.OrdinalIgnoreCase);
+               || folderPath.StartsWith(rootPath + fileSystem.Path.DirectorySeparatorChar,
+                   StringComparison.OrdinalIgnoreCase);
     }
 }
