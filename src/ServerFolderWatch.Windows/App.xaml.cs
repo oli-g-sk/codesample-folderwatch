@@ -1,6 +1,7 @@
 using System.IO.Abstractions;
 using System.Windows;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using ServerFolderWatch.Core;
 using ServerFolderWatch.Core.Service;
 using ServerFolderWatch.Core.Service.Interfaces;
@@ -42,9 +43,16 @@ public partial class App : Application
 
     private static void ConfigureServices(IServiceCollection services)
     {
+        services.AddLogging(logging =>
+        {
+            logging.AddConsole();
+            logging.SetMinimumLevel(LogLevel.Information);
+        });
+
         services.AddSingleton<IAppConfiguration, AppConfiguration>();
         services.AddSingleton<IFileSystem, RealFileSystem>();
         services.AddSingleton<IBrowseService, BrowseService>();
+        services.AddSingleton<IFolderDiffService, FolderDiffService>();
         services.AddSingleton<IFolderSnapshotService, SidecarFolderSnapshotService>();
 
         services.AddSingleton<FolderTreeViewModel>();
