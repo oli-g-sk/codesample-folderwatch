@@ -45,8 +45,10 @@ public partial class App : Application
         services.AddSingleton<IAppConfiguration, AppConfiguration>();
         services.AddSingleton<IFileSystem, RealFileSystem>();
         services.AddSingleton<IBrowseService, BrowseService>();
+        services.AddSingleton<IFolderSnapshotService, SidecarFolderSnapshotService>();
 
         services.AddSingleton<FolderTreeViewModel>();
+        services.AddSingleton<FolderContentsViewModel>();
         services.AddSingleton<BrowseViewModel>();
         services.AddSingleton<MainWindow>();
     }

@@ -1,11 +1,10 @@
 namespace ServerFolderWatch.Desktop.ViewModels;
 
-public class BrowseViewModel
+public class BrowseViewModel(
+    FolderTreeViewModel folderTree,
+    FolderContentsViewModel folderContents)
 {
-    public FolderTreeViewModel FolderTree { get; }
+    public FolderTreeViewModel FolderTree { get; } = folderTree;
 
-    public BrowseViewModel(FolderTreeViewModel folderTree)
-    {
-        FolderTree = folderTree;
-    }
+    public FolderContentsViewModel FolderContents { get; } = folderContents;
 }

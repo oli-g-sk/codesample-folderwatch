@@ -1,5 +1,5 @@
-using ServerFolderWatch.Core.Model;
+using ServerFolderWatch.Desktop.ViewModels.Items;
 
 namespace ServerFolderWatch.Desktop.Messages;
 
-public record SelectedFolderChangedMsg(Folder? Folder);
+public record SelectedFolderChangedMsg(FolderViewModel? Folder);

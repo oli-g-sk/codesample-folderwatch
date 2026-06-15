@@ -1,10 +1,13 @@
-﻿using System.Windows;
+using System.Windows;
 using ServerFolderWatch.Desktop.ViewModels;
+using ServerFolderWatch.Desktop.ViewModels.Items;
 
 namespace ServerFolderWatch.Windows;
 
 public partial class MainWindow : Window
 {
+    private BrowseViewModel viewModel;
+    
     public MainWindow()
     {
         InitializeComponent();
@@ -28,9 +31,16 @@ public partial class MainWindow : Window
         }
     }
 
-    private void InitializeViewModel(BrowseViewModel viewModel)
+    private void InitializeViewModel(BrowseViewModel browseViewModel)
     {
+        viewModel = browseViewModel;
         string folderPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-        _ = viewModel.FolderTree.Initialize(folderPath);        
+        _ = browseViewModel.FolderTree.Initialize(folderPath);     
+    }
+
+    private void TreeView_OnSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+    {
+        if (sender is FrameworkElement { DataContext: FolderViewModel folder })
+            viewModel.FolderTree.SelectedFolder = folder;
     }
 }
