@@ -1,9 +1,9 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
-using ServerFolderWatch.Core.Model;
 using ServerFolderWatch.Core.Service.Interfaces;
 using ServerFolderWatch.Desktop.Messages;
+using ServerFolderWatch.Desktop.ViewModels.Items;
 
 namespace ServerFolderWatch.Desktop.ViewModels;
 
@@ -12,7 +12,7 @@ public class FolderContentsViewModel : ObservableObject,
 {
     private readonly IFolderSnapshotService folderSnapshotService;
 
-    public ObservableCollection<FileSystemEntryBase> Entries { get; } = [];
+    public ObservableCollection<BaseEntryViewModel> Entries { get; } = [];
 
     public FolderContentsViewModel(IFolderSnapshotService folderSnapshotService)
     {
@@ -31,9 +31,9 @@ public class FolderContentsViewModel : ObservableObject,
             var contents = folderSnapshotService.GetCurrentContents(combinedPath);
             
             foreach (var entry in contents.Subfolders)
-                Entries.Add(entry);
+                Entries.Add(new FolderViewModel(entry, combinedPath));
             foreach (var entry in contents.VersionedFiles)
-                Entries.Add(entry);
+                Entries.Add(new FileViewModel(entry, combinedPath));
         }
     }
 }
