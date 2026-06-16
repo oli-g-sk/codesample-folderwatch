@@ -1,5 +1,4 @@
 using System.Collections.ObjectModel;
-using System.Data.SqlTypes;
 using ServerFolderWatch.Desktop.Services;
 
 namespace ServerFolderWatch.Desktop;
@@ -9,65 +8,51 @@ namespace ServerFolderWatch.Desktop;
 // TODO allow setting "batch size" for add & clear operations
 public class DispatcherCollection<T>(IDispatcherService dispatcherService) : ObservableCollection<T>
 {
-#if DEBUG
-    // TODO remove
-    private const bool SkipOptimizations = false;
-#endif
-    
-    private DateTime lastUpdate;
+    private long currentUpdateVersion;
 
-    public async Task AddRange(IEnumerable<T> newItems)
+    public long BeginUpdate()
     {
-        var currentUpdate = DateTime.Now;
-        lastUpdate = currentUpdate;
+        return Interlocked.Increment(ref currentUpdateVersion);
+    }
 
-        foreach (var item in newItems)
+    public bool IsCurrent(long updateVersion)
+    {
+        return Volatile.Read(ref currentUpdateVersion) == updateVersion;
+    }
+
+    public async Task AddRange(long updateVersion, IEnumerable<T> newItems)
+    {
+        using var enumerator = newItems.GetEnumerator();
+
+        while (IsCurrent(updateVersion) && enumerator.MoveNext())
         {
-            if (currentUpdate != lastUpdate)
-                break;
-            
-#if DEBUG
-            if (SkipOptimizations)
-            {
-                Add(item);
-                continue;
-            }
-#endif
+            var item = enumerator.Current;
             
             await dispatcherService.InvokeAsync(() =>
             {
-                if (currentUpdate == lastUpdate)
+                if (IsCurrent(updateVersion))
                     Add(item);
             }, IDispatcherService.BackgroundPriority);
         }
     }
 
-    public async Task ClearAsync()
+    public async Task ClearAsync(long updateVersion)
     {
-        var currentUpdate = DateTime.Now;
-        lastUpdate = currentUpdate;
-        
-#if DEBUG
-        if (SkipOptimizations)
+        while (IsCurrent(updateVersion))
         {
-            Clear();
-            return;
-        }
-#endif
-
-        foreach (var item in new List<T>(Items))
-        {
-            if (lastUpdate != currentUpdate)
-            {
-                Clear();
-                break;
-            }
+            var removedItem = false;
 
             await dispatcherService.InvokeAsync(() =>
             {
-                if (currentUpdate == lastUpdate)
-                    Remove(item);
+                if (!IsCurrent(updateVersion) || Count == 0)
+                    return;
+
+                RemoveAt(0);
+                removedItem = true;
             }, IDispatcherService.BackgroundPriority);
+
+            if (!removedItem)
+                break;
         }
     }
 }

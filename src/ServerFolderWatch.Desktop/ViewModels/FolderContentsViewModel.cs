@@ -38,22 +38,33 @@ public partial class FolderContentsViewModel : ObservableObject,
 
     private async Task RefreshAsync(SelectedFolderChangedMsg message)
     {
+        var updateVersion = Entries.BeginUpdate();
         IsRefreshing = true;
-        await Entries.ClearAsync();
-        
-        // although still refreshing, we can enable interaction now
-        IsRefreshing = false;
 
-        if (message.Folder is { CanViewContents: true } folder)
+        try
         {
-            var selectedFolderPath = Path.Combine(folder.BasePath, folder.Entry.Name);
-            bool canRead = browseService.CanReadFolderContents(selectedFolderPath);
-            
-            if (!canRead)
+            await Entries.ClearAsync(updateVersion);
+            IsRefreshing = false;
+
+            if (!Entries.IsCurrent(updateVersion))
                 return;
-            
-            var contents = folderSnapshotService.GetCurrentContents(selectedFolderPath);
-            await Entries.AddRange(EnumerateEntries(contents, selectedFolderPath));
+
+            if (message.Folder is { CanViewContents: true } folder)
+            {
+                var selectedFolderPath = Path.Combine(folder.BasePath, folder.Entry.Name);
+                bool canRead = browseService.CanReadFolderContents(selectedFolderPath);
+
+                if (!canRead || !Entries.IsCurrent(updateVersion))
+                    return;
+
+                var contents = folderSnapshotService.GetCurrentContents(selectedFolderPath);
+                await Entries.AddRange(updateVersion, EnumerateEntries(contents, selectedFolderPath));
+            }
+        }
+        finally
+        {
+            if (Entries.IsCurrent(updateVersion))
+                IsRefreshing = false;
         }
     }
 
