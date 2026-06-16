@@ -33,7 +33,7 @@
                         <Setter Property="IsEnabled" Value="{Binding CanViewContents}" />
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding CanViewContents}" Value="False">
-                                <Setter Property="Opacity" Value="0.5" />
+                                <Setter Property="Opacity" Value="{StaticResource DisabledItemOpacity}" />
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
@@ -44,7 +44,7 @@
                             <DockPanel>
                                 <TextBlock DockPanel.Dock="Left"
                                            Margin="0,0,16,0"
-                                           Foreground="LightSeaGreen"
+                                           Foreground="{StaticResource FolderIconForegroundBrush}"
                                            Text="{Binding Converter={StaticResource IconConverter}}" />
                                 <TextBlock Text="{Binding Entry.Name}" />
                             </DockPanel>
@@ -72,7 +72,7 @@
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding IsRefreshing}" Value="True">
                                 <Setter Property="IsEnabled" Value="False" />
-                                <Setter Property="Opacity" Value="0.5" />
+                                <Setter Property="Opacity" Value="{StaticResource DisabledItemOpacity}" />
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
