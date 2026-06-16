@@ -22,10 +22,13 @@ public class BufferedListBox : ListBox
     private INotifyCollectionReplacement? currentReplacementSource;
     private bool replacementInProgress;
     private bool sourceIsDispatcherCollection;
+    private long detachedClearVersion;
 
     public BufferedListBox()
     {
         SetValue(System.Windows.Controls.ItemsControl.ItemsSourceProperty, visibleItems);
+        Loaded += OnLoaded;
+        Unloaded += OnUnloaded;
     }
 
     public new IEnumerable? ItemsSource
@@ -41,11 +44,7 @@ public class BufferedListBox : ListBox
 
     private void SetSource(IEnumerable? source)
     {
-        if (currentObservableSource is not null)
-            currentObservableSource.CollectionChanged -= Source_OnCollectionChanged;
-
-        if (currentReplacementSource is not null)
-            currentReplacementSource.ReplacementStarting -= Source_OnReplacementStarting;
+        DetachSourceEvents();
 
         replacementInProgress = false;
         sourceIsDispatcherCollection = IsDispatcherCollection(source);
@@ -66,6 +65,29 @@ public class BufferedListBox : ListBox
     private void Source_OnReplacementStarting(object? sender, EventArgs e)
     {
         BeginReplacement();
+    }
+
+    private void OnUnloaded(object sender, RoutedEventArgs e)
+    {
+        DetachSourceEvents();
+        detachedClearVersion++;
+    }
+
+    private void OnLoaded(object sender, RoutedEventArgs e)
+    {
+        SetSource(ItemsSource);
+    }
+
+    private void DetachSourceEvents()
+    {
+        if (currentObservableSource is not null)
+            currentObservableSource.CollectionChanged -= Source_OnCollectionChanged;
+
+        if (currentReplacementSource is not null)
+            currentReplacementSource.ReplacementStarting -= Source_OnReplacementStarting;
+
+        currentObservableSource = null;
+        currentReplacementSource = null;
     }
 
     private void Source_OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -101,7 +123,7 @@ public class BufferedListBox : ListBox
         var oldItems = visibleItems;
         visibleItems = [];
         SetValue(System.Windows.Controls.ItemsControl.ItemsSourceProperty, visibleItems);
-        ClearDetachedItemsAsync(oldItems);
+        ClearDetachedItemsAsync(oldItems, ++detachedClearVersion);
     }
 
     private void ApplyChange(NotifyCollectionChangedEventArgs e)
@@ -174,14 +196,14 @@ public class BufferedListBox : ListBox
         }
     }
 
-    private void ClearDetachedItemsAsync(ObservableCollection<object?> items)
+    private void ClearDetachedItemsAsync(ObservableCollection<object?> items, long clearVersion)
     {
         Dispatcher.BeginInvoke(() =>
         {
-            if (items.Count > 0)
+            if (clearVersion == detachedClearVersion && items.Count > 0)
             {
                 items.RemoveAt(0);
-                ClearDetachedItemsAsync(items);
+                ClearDetachedItemsAsync(items, clearVersion);
             }
         }, DispatcherPriority.ApplicationIdle);
     }

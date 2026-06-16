@@ -10,7 +10,7 @@ namespace ServerFolderWatch.Windows;
 
 public partial class MainWindow : Window
 {
-    private BrowseViewModel viewModel;
+    private BrowseViewModel? viewModel;
     
     public MainWindow()
     {
@@ -37,10 +37,21 @@ public partial class MainWindow : Window
 
     private void InitializeViewModel(BrowseViewModel browseViewModel)
     {
+        if (viewModel is not null)
+            viewModel.FolderContents.PropertyChanged -= FolderContents_OnPropertyChanged;
+
         viewModel = browseViewModel;
         viewModel.FolderContents.PropertyChanged += FolderContents_OnPropertyChanged;
         string folderPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         _ = browseViewModel.FolderTree.Initialize(folderPath);     
+    }
+
+    protected override void OnClosed(EventArgs e)
+    {
+        if (viewModel is not null)
+            viewModel.FolderContents.PropertyChanged -= FolderContents_OnPropertyChanged;
+
+        base.OnClosed(e);
     }
 
     private void FolderContents_OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -57,7 +68,9 @@ public partial class MainWindow : Window
     {
         if (e.NewValue is FolderViewModel folder)
         {
-            viewModel.FolderTree.SelectedFolder = folder;
+            if (viewModel is not null)
+                viewModel.FolderTree.SelectedFolder = folder;
+
             FolderTreeView.Dispatcher.BeginInvoke(ScrollSelectedTreeItemIntoView, DispatcherPriority.ContextIdle);
         }
     }
