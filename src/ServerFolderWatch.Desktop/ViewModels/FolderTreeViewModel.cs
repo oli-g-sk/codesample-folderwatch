@@ -9,11 +9,13 @@ using ServerFolderWatch.Desktop.ViewModels.Items;
 
 namespace ServerFolderWatch.Desktop.ViewModels;
 
-public partial class FolderTreeViewModel : ObservableObject
+public partial class FolderTreeViewModel : ObservableObject,
+    IRecipient<SelectedFolderChangedMsg>
 {
     private readonly IBrowseService browseService;
 
     private string? rootPath;
+    private bool suppressSelectedFolderMessage;
     
     public ObservableCollection<FolderViewModel> Folders { get; }
     
@@ -24,6 +26,7 @@ public partial class FolderTreeViewModel : ObservableObject
     {
         this.browseService = browseService;
         Folders = new ObservableCollection<FolderViewModel>();
+        WeakReferenceMessenger.Default.Register(this);
     }
 
     public async Task Initialize(string path)
@@ -48,8 +51,26 @@ public partial class FolderTreeViewModel : ObservableObject
     {
         base.OnPropertyChanged(e);
 
-        if (e.PropertyName == nameof(SelectedFolder) && SelectedFolder is { } folder)
+        if (!suppressSelectedFolderMessage
+            && e.PropertyName == nameof(SelectedFolder)
+            && SelectedFolder is { } folder)
+        {
             WeakReferenceMessenger.Default.Send(new SelectedFolderChangedMsg(folder));
+        }
+    }
+
+    public void Receive(SelectedFolderChangedMsg message)
+    {
+        if (message.Folder is not { } folder
+            || SelectedFolder?.FullPath == folder.FullPath)
+        {
+            return;
+        }
+
+        var treeFolder = FindOrLoadFolder(folder.FullPath);
+
+        if (treeFolder is not null)
+            SelectFolder(treeFolder, publishMessage: false);
     }
 
     private void Folder_OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -57,15 +78,84 @@ public partial class FolderTreeViewModel : ObservableObject
         if (sender is FolderViewModel folder && e.PropertyName == nameof(FolderViewModel.IsExpanded))
         {
             if (folder is { IsExpanded: true, HasChildren: true, ChildrenLoaded: false })
-            {
-                folder.Children.Clear();
-    
-                var children = browseService.GetSubfolders(folder.FullPath);
-
-                foreach (var child in children) 
-                    folder.Children.Add(CreateFolderViewModel(child, folder));
-            }
+                LoadChildren(folder);
         }
+    }
+
+    private FolderViewModel? FindOrLoadFolder(string fullPath)
+    {
+        foreach (var folder in Folders)
+        {
+            var match = FindOrLoadFolder(folder, fullPath);
+
+            if (match is not null)
+                return match;
+        }
+
+        return null;
+    }
+
+    private FolderViewModel? FindOrLoadFolder(FolderViewModel folder, string fullPath)
+    {
+        if (folder.FullPath.Equals(fullPath, StringComparison.OrdinalIgnoreCase))
+            return folder;
+
+        if (!IsUnderFolder(fullPath, folder.FullPath))
+            return null;
+
+        if (folder.HasChildren)
+        {
+            LoadChildren(folder);
+            folder.IsExpanded = true;
+        }
+
+        foreach (var child in folder.Children.OfType<FolderViewModel>())
+        {
+            var match = FindOrLoadFolder(child, fullPath);
+
+            if (match is not null)
+                return match;
+        }
+
+        return null;
+    }
+
+    private void LoadChildren(FolderViewModel folder)
+    {
+        if (!folder.HasChildren || folder.ChildrenLoaded)
+            return;
+
+        folder.Children.Clear();
+
+        var children = browseService.GetSubfolders(folder.FullPath);
+
+        foreach (var child in children)
+            folder.Children.Add(CreateFolderViewModel(child, folder));
+    }
+
+    private void SelectFolder(FolderViewModel folder, bool publishMessage)
+    {
+        if (SelectedFolder is { } selectedFolder)
+            selectedFolder.IsSelected = false;
+
+        try
+        {
+            suppressSelectedFolderMessage = !publishMessage;
+            SelectedFolder = folder;
+            folder.IsSelected = true;
+        }
+        finally
+        {
+            suppressSelectedFolderMessage = false;
+        }
+    }
+
+    private static bool IsUnderFolder(string fullPath, string folderPath)
+    {
+        var normalizedFolderPath = Path.TrimEndingDirectorySeparator(folderPath);
+
+        return fullPath.StartsWith(normalizedFolderPath + Path.DirectorySeparatorChar,
+            StringComparison.OrdinalIgnoreCase);
     }
 
     private FolderViewModel CreateFolderViewModel(Folder model, FolderViewModel? parent)

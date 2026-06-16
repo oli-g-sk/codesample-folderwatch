@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using ServerFolderWatch.Core.Model;
 using ServerFolderWatch.Core.Service.Interfaces;
@@ -34,6 +35,13 @@ public partial class FolderContentsViewModel : ObservableObject,
     public void Receive(SelectedFolderChangedMsg message)
     {
         _ = RefreshAsync(message);
+    }
+
+    [RelayCommand]
+    private void OpenEntry(BaseEntryViewModel? entry)
+    {
+        if (entry is FolderViewModel { CanViewContents: true } folder)
+            WeakReferenceMessenger.Default.Send(new SelectedFolderChangedMsg(folder));
     }
 
     private async Task RefreshAsync(SelectedFolderChangedMsg message)

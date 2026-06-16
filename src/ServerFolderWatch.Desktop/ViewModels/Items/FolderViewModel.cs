@@ -12,6 +12,9 @@ public partial class FolderViewModel : BaseEntryViewModel
     
     [ObservableProperty]
     private bool isExpanded;
+
+    [ObservableProperty]
+    private bool isSelected;
     
     [ObservableProperty]
     private bool hasChildren;

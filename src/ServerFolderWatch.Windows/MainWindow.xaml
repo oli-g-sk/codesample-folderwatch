@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ServerFolderWatch.Windows"
+        xmlns:behaviors="clr-namespace:ServerFolderWatch.Windows.Behaviors"
         xmlns:viewModels="clr-namespace:ServerFolderWatch.Desktop.ViewModels;assembly=ServerFolderWatch.Desktop"
         xmlns:items="clr-namespace:ServerFolderWatch.Desktop.ViewModels.Items;assembly=ServerFolderWatch.Desktop"
         xmlns:converters="clr-namespace:ServerFolderWatch.Windows.Converters"
@@ -32,6 +33,7 @@
                            BasedOn="{StaticResource {x:Type TreeViewItem}}">
                         <Setter Property="IsEnabled" Value="{Binding CanViewContents}" />
                         <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+                        <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding CanViewContents}" Value="False">
                                 <Setter Property="Opacity" Value="{StaticResource DisabledItemOpacity}" />
@@ -65,6 +67,7 @@
                 CornerRadius="0,8,8,0">
             
             <ListBox ItemsSource="{Binding Entries}"
+                     behaviors:ListBoxDoubleClick.Command="{Binding OpenEntryCommand}"
                      Background="Transparent"
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled" >
                 <ListBox.Style>
