@@ -13,7 +13,7 @@ public partial class FolderTreeViewModel : ObservableObject
 {
     private readonly IBrowseService browseService;
 
-    private string rootPath;
+    private string? rootPath;
     
     public ObservableCollection<FolderViewModel> Folders { get; }
     
@@ -56,9 +56,11 @@ public partial class FolderTreeViewModel : ObservableObject
     {
         if (sender is FolderViewModel folder && e.PropertyName == nameof(FolderViewModel.IsExpanded))
         {
-            if (folder is { IsExpanded: true, ChildrenLoaded: false })
+            if (folder is { IsExpanded: true, HasChildren: true, ChildrenLoaded: false })
             {
-                var children = browseService.GetSubfolders(folder.BasePath);
+                folder.Children.Clear();
+    
+                var children = browseService.GetSubfolders(folder.FullPath);
 
                 foreach (var child in children) 
                     folder.Children.Add(CreateFolderViewModel(child, folder));
@@ -68,11 +70,12 @@ public partial class FolderTreeViewModel : ObservableObject
 
     private FolderViewModel CreateFolderViewModel(Folder model, FolderViewModel? parent)
     {
-        string basePath = Path.Combine(rootPath, parent?.BasePath ?? string.Empty);
-        string folderPath = Path.Combine(basePath, model.Name);
-        bool canRead = browseService.CanReadFolderContents(folderPath);
-        bool hasChildren = canRead && browseService.GetChildren(folderPath).Any();
-        var viewModel = new FolderViewModel(model, basePath, hasChildren, canRead);
+        string parentPath = parent?.FullPath ?? rootPath
+            ?? throw new InvalidOperationException("FolderTreeViewModel must be initialized before creating folders.");
+        string fullPath = Path.Combine(parentPath, model.Name);
+        bool canRead = browseService.CanReadFolderContents(fullPath);
+        bool hasChildren = canRead && browseService.GetChildren(fullPath).Any();
+        var viewModel = new FolderViewModel(model, fullPath, hasChildren, canRead);
         viewModel.PropertyChanged += Folder_OnPropertyChanged;
         return viewModel;
     }

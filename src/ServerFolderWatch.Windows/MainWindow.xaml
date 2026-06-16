@@ -31,7 +31,7 @@
                     <Style TargetType="{x:Type TreeViewItem}"
                            BasedOn="{StaticResource {x:Type TreeViewItem}}">
                         <Setter Property="IsEnabled" Value="{Binding CanViewContents}" />
-                        <Setter Property="IsExpanded" Value="{Binding IsExpanded}" />
+                        <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding CanViewContents}" Value="False">
                                 <Setter Property="Opacity" Value="{StaticResource DisabledItemOpacity}" />
@@ -47,7 +47,7 @@
                                            Margin="0,0,16,0"
                                            Foreground="{StaticResource FolderIconForegroundBrush}"
                                            Text="{Binding Converter={StaticResource IconConverter}}" />
-                                <TextBlock Text="{Binding Entry.Name}" />
+                                <TextBlock Text="{Binding Name}" />
                             </DockPanel>
                         </Border>
                     </HierarchicalDataTemplate>
@@ -100,7 +100,7 @@
                             <TextBlock Grid.Row="1"
                                        Margin="0,8,0,0"
                                        HorizontalAlignment="Center"
-                                       Text="{Binding Entry.Name}" />
+                                       Text="{Binding Name}" />
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>

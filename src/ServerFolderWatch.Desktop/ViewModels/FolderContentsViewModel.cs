@@ -51,14 +51,13 @@ public partial class FolderContentsViewModel : ObservableObject,
 
             if (message.Folder is { CanViewContents: true } folder)
             {
-                var selectedFolderPath = Path.Combine(folder.BasePath, folder.Entry.Name);
-                bool canRead = browseService.CanReadFolderContents(selectedFolderPath);
+                bool canRead = browseService.CanReadFolderContents(folder.FullPath);
 
                 if (!canRead || !Entries.IsCurrent(updateVersion))
                     return;
 
-                var contents = folderSnapshotService.GetCurrentContents(selectedFolderPath);
-                await Entries.AddRange(updateVersion, EnumerateEntries(contents, selectedFolderPath));
+                var contents = folderSnapshotService.GetCurrentContents(folder.FullPath);
+                await Entries.AddRange(updateVersion, EnumerateEntries(contents, folder.FullPath));
             }
         }
         finally
@@ -72,13 +71,13 @@ public partial class FolderContentsViewModel : ObservableObject,
     {
         foreach (var entry in snapshot.Subfolders)
         {
-            string subfolderPath = Path.Combine(selectedFolderPath, entry.Name);
-            bool canReadSubfolder = browseService.CanReadFolderContents(subfolderPath);
-            bool hasChildren = canReadSubfolder && browseService.GetChildren(subfolderPath).Any();
-            yield return new FolderViewModel(entry, selectedFolderPath, canReadSubfolder, hasChildren);
+            string fullPath = Path.Combine(selectedFolderPath, entry.Name);
+            bool canReadSubfolder = browseService.CanReadFolderContents(fullPath);
+            bool hasChildren = canReadSubfolder && browseService.GetChildren(fullPath).Any();
+            yield return new FolderViewModel(entry, fullPath, hasChildren, canReadSubfolder);
         }
 
         foreach (var entry in snapshot.VersionedFiles)
-            yield return new FileViewModel(entry, selectedFolderPath);
+            yield return new FileViewModel(entry, Path.Combine(selectedFolderPath, entry.Name));
     }
 }

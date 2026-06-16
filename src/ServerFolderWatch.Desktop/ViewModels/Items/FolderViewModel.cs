@@ -18,7 +18,7 @@ public partial class FolderViewModel : BaseEntryViewModel
 
     /// <inheritdoc/>
     public FolderViewModel(FileSystemEntryBase entry,
-        string basePath, bool hasChildren, bool canViewContents) : base(entry, basePath)
+        string fullPath, bool hasChildren, bool canViewContents) : base(entry, fullPath)
     {
         CanViewContents = canViewContents;
         this.hasChildren = hasChildren;

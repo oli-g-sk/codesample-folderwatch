@@ -3,13 +3,14 @@ using ServerFolderWatch.Core.Model;
 
 namespace ServerFolderWatch.Desktop.ViewModels.Items;
 
-public abstract class BaseEntryViewModel(FileSystemEntryBase entry, string basePath)
+public abstract class BaseEntryViewModel(FileSystemEntryBase entry, string fullPath)
     : ObservableObject
 {
     public FileSystemEntryBase Entry { get; } = entry;
-
-    // TODO replace with a Parent reference
-    public string BasePath { get; } = basePath;
+    
+    public string FullPath { get; } = fullPath;
+    
+    public string Name => Entry.Name;
 
     public abstract bool IsFolder { get; }
 }
