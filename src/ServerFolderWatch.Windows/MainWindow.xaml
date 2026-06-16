@@ -13,6 +13,8 @@
         Title="MainWindow" Height="450" Width="800">
     <Window.Resources>
         <converters:FileSystemEntryToIconConverter x:Key="IconConverter" />
+        <converters:BoolToVisibilityConverter x:Key="NotRefreshingConverter"
+                                              IsInverse="True" />
     </Window.Resources>
     <Grid Margin="8">
         <Grid.ColumnDefinitions>
@@ -65,6 +67,17 @@
             <ListBox ItemsSource="{Binding Entries}"
                      Background="Transparent"
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled" >
+                <ListBox.Style>
+                    <Style TargetType="{x:Type ListBox}"
+                           BasedOn="{StaticResource {x:Type ListBox}}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsRefreshing}" Value="True">
+                                <Setter Property="IsEnabled" Value="False" />
+                                <Setter Property="Opacity" Value="0.5" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ListBox.Style>
                 <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
                         <WrapPanel />
@@ -79,10 +92,11 @@
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
                             <TextBlock Text="{Binding Converter={StaticResource IconConverter}}"
+                                       Opacity="0.75"
                                        HorizontalAlignment="Center"
                                        VerticalAlignment="Center"
                                        FontWeight="ExtraLight"
-                                       FontSize="64"/>
+                                       FontSize="64" />
                             <TextBlock Grid.Row="1"
                                        Margin="0,8,0,0"
                                        HorizontalAlignment="Center"

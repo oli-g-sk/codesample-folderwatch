@@ -9,13 +9,16 @@ using ServerFolderWatch.Desktop.ViewModels.Items;
 
 namespace ServerFolderWatch.Desktop.ViewModels;
 
-public class FolderContentsViewModel : ObservableObject,
+public partial class FolderContentsViewModel : ObservableObject,
     IRecipient<SelectedFolderChangedMsg>
 {
     private readonly IFolderSnapshotService folderSnapshotService;
     private readonly IBrowseService browseService;
 
     public DispatcherCollection<BaseEntryViewModel> Entries { get; }
+
+    [ObservableProperty]
+    private bool isRefreshing;
 
     public FolderContentsViewModel(IFolderSnapshotService folderSnapshotService,
         IBrowseService browseService,
@@ -35,7 +38,11 @@ public class FolderContentsViewModel : ObservableObject,
 
     private async Task RefreshAsync(SelectedFolderChangedMsg message)
     {
+        IsRefreshing = true;
         await Entries.ClearAsync();
+        
+        // although still refreshing, we can enable interaction now
+        IsRefreshing = false;
 
         if (message.Folder is { CanViewContents: true } folder)
         {
