@@ -5,7 +5,9 @@ using Microsoft.Extensions.Logging;
 using ServerFolderWatch.Core;
 using ServerFolderWatch.Core.Service;
 using ServerFolderWatch.Core.Service.Interfaces;
+using ServerFolderWatch.Desktop.Services;
 using ServerFolderWatch.Desktop.ViewModels;
+using ServerFolderWatch.Windows.Services;
 using Testably.Abstractions;
 
 namespace ServerFolderWatch.Windows;
@@ -55,6 +57,8 @@ public partial class App : Application
         services.AddSingleton<IFolderDiffService, FolderDiffService>();
         services.AddSingleton<IFolderSnapshotService, SidecarFolderSnapshotService>();
 
+        services.AddSingleton<IDispatcherService, WpfDispatcherService>();
+        
         services.AddSingleton<FolderTreeViewModel>();
         services.AddSingleton<FolderContentsViewModel>();
         services.AddSingleton<BrowseViewModel>();
