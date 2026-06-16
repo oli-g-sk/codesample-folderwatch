@@ -74,7 +74,8 @@ public partial class FolderContentsViewModel : ObservableObject,
         {
             string subfolderPath = Path.Combine(selectedFolderPath, entry.Name);
             bool canReadSubfolder = browseService.CanReadFolderContents(subfolderPath);
-            yield return new FolderViewModel(entry, selectedFolderPath, canReadSubfolder);
+            bool hasChildren = canReadSubfolder && browseService.GetChildren(subfolderPath).Any();
+            yield return new FolderViewModel(entry, selectedFolderPath, canReadSubfolder, hasChildren);
         }
 
         foreach (var entry in snapshot.VersionedFiles)

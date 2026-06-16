@@ -42,7 +42,8 @@ public partial class FolderTreeViewModel : ObservableObject
             // TODO use dispatcher collection
             string folderPath = Path.Combine(path, folder.Name);
             bool canRead = browseService.CanReadFolderContents(folderPath);
-            Folders.Add(new FolderViewModel(folder, path, canRead));           
+            bool hasChildren = canRead && browseService.GetChildren(folderPath).Any();
+            Folders.Add(new FolderViewModel(folder, path, hasChildren, canRead));
         }
     }
 

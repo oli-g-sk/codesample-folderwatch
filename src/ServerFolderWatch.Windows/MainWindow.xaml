@@ -39,7 +39,7 @@
                     </Style>
                 </TreeView.ItemContainerStyle>
                 <TreeView.ItemTemplate>
-                    <HierarchicalDataTemplate>
+                    <HierarchicalDataTemplate ItemsSource="{Binding Children}">
                         <Border Padding="8">
                             <DockPanel>
                                 <TextBlock DockPanel.Dock="Left"
