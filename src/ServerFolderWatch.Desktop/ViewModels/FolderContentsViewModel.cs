@@ -52,7 +52,6 @@ public partial class FolderContentsViewModel : ObservableObject,
         try
         {
             await Entries.ClearAsync(updateVersion);
-            IsRefreshing = false;
 
             if (!Entries.IsCurrent(updateVersion))
                 return;

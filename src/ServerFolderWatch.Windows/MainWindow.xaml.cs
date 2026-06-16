@@ -1,5 +1,7 @@
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Threading;
 using ServerFolderWatch.Desktop.ViewModels;
 using ServerFolderWatch.Desktop.ViewModels.Items;
@@ -36,8 +38,19 @@ public partial class MainWindow : Window
     private void InitializeViewModel(BrowseViewModel browseViewModel)
     {
         viewModel = browseViewModel;
+        viewModel.FolderContents.PropertyChanged += FolderContents_OnPropertyChanged;
         string folderPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         _ = browseViewModel.FolderTree.Initialize(folderPath);     
+    }
+
+    private void FolderContents_OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(FolderContentsViewModel.IsRefreshing)
+            && sender is FolderContentsViewModel { IsRefreshing: false })
+        {
+            FolderContentsListBox.Dispatcher.BeginInvoke(ScrollFolderContentsToTop,
+                DispatcherPriority.ContextIdle);
+        }
     }
 
     private void TreeView_OnSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
@@ -75,6 +88,34 @@ public partial class MainWindow : Window
 
             if (result is not null)
                 return result;
+        }
+
+        return null;
+    }
+
+    private void ScrollFolderContentsToTop()
+    {
+        FolderContentsListBox.UpdateLayout();
+
+        var scrollViewer = GetVisualChild<ScrollViewer>(FolderContentsListBox);
+        scrollViewer?.ScrollToTop();
+        scrollViewer?.ScrollToLeftEnd();
+    }
+
+    private static T? GetVisualChild<T>(DependencyObject parent)
+        where T : DependencyObject
+    {
+        for (var i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+        {
+            var child = VisualTreeHelper.GetChild(parent, i);
+
+            if (child is T result)
+                return result;
+
+            var descendant = GetVisualChild<T>(child);
+
+            if (descendant is not null)
+                return descendant;
         }
 
         return null;

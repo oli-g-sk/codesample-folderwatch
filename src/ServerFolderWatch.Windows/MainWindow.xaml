@@ -67,7 +67,8 @@
                 DataContext="{Binding FolderContents}"
                 CornerRadius="0,8,8,0">
             
-            <ListBox ItemsSource="{Binding Entries}"
+            <ListBox x:Name="FolderContentsListBox"
+                     ItemsSource="{Binding Entries}"
                      behaviors:ListBoxDoubleClick.Command="{Binding OpenEntryCommand}"
                      Background="Transparent"
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled" >
