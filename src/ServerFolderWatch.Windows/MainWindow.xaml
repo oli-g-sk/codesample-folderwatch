@@ -31,6 +31,7 @@
                     <Style TargetType="{x:Type TreeViewItem}"
                            BasedOn="{StaticResource {x:Type TreeViewItem}}">
                         <Setter Property="IsEnabled" Value="{Binding CanViewContents}" />
+                        <Setter Property="IsExpanded" Value="{Binding IsExpanded}" />
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding CanViewContents}" Value="False">
                                 <Setter Property="Opacity" Value="{StaticResource DisabledItemOpacity}" />
