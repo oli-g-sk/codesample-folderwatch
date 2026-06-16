@@ -3,7 +3,9 @@ using ServerFolderWatch.Desktop.Services;
 
 namespace ServerFolderWatch.Desktop;
 
-// TODO move to a standalone  library
+// TODO move to a standalone library
+// TODO allow adjusting of priority
+// TODO allow setting "batch size" for add & clear operations
 public class DispatcherCollection<T>(IDispatcherService dispatcherService) : ObservableCollection<T>
 {
     private DateTime lastUpdate;
@@ -18,7 +20,8 @@ public class DispatcherCollection<T>(IDispatcherService dispatcherService) : Obs
             if (currentUpdate != lastUpdate)
                 break;
 
-            await dispatcherService.InvokeAsync(() => Add(item), IDispatcherService.BackgroundPriority);
+            await dispatcherService.InvokeAsync(() =>
+                Add(item), IDispatcherService.BackgroundPriority);
         }
     }
 
@@ -35,7 +38,8 @@ public class DispatcherCollection<T>(IDispatcherService dispatcherService) : Obs
                 break;
             }
 
-            Remove(item);
+            await dispatcherService.InvokeAsync(() =>
+                Remove(item), IDispatcherService.BackgroundPriority);
         }
     }
 }
