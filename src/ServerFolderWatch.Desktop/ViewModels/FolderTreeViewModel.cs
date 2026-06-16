@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using ServerFolderWatch.Core.Model;
 using ServerFolderWatch.Core.Service.Interfaces;
 using ServerFolderWatch.Desktop.Messages;
+using ServerFolderWatch.Desktop.Services;
 using ServerFolderWatch.Desktop.ViewModels.Items;
 
 namespace ServerFolderWatch.Desktop.ViewModels;
@@ -13,6 +14,7 @@ public partial class FolderTreeViewModel : ObservableObject,
     IRecipient<SelectedFolderChangedMsg>
 {
     private readonly IBrowseService browseService;
+    private readonly IDispatcherService dispatcherService;
 
     private string? rootPath;
     private bool suppressSelectedFolderMessage;
@@ -22,9 +24,10 @@ public partial class FolderTreeViewModel : ObservableObject,
     [ObservableProperty]
     private FolderViewModel? selectedFolder;
 
-    public FolderTreeViewModel(IBrowseService browseService)
+    public FolderTreeViewModel(IBrowseService browseService, IDispatcherService dispatcherService)
     {
         this.browseService = browseService;
+        this.dispatcherService = dispatcherService;
         Folders = new ObservableCollection<FolderViewModel>();
         WeakReferenceMessenger.Default.Register(this);
     }
@@ -127,10 +130,11 @@ public partial class FolderTreeViewModel : ObservableObject,
 
         folder.Children.Clear();
 
-        var children = browseService.GetSubfolders(folder.FullPath);
+        var childViewModels = browseService.GetSubfolders(folder.FullPath)
+            .Select(x => new FolderViewModel(x, folder.FullPath, true, true, dispatcherService));
 
-        foreach (var child in children)
-            folder.Children.Add(CreateFolderViewModel(child, folder));
+        var updateVersion = folder.Children.BeginUpdate();
+        _ = folder.Children.AddRangeAsync(childViewModels, updateVersion);
     }
 
     private void SelectFolder(FolderViewModel folder, bool publishMessage)
@@ -165,7 +169,7 @@ public partial class FolderTreeViewModel : ObservableObject,
         string fullPath = Path.Combine(parentPath, model.Name);
         bool canRead = browseService.CanReadFolderContents(fullPath);
         bool hasChildren = canRead && browseService.GetChildren(fullPath).Any();
-        var viewModel = new FolderViewModel(model, fullPath, hasChildren, canRead);
+        var viewModel = new FolderViewModel(model, fullPath, hasChildren, canRead, dispatcherService);
         viewModel.PropertyChanged += Folder_OnPropertyChanged;
         return viewModel;
     }

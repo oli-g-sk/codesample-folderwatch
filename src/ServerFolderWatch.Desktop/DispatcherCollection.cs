@@ -20,7 +20,7 @@ public class DispatcherCollection<T>(IDispatcherService dispatcherService) : Obs
         return Volatile.Read(ref currentUpdateVersion) == updateVersion;
     }
 
-    public async Task AddRange(long updateVersion, IEnumerable<T> newItems)
+    public async Task AddRangeAsync(IEnumerable<T> newItems, long updateVersion)
     {
         using var enumerator = newItems.GetEnumerator();
 

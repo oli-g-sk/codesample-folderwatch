@@ -15,6 +15,7 @@ public partial class FolderContentsViewModel : ObservableObject,
 {
     private readonly IFolderSnapshotService folderSnapshotService;
     private readonly IBrowseService browseService;
+    private readonly IDispatcherService dispatcherService;
 
     public DispatcherCollection<BaseEntryViewModel> Entries { get; }
 
@@ -27,6 +28,7 @@ public partial class FolderContentsViewModel : ObservableObject,
     {
         this.folderSnapshotService = folderSnapshotService;
         this.browseService = browseService;
+        this.dispatcherService = dispatcherService;
 
         Entries = new DispatcherCollection<BaseEntryViewModel>(dispatcherService);
         WeakReferenceMessenger.Default.Register(this);
@@ -64,7 +66,7 @@ public partial class FolderContentsViewModel : ObservableObject,
                     return;
 
                 var contents = folderSnapshotService.GetCurrentContents(folder.FullPath);
-                await Entries.AddRange(updateVersion, EnumerateEntries(contents, folder.FullPath));
+                await Entries.AddRangeAsync(EnumerateEntries(contents, folder.FullPath), updateVersion);
             }
         }
         finally
@@ -81,7 +83,7 @@ public partial class FolderContentsViewModel : ObservableObject,
             string fullPath = Path.Combine(selectedFolderPath, entry.Name);
             bool canReadSubfolder = browseService.CanReadFolderContents(fullPath);
             bool hasChildren = canReadSubfolder && browseService.GetChildren(fullPath).Any();
-            yield return new FolderViewModel(entry, fullPath, hasChildren, canReadSubfolder);
+            yield return new FolderViewModel(entry, fullPath, hasChildren, canReadSubfolder, dispatcherService);
         }
 
         foreach (var entry in snapshot.VersionedFiles)
