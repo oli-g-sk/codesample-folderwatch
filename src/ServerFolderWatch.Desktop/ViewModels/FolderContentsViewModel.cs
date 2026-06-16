@@ -53,20 +53,24 @@ public partial class FolderContentsViewModel : ObservableObject,
 
         try
         {
-            await Entries.ClearAsync(updateVersion);
-
-            if (!Entries.IsCurrent(updateVersion))
-                return;
-
             if (message.Folder is { CanViewContents: true } folder)
             {
                 bool canRead = browseService.CanReadFolderContents(folder.FullPath);
 
                 if (!canRead || !Entries.IsCurrent(updateVersion))
+                {
+                    if (Entries.IsCurrent(updateVersion))
+                        await Entries.ClearAsync(updateVersion);
+
                     return;
+                }
 
                 var contents = folderSnapshotService.GetCurrentContents(folder.FullPath);
-                await Entries.AddRangeAsync(EnumerateEntries(contents, folder.FullPath), updateVersion);
+                await Entries.ReplaceRangeAsync(EnumerateEntries(contents, folder.FullPath), updateVersion);
+            }
+            else
+            {
+                await Entries.ClearAsync(updateVersion);
             }
         }
         finally

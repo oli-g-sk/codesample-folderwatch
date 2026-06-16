@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ServerFolderWatch.Windows"
         xmlns:behaviors="clr-namespace:ServerFolderWatch.Windows.Behaviors"
+        xmlns:controls="clr-namespace:ServerFolderWatch.Windows.Controls"
         xmlns:viewModels="clr-namespace:ServerFolderWatch.Desktop.ViewModels;assembly=ServerFolderWatch.Desktop"
         xmlns:items="clr-namespace:ServerFolderWatch.Desktop.ViewModels.Items;assembly=ServerFolderWatch.Desktop"
         xmlns:converters="clr-namespace:ServerFolderWatch.Windows.Converters"
@@ -67,13 +68,13 @@
                 DataContext="{Binding FolderContents}"
                 CornerRadius="0,8,8,0">
             
-            <ListBox x:Name="FolderContentsListBox"
-                     ItemsSource="{Binding Entries}"
-                     behaviors:ListBoxDoubleClick.Command="{Binding OpenEntryCommand}"
-                     Background="Transparent"
-                     ScrollViewer.HorizontalScrollBarVisibility="Disabled" >
-                <ListBox.Style>
-                    <Style TargetType="{x:Type ListBox}"
+            <controls:BufferedListBox x:Name="FolderContentsListBox"
+                                      ItemsSource="{Binding Entries}"
+                                      behaviors:ListBoxDoubleClick.Command="{Binding OpenEntryCommand}"
+                                      Background="Transparent"
+                                      ScrollViewer.HorizontalScrollBarVisibility="Disabled" >
+                <controls:BufferedListBox.Style>
+                    <Style TargetType="{x:Type controls:BufferedListBox}"
                            BasedOn="{StaticResource {x:Type ListBox}}">
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding IsRefreshing}" Value="True">
@@ -82,13 +83,13 @@
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
-                </ListBox.Style>
-                <ListBox.ItemsPanel>
+                </controls:BufferedListBox.Style>
+                <controls:BufferedListBox.ItemsPanel>
                     <ItemsPanelTemplate>
                         <WrapPanel />
                     </ItemsPanelTemplate>
-                </ListBox.ItemsPanel>
-                <ListBox.ItemTemplate>
+                </controls:BufferedListBox.ItemsPanel>
+                <controls:BufferedListBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type items:BaseEntryViewModel}">
                         <Grid Width="128"
                               Height="128">
@@ -108,8 +109,8 @@
                                        Text="{Binding Name}" />
                         </Grid>
                     </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+                </controls:BufferedListBox.ItemTemplate>
+            </controls:BufferedListBox>
         </Border>
     </Grid>
 </Window>

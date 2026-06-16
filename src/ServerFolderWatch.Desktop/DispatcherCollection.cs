@@ -36,6 +36,28 @@ public class DispatcherCollection<T>(IDispatcherService dispatcherService) : Obs
         }
     }
 
+    public async Task ReplaceRangeAsync(IEnumerable<T> newItems, long updateVersion)
+    {
+        var materializedItems = newItems.ToList();
+        var oldItemCount = await GetCountAsync(updateVersion);
+
+        if (!IsCurrent(updateVersion))
+            return;
+
+        if (oldItemCount == 0)
+        {
+            await AddRangeAsync(materializedItems, updateVersion);
+            return;
+        }
+
+        await RemoveFirstItemAsync(updateVersion);
+        oldItemCount--;
+
+        var clearTask = RemoveFirstItemsAsync(updateVersion, oldItemCount);
+        await AddRangeAsync(materializedItems, updateVersion);
+        await clearTask;
+    }
+
     public async Task ClearAsync(long updateVersion)
     {
         while (IsCurrent(updateVersion))
@@ -54,5 +76,33 @@ public class DispatcherCollection<T>(IDispatcherService dispatcherService) : Obs
             if (!removedItem)
                 break;
         }
+    }
+
+    private async Task<int> GetCountAsync(long updateVersion)
+    {
+        var count = 0;
+
+        await dispatcherService.InvokeAsync(() =>
+        {
+            if (IsCurrent(updateVersion))
+                count = Count;
+        }, IDispatcherService.BackgroundPriority);
+
+        return count;
+    }
+
+    private async Task RemoveFirstItemsAsync(long updateVersion, int count)
+    {
+        for (var i = 0; IsCurrent(updateVersion) && i < count; i++)
+            await RemoveFirstItemAsync(updateVersion);
+    }
+
+    private async Task RemoveFirstItemAsync(long updateVersion)
+    {
+        await dispatcherService.InvokeAsync(() =>
+        {
+            if (IsCurrent(updateVersion) && Count > 0)
+                RemoveAt(0);
+        }, IDispatcherService.BackgroundPriority);
     }
 }
