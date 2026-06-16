@@ -19,6 +19,7 @@ public class BufferedListBox : ListBox
 
     private ObservableCollection<object?> visibleItems = [];
     private INotifyCollectionChanged? currentObservableSource;
+    private INotifyCollectionReplacement? currentReplacementSource;
     private bool replacementInProgress;
     private bool sourceIsDispatcherCollection;
 
@@ -43,6 +44,9 @@ public class BufferedListBox : ListBox
         if (currentObservableSource is not null)
             currentObservableSource.CollectionChanged -= Source_OnCollectionChanged;
 
+        if (currentReplacementSource is not null)
+            currentReplacementSource.ReplacementStarting -= Source_OnReplacementStarting;
+
         replacementInProgress = false;
         sourceIsDispatcherCollection = IsDispatcherCollection(source);
         visibleItems = CopyItems(source);
@@ -52,6 +56,16 @@ public class BufferedListBox : ListBox
 
         if (currentObservableSource is not null)
             currentObservableSource.CollectionChanged += Source_OnCollectionChanged;
+
+        currentReplacementSource = source as INotifyCollectionReplacement;
+
+        if (currentReplacementSource is not null)
+            currentReplacementSource.ReplacementStarting += Source_OnReplacementStarting;
+    }
+
+    private void Source_OnReplacementStarting(object? sender, EventArgs e)
+    {
+        BeginReplacement();
     }
 
     private void Source_OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)

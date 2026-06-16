@@ -3,12 +3,20 @@ using ServerFolderWatch.Desktop.Services;
 
 namespace ServerFolderWatch.Desktop;
 
+public interface INotifyCollectionReplacement
+{
+    event EventHandler? ReplacementStarting;
+}
+
 // TODO move to a standalone library
 // TODO allow adjusting of priority
 // TODO allow setting "batch size" for add & clear operations
-public class DispatcherCollection<T>(IDispatcherService dispatcherService) : ObservableCollection<T>
+public class DispatcherCollection<T>(IDispatcherService dispatcherService) : ObservableCollection<T>,
+    INotifyCollectionReplacement
 {
     private long currentUpdateVersion;
+
+    public event EventHandler? ReplacementStarting;
 
     public long BeginUpdate()
     {
@@ -38,6 +46,8 @@ public class DispatcherCollection<T>(IDispatcherService dispatcherService) : Obs
 
     public async Task ReplaceRangeAsync(IEnumerable<T> newItems, long updateVersion)
     {
+        ReplacementStarting?.Invoke(this, EventArgs.Empty);
+
         var materializedItems = newItems.ToList();
         var oldItemCount = await GetCountAsync(updateVersion);
 
