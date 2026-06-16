@@ -14,9 +14,8 @@ public class FolderContentsViewModel : ObservableObject,
 {
     private readonly IFolderSnapshotService folderSnapshotService;
     private readonly IBrowseService browseService;
-    private readonly IDispatcherService dispatcherService;
 
-    public ObservableCollection<BaseEntryViewModel> Entries { get; } = [];
+    public DispatcherCollection<BaseEntryViewModel> Entries { get; }
 
     public FolderContentsViewModel(IFolderSnapshotService folderSnapshotService,
         IBrowseService browseService,
@@ -24,16 +23,21 @@ public class FolderContentsViewModel : ObservableObject,
     {
         this.folderSnapshotService = folderSnapshotService;
         this.browseService = browseService;
-        this.dispatcherService = dispatcherService;
 
+        Entries = new DispatcherCollection<BaseEntryViewModel>(dispatcherService);
         WeakReferenceMessenger.Default.Register(this);
     }
 
     public void Receive(SelectedFolderChangedMsg message)
     {
-        Entries.Clear();
+        _ = RefreshAsync(message);
+    }
 
-        if (message.Folder is { } folder)
+    private async Task RefreshAsync(SelectedFolderChangedMsg message)
+    {
+        await Entries.ClearAsync();
+
+        if (message.Folder is { CanViewContents: true } folder)
         {
             var selectedFolderPath = Path.Combine(folder.BasePath, folder.Entry.Name);
             bool canRead = browseService.CanReadFolderContents(selectedFolderPath);
@@ -42,9 +46,7 @@ public class FolderContentsViewModel : ObservableObject,
                 return;
             
             var contents = folderSnapshotService.GetCurrentContents(selectedFolderPath);
-
-            foreach (var entry in EnumerateEntries(contents, selectedFolderPath))
-                dispatcherService.InvokeAsync(() => Entries.Add(entry), IDispatcherService.BackgroundPriority);
+            await Entries.AddRange(EnumerateEntries(contents, selectedFolderPath));
         }
     }
 
