@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Data.SqlTypes;
 using ServerFolderWatch.Desktop.Services;
 
 namespace ServerFolderWatch.Desktop;
@@ -8,6 +9,11 @@ namespace ServerFolderWatch.Desktop;
 // TODO allow setting "batch size" for add & clear operations
 public class DispatcherCollection<T>(IDispatcherService dispatcherService) : ObservableCollection<T>
 {
+#if DEBUG
+    // TODO remove
+    private const bool SkipOptimizations = false;
+#endif
+    
     private DateTime lastUpdate;
 
     public async Task AddRange(IEnumerable<T> newItems)
@@ -19,9 +25,20 @@ public class DispatcherCollection<T>(IDispatcherService dispatcherService) : Obs
         {
             if (currentUpdate != lastUpdate)
                 break;
-
+            
+#if DEBUG
+            if (SkipOptimizations)
+            {
+                Add(item);
+                continue;
+            }
+#endif
+            
             await dispatcherService.InvokeAsync(() =>
-                Add(item), IDispatcherService.BackgroundPriority);
+            {
+                if (currentUpdate == lastUpdate)
+                    Add(item);
+            }, IDispatcherService.BackgroundPriority);
         }
     }
 
@@ -29,6 +46,14 @@ public class DispatcherCollection<T>(IDispatcherService dispatcherService) : Obs
     {
         var currentUpdate = DateTime.Now;
         lastUpdate = currentUpdate;
+        
+#if DEBUG
+        if (SkipOptimizations)
+        {
+            Clear();
+            return;
+        }
+#endif
 
         foreach (var item in new List<T>(Items))
         {
@@ -39,7 +64,10 @@ public class DispatcherCollection<T>(IDispatcherService dispatcherService) : Obs
             }
 
             await dispatcherService.InvokeAsync(() =>
-                Remove(item), IDispatcherService.BackgroundPriority);
+            {
+                if (currentUpdate == lastUpdate)
+                    Remove(item);
+            }, IDispatcherService.BackgroundPriority);
         }
     }
 }

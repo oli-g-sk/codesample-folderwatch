@@ -13,9 +13,8 @@
         Title="MainWindow" Height="450" Width="800">
     <Window.Resources>
         <converters:FileSystemEntryToIconConverter x:Key="IconConverter" />
-        <converters:BoolToVisibilityConverter x:Key="NotRefreshingConverter"
-                                              IsInverse="True" />
     </Window.Resources>
+    
     <Grid Margin="8">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" MinWidth="160" />
