@@ -131,7 +131,8 @@ public partial class FolderTreeViewModel : ObservableObject,
         folder.Children.Clear();
 
         var childViewModels = browseService.GetSubfolders(folder.FullPath)
-            .Select(x => new FolderViewModel(x, folder.FullPath, true, true, dispatcherService));
+            .Select(child => CreateFolderViewModel(child, folder))
+            .ToList();
 
         var updateVersion = folder.Children.BeginUpdate();
         _ = folder.Children.AddRangeAsync(childViewModels, updateVersion);
