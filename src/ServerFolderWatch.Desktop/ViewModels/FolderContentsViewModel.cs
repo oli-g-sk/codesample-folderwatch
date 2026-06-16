@@ -11,13 +11,16 @@ public class FolderContentsViewModel : ObservableObject,
     IRecipient<SelectedFolderChangedMsg>
 {
     private readonly IFolderSnapshotService folderSnapshotService;
+    private readonly IBrowseService browseService;
 
     public ObservableCollection<BaseEntryViewModel> Entries { get; } = [];
 
-    public FolderContentsViewModel(IFolderSnapshotService folderSnapshotService)
+    public FolderContentsViewModel(IFolderSnapshotService folderSnapshotService,
+        IBrowseService browseService)
     {
         this.folderSnapshotService = folderSnapshotService;
-        
+        this.browseService = browseService;
+
         WeakReferenceMessenger.Default.Register(this);
     }
 
@@ -27,13 +30,23 @@ public class FolderContentsViewModel : ObservableObject,
 
         if (message.Folder is { } folder)
         {
-            var combinedPath = Path.Combine(folder.BasePath, folder.Entry.Name);
-            var contents = folderSnapshotService.GetCurrentContents(combinedPath);
+            var selectedFolderPath = Path.Combine(folder.BasePath, folder.Entry.Name);
+            bool canRead = browseService.CanReadFolderContents(selectedFolderPath);
             
+            if (!canRead)
+                return;
+            
+            var contents = folderSnapshotService.GetCurrentContents(selectedFolderPath);
+
             foreach (var entry in contents.Subfolders)
-                Entries.Add(new FolderViewModel(entry, combinedPath));
+            {
+                string subfolderPath = Path.Combine(selectedFolderPath, entry.Name);
+                bool canReadSubfolder = browseService.CanReadFolderContents(subfolderPath);
+                Entries.Add(new FolderViewModel(entry, selectedFolderPath, canReadSubfolder));
+            }
+
             foreach (var entry in contents.VersionedFiles)
-                Entries.Add(new FileViewModel(entry, combinedPath));
+                Entries.Add(new FileViewModel(entry, selectedFolderPath));
         }
     }
 }

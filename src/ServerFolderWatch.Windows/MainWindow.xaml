@@ -24,7 +24,8 @@
                       SelectedItemChanged="TreeView_OnSelectedItemChanged">
                 <TreeView.ItemTemplate>
                     <HierarchicalDataTemplate>
-                        <Border Padding="8">
+                        <Border Padding="8"
+                                IsEnabled="{Binding CanViewContents}">
                             <DockPanel>
                                 <TextBlock DockPanel.Dock="Left"
                                            Margin="0,0,16,0"
@@ -48,7 +49,8 @@
                 CornerRadius="0,8,8,0">
             
             <ListBox ItemsSource="{Binding Entries}"
-                     Background="Transparent">
+                     Background="Transparent"
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled" >
                 <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
                         <WrapPanel />

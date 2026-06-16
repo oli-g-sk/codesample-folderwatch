@@ -23,6 +23,12 @@ public class BrowseService(IAppConfiguration configuration, IFileSystem fileSyst
     public bool CanReadFolderContents(string folderPath)
     {
         folderPath = NormalizePath(folderPath);
+
+        if ((fileSystem.File.GetAttributes(folderPath)
+             & FileAttributes.Hidden) != 0)
+        {
+            return false;
+        }
         
         try
         {

@@ -39,8 +39,13 @@ public partial class FolderTreeViewModel : ObservableObject
 
         foreach (var folder in folders)
         {
-            await Task.Delay(250);
-            Folders.Add(new FolderViewModel(folder, path));           
+#if DEBUG
+            await Task.Delay(50);
+#endif
+            
+            // TODO use dispatcher
+            bool canRead = browseService.CanReadFolderContents(path);
+            Folders.Add(new FolderViewModel(folder, path, canRead));           
         }
     }
 
