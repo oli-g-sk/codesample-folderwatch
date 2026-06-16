@@ -140,8 +140,7 @@ public partial class FolderTreeViewModel : ObservableObject,
 
     private void SelectFolder(FolderViewModel folder, bool publishMessage)
     {
-        if (SelectedFolder is { } selectedFolder)
-            selectedFolder.IsSelected = false;
+        SelectedFolder?.IsSelected = false;
 
         try
         {

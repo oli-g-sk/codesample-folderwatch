@@ -56,8 +56,8 @@ public partial class MainWindow : Window
 
     private void FolderContents_OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(FolderContentsViewModel.IsRefreshing)
-            && sender is FolderContentsViewModel { IsRefreshing: false })
+        if (e.PropertyName == nameof(FolderContentsViewModel.IsBusy)
+            && sender is FolderContentsViewModel { IsBusy: false })
         {
             FolderContentsListBox.Dispatcher.BeginInvoke(ScrollFolderContentsToTop,
                 DispatcherPriority.ContextIdle);

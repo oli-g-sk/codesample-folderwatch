@@ -20,7 +20,7 @@ public partial class FolderContentsViewModel : ObservableObject,
     public DispatcherCollection<BaseEntryViewModel> Entries { get; }
 
     [ObservableProperty]
-    private bool isRefreshing;
+    private bool isBusy;
 
     public FolderContentsViewModel(IFolderSnapshotService folderSnapshotService,
         IBrowseService browseService,
@@ -31,7 +31,14 @@ public partial class FolderContentsViewModel : ObservableObject,
         this.dispatcherService = dispatcherService;
 
         Entries = new DispatcherCollection<BaseEntryViewModel>(dispatcherService);
+        Entries.IsBusyChanged += Entries_OnIsBusyChanged;
+        IsBusy = Entries.IsBusy;
         WeakReferenceMessenger.Default.Register(this);
+    }
+
+    private void Entries_OnIsBusyChanged(object? sender, EventArgs e)
+    {
+        IsBusy = Entries.IsBusy;
     }
 
     public void Receive(SelectedFolderChangedMsg message)
@@ -49,34 +56,25 @@ public partial class FolderContentsViewModel : ObservableObject,
     private async Task RefreshAsync(SelectedFolderChangedMsg message)
     {
         var updateVersion = Entries.BeginUpdate();
-        IsRefreshing = true;
 
-        try
+        if (message.Folder is { CanViewContents: true } folder)
         {
-            if (message.Folder is { CanViewContents: true } folder)
+            bool canRead = browseService.CanReadFolderContents(folder.FullPath);
+
+            if (!canRead || !Entries.IsCurrent(updateVersion))
             {
-                bool canRead = browseService.CanReadFolderContents(folder.FullPath);
+                if (Entries.IsCurrent(updateVersion))
+                    await Entries.ClearAsync(updateVersion);
 
-                if (!canRead || !Entries.IsCurrent(updateVersion))
-                {
-                    if (Entries.IsCurrent(updateVersion))
-                        await Entries.ClearAsync(updateVersion);
-
-                    return;
-                }
-
-                var contents = folderSnapshotService.GetCurrentContents(folder.FullPath);
-                await Entries.ReplaceRangeAsync(EnumerateEntries(contents, folder.FullPath), updateVersion);
+                return;
             }
-            else
-            {
-                await Entries.ClearAsync(updateVersion);
-            }
+
+            var contents = folderSnapshotService.GetCurrentContents(folder.FullPath);
+            await Entries.ReplaceRangeAsync(EnumerateEntries(contents, folder.FullPath), updateVersion);
         }
-        finally
+        else
         {
-            if (Entries.IsCurrent(updateVersion))
-                IsRefreshing = false;
+            await Entries.ClearAsync(updateVersion);
         }
     }
 

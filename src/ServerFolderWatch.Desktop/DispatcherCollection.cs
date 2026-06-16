@@ -15,8 +15,13 @@ public class DispatcherCollection<T>(IDispatcherService dispatcherService) : Obs
     INotifyCollectionReplacement
 {
     private long currentUpdateVersion;
+    private int busyOperationCount;
 
     public event EventHandler? ReplacementStarting;
+    
+    public event EventHandler? IsBusyChanged;
+
+    public bool IsBusy => Volatile.Read(ref busyOperationCount) > 0;
 
     public long BeginUpdate()
     {
@@ -30,6 +35,7 @@ public class DispatcherCollection<T>(IDispatcherService dispatcherService) : Obs
 
     public async Task AddRangeAsync(IEnumerable<T> newItems, long updateVersion)
     {
+        using var busyScope = BeginBusyScope();
         using var enumerator = newItems.GetEnumerator();
 
         while (IsCurrent(updateVersion) && enumerator.MoveNext())
@@ -46,8 +52,9 @@ public class DispatcherCollection<T>(IDispatcherService dispatcherService) : Obs
 
     public async Task ReplaceRangeAsync(IEnumerable<T> newItems, long updateVersion)
     {
-        ReplacementStarting?.Invoke(this, EventArgs.Empty);
+        using var busyScope = BeginBusyScope();
 
+        ReplacementStarting?.Invoke(this, EventArgs.Empty);
         var materializedItems = newItems.ToList();
         var oldItemCount = await GetCountAsync(updateVersion);
 
@@ -70,6 +77,8 @@ public class DispatcherCollection<T>(IDispatcherService dispatcherService) : Obs
 
     public async Task ClearAsync(long updateVersion)
     {
+        using var busyScope = BeginBusyScope();
+
         while (IsCurrent(updateVersion))
         {
             var removedItem = false;
@@ -114,5 +123,33 @@ public class DispatcherCollection<T>(IDispatcherService dispatcherService) : Obs
             if (IsCurrent(updateVersion) && Count > 0)
                 RemoveAt(0);
         }, IDispatcherService.BackgroundPriority);
+    }
+
+    private IDisposable BeginBusyScope()
+    {
+        if (Interlocked.Increment(ref busyOperationCount) == 1)
+            IsBusyChanged?.Invoke(this, EventArgs.Empty);
+
+        return new BusyScope(this);
+    }
+
+    private void EndBusyScope()
+    {
+        if (Interlocked.Decrement(ref busyOperationCount) == 0)
+            IsBusyChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    private sealed class BusyScope(DispatcherCollection<T> collection) : IDisposable
+    {
+        private bool disposed;
+
+        public void Dispose()
+        {
+            if (disposed)
+                return;
+
+            disposed = true;
+            collection.EndBusyScope();
+        }
     }
 }

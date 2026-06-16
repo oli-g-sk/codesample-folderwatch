@@ -73,17 +73,6 @@
                                       behaviors:ListBoxDoubleClick.Command="{Binding OpenEntryCommand}"
                                       Background="Transparent"
                                       ScrollViewer.HorizontalScrollBarVisibility="Disabled" >
-                <controls:BufferedListBox.Style>
-                    <Style TargetType="{x:Type controls:BufferedListBox}"
-                           BasedOn="{StaticResource {x:Type ListBox}}">
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding IsRefreshing}" Value="True">
-                                <Setter Property="IsEnabled" Value="False" />
-                                <Setter Property="Opacity" Value="{StaticResource DisabledItemOpacity}" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </controls:BufferedListBox.Style>
                 <controls:BufferedListBox.ItemsPanel>
                     <ItemsPanelTemplate>
                         <WrapPanel />
