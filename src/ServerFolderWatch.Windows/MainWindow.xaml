@@ -26,7 +26,8 @@
         <Border Background="#44000000" Grid.Column="0"
                 CornerRadius="8,0,0,8"
                 DataContext="{Binding FolderTree}">
-            <TreeView ItemsSource="{Binding Folders}"
+            <TreeView x:Name="FolderTreeView"
+                      ItemsSource="{Binding Folders}"
                       SelectedItemChanged="TreeView_OnSelectedItemChanged">
                 <TreeView.ItemContainerStyle>
                     <Style TargetType="{x:Type TreeViewItem}"

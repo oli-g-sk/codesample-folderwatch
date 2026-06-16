@@ -1,4 +1,6 @@
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Threading;
 using ServerFolderWatch.Desktop.ViewModels;
 using ServerFolderWatch.Desktop.ViewModels.Items;
 
@@ -41,6 +43,40 @@ public partial class MainWindow : Window
     private void TreeView_OnSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
     {
         if (e.NewValue is FolderViewModel folder)
+        {
             viewModel.FolderTree.SelectedFolder = folder;
+            FolderTreeView.Dispatcher.BeginInvoke(ScrollSelectedTreeItemIntoView, DispatcherPriority.ContextIdle);
+        }
+    }
+
+    private void ScrollSelectedTreeItemIntoView()
+    {
+        if (FolderTreeView.SelectedItem is null)
+            return;
+
+        var item = GetTreeViewItem(FolderTreeView, FolderTreeView.SelectedItem);
+        item?.BringIntoView();
+    }
+
+    private static TreeViewItem? GetTreeViewItem(ItemsControl parent, object item)
+    {
+        parent.ApplyTemplate();
+        parent.UpdateLayout();
+
+        if (parent.ItemContainerGenerator.ContainerFromItem(item) is TreeViewItem directItem)
+            return directItem;
+
+        foreach (var child in parent.Items)
+        {
+            if (parent.ItemContainerGenerator.ContainerFromItem(child) is not TreeViewItem childItem)
+                continue;
+
+            var result = GetTreeViewItem(childItem, item);
+
+            if (result is not null)
+                return result;
+        }
+
+        return null;
     }
 }
