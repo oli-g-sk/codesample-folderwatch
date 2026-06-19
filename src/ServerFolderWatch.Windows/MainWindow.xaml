@@ -91,7 +91,23 @@
                                        HorizontalAlignment="Center"
                                        VerticalAlignment="Center"
                                        FontWeight="ExtraLight"
-                                       FontSize="64" />
+                                       FontSize="64">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding DiffOperation}" Value="Added">
+                                                <Setter Property="Foreground" Value="LimeGreen" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding DiffOperation}" Value="Modified">
+                                                <Setter Property="Foreground" Value="DarkOrange" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding DiffOperation}" Value="Removed">
+                                                <Setter Property="Foreground" Value="IndianRed" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
                             <TextBlock Grid.Row="1"
                                        Margin="0,8,0,0"
                                        HorizontalAlignment="Center"
