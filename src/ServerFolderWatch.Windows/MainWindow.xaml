@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ServerFolderWatch.Windows"
         xmlns:behaviors="clr-namespace:ServerFolderWatch.Windows.Behaviors"
-        xmlns:controls="clr-namespace:ServerFolderWatch.Windows.Controls"
+        xmlns:controls="clr-namespace:Olivercode.WPFastr.Controls;assembly=Olivercode.WPFastr"
         xmlns:viewModels="clr-namespace:ServerFolderWatch.Desktop.ViewModels;assembly=ServerFolderWatch.Desktop"
         xmlns:items="clr-namespace:ServerFolderWatch.Desktop.ViewModels.Items;assembly=ServerFolderWatch.Desktop"
         xmlns:converters="clr-namespace:ServerFolderWatch.Windows.Converters"

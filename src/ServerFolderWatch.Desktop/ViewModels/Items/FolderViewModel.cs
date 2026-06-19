@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Olivercode.WPFastr;
 using ServerFolderWatch.Core.Model;
 using ServerFolderWatch.Desktop.Services;
 

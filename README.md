@@ -9,6 +9,16 @@ against the last snapshot.
 An accompanying **CLI tool** can be used to perform the same operations from within the
 command line, at any location within the file system.
 
+## Package sources
+
+The WPF desktop app currently depends on `Olivercode.WPFastr`, which is published to
+GitHub Packages until it is available on NuGet.org. Add this package source before
+restoring or building the solution:
+
+```powershell
+dotnet nuget add source https://nuget.pkg.github.com/oli-g-sk/index.json -n github
+```
+
 ## Server app
 
 - Either use `dotnet run` in the `ServerFolderWatch.Server` folder

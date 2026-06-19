@@ -7,8 +7,8 @@ public class WpfDispatcherService : IDispatcherService
 {
     private readonly Dispatcher dispatcher = System.Windows.Application.Current.Dispatcher;
 
-    public async Task InvokeAsync(Action action, int priority)
+    public async Task InvokeAsync(Action action, DispatcherPriority priority)
     {
-        await dispatcher.InvokeAsync(action, (DispatcherPriority)priority);
+        await dispatcher.InvokeAsync(action, priority);
     }
 }
