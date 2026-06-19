@@ -16,6 +16,7 @@ public partial class FolderContentsViewModel : ObservableObject,
     IRecipient<SelectedFolderChangedMsg>
 {
     private readonly IFolderSnapshotService folderSnapshotService;
+    private readonly IFolderDiffService folderDiffService;
     private readonly IBrowseService browseService;
     private readonly IDispatcherService dispatcherService;
 
@@ -25,10 +26,12 @@ public partial class FolderContentsViewModel : ObservableObject,
     private bool isBusy;
 
     public FolderContentsViewModel(IFolderSnapshotService folderSnapshotService,
+        IFolderDiffService folderDiffService,
         IBrowseService browseService,
         IDispatcherService dispatcherService)
     {
         this.folderSnapshotService = folderSnapshotService;
+        this.folderDiffService = folderDiffService;
         this.browseService = browseService;
         this.dispatcherService = dispatcherService;
 
@@ -72,7 +75,9 @@ public partial class FolderContentsViewModel : ObservableObject,
             }
 
             var contents = folderSnapshotService.GetCurrentContents(folder.FullPath);
-            await Entries.ReplaceRangeAsync(EnumerateEntries(contents, folder.FullPath), updateVersion);
+            var previousContents = folderSnapshotService.LoadPersistedSnapshot(folder.FullPath);
+            var diff = folderDiffService.Compare(previousContents, contents, folder.FullPath, out _);
+            await Entries.ReplaceRangeAsync(EnumerateEntries(diff, folder.FullPath), updateVersion);
         }
         else
         {
@@ -80,17 +85,24 @@ public partial class FolderContentsViewModel : ObservableObject,
         }
     }
 
-    private IEnumerable<BaseEntryViewModel> EnumerateEntries(FolderSnapshot snapshot, string selectedFolderPath)
+    private IEnumerable<BaseEntryViewModel> EnumerateEntries(
+        IReadOnlyDictionary<FileSystemEntryBase, DiffOperation> diff, string selectedFolderPath)
     {
-        foreach (var entry in snapshot.Subfolders)
+        foreach (var (entry, operation) in diff)
         {
             string fullPath = Path.Combine(selectedFolderPath, entry.Name);
-            bool canReadSubfolder = browseService.CanReadFolderContents(fullPath);
-            bool hasChildren = canReadSubfolder && browseService.GetChildren(fullPath).Any();
-            yield return new FolderViewModel(entry, fullPath, hasChildren, canReadSubfolder, dispatcherService);
-        }
 
-        foreach (var entry in snapshot.VersionedFiles)
-            yield return new FileViewModel(entry, Path.Combine(selectedFolderPath, entry.Name));
+            if (entry is Folder)
+            {
+                bool canRead = operation != DiffOperation.Removed && browseService.CanReadFolderContents(fullPath);
+                bool hasChildren = canRead && browseService.GetChildren(fullPath).Any();
+                yield return new FolderViewModel(entry, fullPath, hasChildren, canRead, dispatcherService)
+                    { DiffOperation = operation };
+            }
+            else
+            {
+                yield return new FileViewModel(entry, fullPath) { DiffOperation = operation };
+            }
+        }
     }
 }

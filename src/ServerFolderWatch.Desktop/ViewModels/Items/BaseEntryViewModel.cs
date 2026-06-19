@@ -12,5 +12,7 @@ public abstract class BaseEntryViewModel(FileSystemEntryBase entry, string fullP
     
     public string Name => Entry.Name;
 
+    public DiffOperation DiffOperation { get; init; }
+
     public abstract bool IsFolder { get; }
 }
