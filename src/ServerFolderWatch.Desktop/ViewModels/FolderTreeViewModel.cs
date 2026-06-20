@@ -170,7 +170,7 @@ public partial class FolderTreeViewModel : ObservableObject,
         string fullPath = Path.Combine(parentPath, model.Name);
         bool canRead = browseService.CanReadFolderContents(fullPath);
         bool hasChildren = canRead && browseService.GetChildren(fullPath).Any();
-        var viewModel = new FolderViewModel(model, fullPath, hasChildren, canRead, dispatcherService);
+        var viewModel = new FolderViewModel(model, fullPath, hasChildren, canRead, dispatcherService, parent);
         viewModel.PropertyChanged += Folder_OnPropertyChanged;
         return viewModel;
     }

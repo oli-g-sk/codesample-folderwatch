@@ -23,6 +23,9 @@ public partial class FolderContentsViewModel : ObservableObject,
     public DispatcherCollection<BaseEntryViewModel> Entries { get; }
 
     [ObservableProperty]
+    private IEnumerable<FolderViewModel> breadcrumbs = [];
+
+    [ObservableProperty]
     private bool isBusy;
 
     public FolderContentsViewModel(IFolderSnapshotService folderSnapshotService,
@@ -64,6 +67,7 @@ public partial class FolderContentsViewModel : ObservableObject,
 
         if (message.Folder is { CanViewContents: true } folder)
         {
+            Breadcrumbs = EnumerateBreadcrumbs(folder);
             bool canRead = browseService.CanReadFolderContents(folder.FullPath);
 
             if (!canRead || !Entries.IsCurrent(updateVersion))
@@ -77,26 +81,27 @@ public partial class FolderContentsViewModel : ObservableObject,
             var contents = folderSnapshotService.GetCurrentContents(folder.FullPath);
             var previousContents = folderSnapshotService.LoadPersistedSnapshot(folder.FullPath);
             var diff = folderDiffService.Compare(previousContents, contents, folder.FullPath, out _);
-            await Entries.ReplaceRangeAsync(EnumerateEntries(diff, folder.FullPath), updateVersion);
+            await Entries.ReplaceRangeAsync(EnumerateEntries(diff, folder), updateVersion);
         }
         else
         {
+            Breadcrumbs = [];
             await Entries.ClearAsync(updateVersion);
         }
     }
 
     private IEnumerable<BaseEntryViewModel> EnumerateEntries(
-        IReadOnlyDictionary<FileSystemEntryBase, DiffOperation> diff, string selectedFolderPath)
+        IReadOnlyDictionary<FileSystemEntryBase, DiffOperation> diff, FolderViewModel selectedFolder)
     {
         foreach (var (entry, operation) in diff)
         {
-            string fullPath = Path.Combine(selectedFolderPath, entry.Name);
+            string fullPath = Path.Combine(selectedFolder.FullPath, entry.Name);
 
             if (entry is Folder)
             {
                 bool canRead = operation != DiffOperation.Removed && browseService.CanReadFolderContents(fullPath);
                 bool hasChildren = canRead && browseService.GetChildren(fullPath).Any();
-                yield return new FolderViewModel(entry, fullPath, hasChildren, canRead, dispatcherService)
+                yield return new FolderViewModel(entry, fullPath, hasChildren, canRead, dispatcherService, selectedFolder)
                     { DiffOperation = operation };
             }
             else
@@ -104,5 +109,15 @@ public partial class FolderContentsViewModel : ObservableObject,
                 yield return new FileViewModel(entry, fullPath) { DiffOperation = operation };
             }
         }
+    }
+
+    private static IEnumerable<FolderViewModel> EnumerateBreadcrumbs(FolderViewModel folder)
+    {
+        var result = new Stack<FolderViewModel>();
+
+        for (FolderViewModel? current = folder; current is not null; current = current.Parent)
+            result.Push(current);
+
+        return result;
     }
 }

@@ -11,6 +11,8 @@ public partial class FolderViewModel : BaseEntryViewModel
     public override bool IsFolder { get; } = true;
     
     public bool CanViewContents { get; }
+
+    public FolderViewModel? Parent { get; }
     
     [ObservableProperty]
     private bool isExpanded;
@@ -23,9 +25,10 @@ public partial class FolderViewModel : BaseEntryViewModel
 
     /// <inheritdoc/>
     public FolderViewModel(FileSystemEntryBase entry, string fullPath, bool hasChildren, bool canViewContents,
-        IDispatcherService dispatcherService) : base(entry, fullPath)
+        IDispatcherService dispatcherService, FolderViewModel? parent = null) : base(entry, fullPath)
     {
         CanViewContents = canViewContents;
+        Parent = parent;
         this.hasChildren = hasChildren;
      
         Children = new DispatcherCollection<BaseEntryViewModel?>(dispatcherService);

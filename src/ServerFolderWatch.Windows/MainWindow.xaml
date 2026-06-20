@@ -67,8 +67,33 @@
         <Border Background="#44000000" Grid.Column="2"
                 DataContext="{Binding FolderContents}"
                 CornerRadius="0,8,8,0">
-            
-            <controls:BufferedListBox x:Name="FolderContentsListBox"
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <ItemsControl ItemsSource="{Binding Breadcrumbs}" Margin="8,4">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type items:FolderViewModel}">
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="{Binding Name}"
+                                        Command="{Binding DataContext.OpenEntryCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                        CommandParameter="{Binding}"
+                                        Padding="8,4" />
+                                <TextBlock Text="›" Margin="4,0" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <controls:BufferedListBox x:Name="FolderContentsListBox"
+                                      Grid.Row="1"
                                       ItemsSource="{Binding Entries}"
                                       behaviors:ListBoxDoubleClick.Command="{Binding OpenEntryCommand}"
                                       Background="Transparent"
@@ -115,7 +140,8 @@
                         </Grid>
                     </DataTemplate>
                 </controls:BufferedListBox.ItemTemplate>
-            </controls:BufferedListBox>
+                </controls:BufferedListBox>
+            </Grid>
         </Border>
     </Grid>
 </Window>
