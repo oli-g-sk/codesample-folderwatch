@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/Tests/">
     <Project Path="test/ServerFolderWatch.Core.Tests/ServerFolderWatch.Core.Tests.csproj" />
+    <Project Path="test/ServerFolderWatch.Desktop.Tests/ServerFolderWatch.Desktop.Tests.csproj" />
     <Project Path="test/ServerFolderWatch.Server.Tests/ServerFolderWatch.Server.Tests.csproj" />
   </Folder>
   <Project Path="src/ServerFolderWatch.CLI/ServerFolderWatch.CLI.csproj" />

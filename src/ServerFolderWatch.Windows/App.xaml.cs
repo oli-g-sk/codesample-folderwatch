@@ -58,6 +58,7 @@ public partial class App : Application
         services.AddSingleton<IFolderSnapshotService, SidecarFolderSnapshotService>();
 
         services.AddSingleton<IDispatcherService, WpfDispatcherService>();
+        services.AddSingleton<IFileLauncher, ShellFileLauncher>();
         
         services.AddSingleton<FolderTreeViewModel>();
         services.AddSingleton<FolderContentsViewModel>();

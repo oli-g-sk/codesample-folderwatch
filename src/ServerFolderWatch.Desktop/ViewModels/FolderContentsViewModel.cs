@@ -19,6 +19,7 @@ public partial class FolderContentsViewModel : ObservableObject,
     private readonly IFolderDiffService folderDiffService;
     private readonly IBrowseService browseService;
     private readonly IDispatcherService dispatcherService;
+    private readonly IFileLauncher fileLauncher;
 
     public DispatcherCollection<BaseEntryViewModel> Entries { get; }
 
@@ -31,12 +32,14 @@ public partial class FolderContentsViewModel : ObservableObject,
     public FolderContentsViewModel(IFolderSnapshotService folderSnapshotService,
         IFolderDiffService folderDiffService,
         IBrowseService browseService,
-        IDispatcherService dispatcherService)
+        IDispatcherService dispatcherService,
+        IFileLauncher fileLauncher)
     {
         this.folderSnapshotService = folderSnapshotService;
         this.folderDiffService = folderDiffService;
         this.browseService = browseService;
         this.dispatcherService = dispatcherService;
+        this.fileLauncher = fileLauncher;
 
         Entries = new DispatcherCollection<BaseEntryViewModel>(dispatcherService);
         Entries.IsBusyChanged += Entries_OnIsBusyChanged;
@@ -59,6 +62,8 @@ public partial class FolderContentsViewModel : ObservableObject,
     {
         if (entry is FolderViewModel { CanViewContents: true } folder)
             WeakReferenceMessenger.Default.Send(new SelectedFolderChangedMsg(folder));
+        else if (entry is FileViewModel)
+            fileLauncher.Open(entry.FullPath);
     }
 
     private async Task RefreshAsync(SelectedFolderChangedMsg message)
