@@ -18,6 +18,8 @@
       <PackageReference Include="Microsoft.Extensions.Logging" />
       <PackageReference Include="Microsoft.Extensions.Logging.Console" />
       <PackageReference Include="Olivercode.WPFastr" />
+      <PackageReference Include="Olivercode.Dry.System" />
+      <PackageReference Include="Olivercode.Dry.UI.Behaviors.WPF" />
     </ItemGroup>
 
 </Project>

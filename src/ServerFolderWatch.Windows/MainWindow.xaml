@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ServerFolderWatch.Windows"
-        xmlns:behaviors="clr-namespace:ServerFolderWatch.Windows.Behaviors"
+        xmlns:behaviors="clr-namespace:Olivercode.Dry.UI.Behaviors.WPF;assembly=Olivercode.Dry.UI.Behaviors.WPF"
         xmlns:controls="clr-namespace:Olivercode.WPFastr.Controls;assembly=Olivercode.WPFastr"
         xmlns:viewModels="clr-namespace:ServerFolderWatch.Desktop.ViewModels;assembly=ServerFolderWatch.Desktop"
         xmlns:items="clr-namespace:ServerFolderWatch.Desktop.ViewModels.Items;assembly=ServerFolderWatch.Desktop"
@@ -95,7 +95,7 @@
                 <controls:BufferedListBox x:Name="FolderContentsListBox"
                                       Grid.Row="1"
                                       ItemsSource="{Binding Entries}"
-                                      behaviors:ListBoxDoubleClick.Command="{Binding OpenEntryCommand}"
+                                      behaviors:ListBoxDoubleClickBehavior.Command="{Binding OpenEntryCommand}"
                                       Background="Transparent"
                                       ScrollViewer.HorizontalScrollBarVisibility="Disabled" >
                 <controls:BufferedListBox.ItemsPanel>

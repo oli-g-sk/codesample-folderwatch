@@ -1,19 +1,12 @@
-using System.Diagnostics;
-using System.IO.Abstractions;
+using Olivercode.Dry.System;
 using ServerFolderWatch.Desktop.Services;
 
 namespace ServerFolderWatch.Windows.Services;
 
-public sealed class ShellFileLauncher(IFileSystem fileSystem) : IFileLauncher
+public sealed class ShellFileLauncher : IFileLauncher
 {
     public void Open(string filePath)
     {
-        if (!fileSystem.File.Exists(filePath))
-            return;
-
-        Process.Start(new ProcessStartInfo(filePath)
-        {
-            UseShellExecute = true
-        });
+        ProcessHelper.TryOpenFile(filePath);
     }
 }
