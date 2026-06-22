@@ -7,7 +7,7 @@
 		<Title>ServerFolderWatch</Title>
 		<Version>1.0.0</Version>
 
-		<BaseOutputPath>$(MSBuildThisFileDirectory)..\build\</BaseOutputPath>
+		<BaseOutputPath>$(MSBuildThisFileDirectory)\build\</BaseOutputPath>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 		<AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
 	</PropertyGroup>

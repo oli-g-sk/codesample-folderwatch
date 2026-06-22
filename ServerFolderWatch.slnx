@@ -1,58 +1,11 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerFolderWatch.Core", "ServerFolderWatch.Core\ServerFolderWatch.Core.csproj", "{01FD3D68-8AD1-446A-8963-FD37DC6F89F5}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerFolderWatch.CLI", "ServerFolderWatch.CLI\ServerFolderWatch.CLI.csproj", "{84233D37-1271-4D92-A663-50570E6E94B4}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerFolderWatch.Core.Tests", "ServerFolderWatch.Core.Tests\ServerFolderWatch.Core.Tests.csproj", "{69DFFCEF-2D55-4626-97C7-AF8B1F8FAFA1}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerFolderWatch.Server", "ServerFolderWatch.Server\ServerFolderWatch.Server.csproj", "{53AECE7B-38A3-40D4-86DD-91858AAF2AA1}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerFolderWatch.Server.Tests", "ServerFolderWatch.Server.Tests\ServerFolderWatch.Server.Tests.csproj", "{BD68A3F5-177C-450E-A1B2-98CB9F5FFE65}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{BC7B57CC-D8F1-4270-9A11-CE6DE993D935}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerFolderWatch.Windows", "ServerFolderWatch.Windows\ServerFolderWatch.Windows.csproj", "{638E2200-9200-4CB5-9F97-829CE3A2387C}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerFolderWatch.Desktop", "ServerFolderWatch.Desktop\ServerFolderWatch.Desktop.csproj", "{36C327D1-EA2A-45B4-A977-BA1DE397739D}"
-EndProject
-Global
-	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
-		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{01FD3D68-8AD1-446A-8963-FD37DC6F89F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{01FD3D68-8AD1-446A-8963-FD37DC6F89F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{01FD3D68-8AD1-446A-8963-FD37DC6F89F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{01FD3D68-8AD1-446A-8963-FD37DC6F89F5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{84233D37-1271-4D92-A663-50570E6E94B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{84233D37-1271-4D92-A663-50570E6E94B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{84233D37-1271-4D92-A663-50570E6E94B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{84233D37-1271-4D92-A663-50570E6E94B4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{69DFFCEF-2D55-4626-97C7-AF8B1F8FAFA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{69DFFCEF-2D55-4626-97C7-AF8B1F8FAFA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{69DFFCEF-2D55-4626-97C7-AF8B1F8FAFA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{69DFFCEF-2D55-4626-97C7-AF8B1F8FAFA1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{53AECE7B-38A3-40D4-86DD-91858AAF2AA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{53AECE7B-38A3-40D4-86DD-91858AAF2AA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{53AECE7B-38A3-40D4-86DD-91858AAF2AA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{53AECE7B-38A3-40D4-86DD-91858AAF2AA1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BD68A3F5-177C-450E-A1B2-98CB9F5FFE65}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BD68A3F5-177C-450E-A1B2-98CB9F5FFE65}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BD68A3F5-177C-450E-A1B2-98CB9F5FFE65}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BD68A3F5-177C-450E-A1B2-98CB9F5FFE65}.Release|Any CPU.Build.0 = Release|Any CPU
-		{638E2200-9200-4CB5-9F97-829CE3A2387C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{638E2200-9200-4CB5-9F97-829CE3A2387C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{638E2200-9200-4CB5-9F97-829CE3A2387C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{638E2200-9200-4CB5-9F97-829CE3A2387C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{36C327D1-EA2A-45B4-A977-BA1DE397739D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{36C327D1-EA2A-45B4-A977-BA1DE397739D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{36C327D1-EA2A-45B4-A977-BA1DE397739D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{36C327D1-EA2A-45B4-A977-BA1DE397739D}.Release|Any CPU.Build.0 = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{BD68A3F5-177C-450E-A1B2-98CB9F5FFE65} = {BC7B57CC-D8F1-4270-9A11-CE6DE993D935}
-		{69DFFCEF-2D55-4626-97C7-AF8B1F8FAFA1} = {BC7B57CC-D8F1-4270-9A11-CE6DE993D935}
-	EndGlobalSection
-EndGlobal
+<Solution>
+  <Folder Name="/Tests/">
+    <Project Path="src/ServerFolderWatch.Core.Tests/ServerFolderWatch.Core.Tests.csproj" />
+    <Project Path="src/ServerFolderWatch.Server.Tests/ServerFolderWatch.Server.Tests.csproj" />
+  </Folder>
+  <Project Path="src/ServerFolderWatch.CLI/ServerFolderWatch.CLI.csproj" />
+  <Project Path="src/ServerFolderWatch.Core/ServerFolderWatch.Core.csproj" />
+  <Project Path="src/ServerFolderWatch.Desktop/ServerFolderWatch.Desktop.csproj" />
+  <Project Path="src/ServerFolderWatch.Server/ServerFolderWatch.Server.csproj" />
+  <Project Path="src/ServerFolderWatch.Windows/ServerFolderWatch.Windows.csproj" />
+</Solution>
