@@ -5,6 +5,14 @@
 @inject BrowsePageModel Model;
 
 <div id="browser">
+    <nav class="breadcrumbs">
+        @foreach (var breadcrumb in Model.GetBreadcrumbs())
+        {
+            <a href="@breadcrumb.Url" class="@(breadcrumb.IsMonitored ? "monitored" : null)">
+                <em class="icon">@breadcrumb.Icon</em> @breadcrumb.Name
+            </a>
+        }
+    </nav>
     <ul>
         @if (Model.CanGoToParent())
         {
@@ -20,7 +28,10 @@
                 @if (child.Key is Folder folder)
                 {
                     <a href="@Model.GetFolderUrl(folder)">
-                        <em class="icon">🗀</em> @child.Key.Name
+                        <em class="icon">@Model.GetFolderIcon(folder)</em>
+                        <span class="folder-name @(Model.IsFolderMonitored(folder) ? "monitored" : null)">
+                            @child.Key.Name
+                        </span>
                     </a>
                 }
                 else if (child.Key is File file)
