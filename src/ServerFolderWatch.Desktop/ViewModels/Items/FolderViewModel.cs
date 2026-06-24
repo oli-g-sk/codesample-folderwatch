@@ -13,6 +13,10 @@ public partial class FolderViewModel : BaseEntryViewModel
     public bool CanViewContents { get; }
 
     public FolderViewModel? Parent { get; }
+
+    public bool IsMonitored { get; }
+
+    public override string Icon => IsExpanded ? "📂" : "📁";
     
     [ObservableProperty]
     private bool isExpanded;
@@ -25,10 +29,12 @@ public partial class FolderViewModel : BaseEntryViewModel
 
     /// <inheritdoc/>
     public FolderViewModel(FileSystemEntryBase entry, string fullPath, bool hasChildren, bool canViewContents,
+        bool isMonitored,
         IDispatcherService dispatcherService, FolderViewModel? parent = null) : base(entry, fullPath)
     {
         CanViewContents = canViewContents;
         Parent = parent;
+        IsMonitored = isMonitored;
         this.hasChildren = hasChildren;
      
         Children = new DispatcherCollection<BaseEntryViewModel?>(dispatcherService);
@@ -43,4 +49,9 @@ public partial class FolderViewModel : BaseEntryViewModel
     public DispatcherCollection<BaseEntryViewModel?> Children { get; }
     
     public bool ChildrenLoaded => HasChildren && Children is not [null];
+
+    partial void OnIsExpandedChanged(bool value)
+    {
+        OnPropertyChanged(nameof(Icon));
+    }
 }

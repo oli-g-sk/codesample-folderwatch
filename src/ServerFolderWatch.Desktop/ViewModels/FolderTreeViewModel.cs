@@ -15,6 +15,7 @@ public partial class FolderTreeViewModel : ObservableObject,
     IRecipient<SelectedFolderChangedMsg>
 {
     private readonly IBrowseService browseService;
+    private readonly IFolderSnapshotService folderSnapshotService;
     private readonly IDispatcherService dispatcherService;
 
     private string? rootPath;
@@ -25,9 +26,13 @@ public partial class FolderTreeViewModel : ObservableObject,
     [ObservableProperty]
     private FolderViewModel? selectedFolder;
 
-    public FolderTreeViewModel(IBrowseService browseService, IDispatcherService dispatcherService)
+    public FolderTreeViewModel(
+        IBrowseService browseService,
+        IFolderSnapshotService folderSnapshotService,
+        IDispatcherService dispatcherService)
     {
         this.browseService = browseService;
+        this.folderSnapshotService = folderSnapshotService;
         this.dispatcherService = dispatcherService;
         Folders = new ObservableCollection<FolderViewModel>();
         WeakReferenceMessenger.Default.Register(this);
@@ -170,7 +175,8 @@ public partial class FolderTreeViewModel : ObservableObject,
         string fullPath = Path.Combine(parentPath, model.Name);
         bool canRead = browseService.CanReadFolderContents(fullPath);
         bool hasChildren = canRead && browseService.GetChildren(fullPath).Any();
-        var viewModel = new FolderViewModel(model, fullPath, hasChildren, canRead, dispatcherService, parent);
+        bool isMonitored = folderSnapshotService.IsFolderAlreadyMonitored(fullPath);
+        var viewModel = new FolderViewModel(model, fullPath, hasChildren, canRead, isMonitored, dispatcherService, parent);
         viewModel.PropertyChanged += Folder_OnPropertyChanged;
         return viewModel;
     }
