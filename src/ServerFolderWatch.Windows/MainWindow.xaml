@@ -49,8 +49,18 @@
                             <DockPanel>
                                 <TextBlock DockPanel.Dock="Left"
                                            Margin="0,0,16,0"
-                                           Foreground="{StaticResource FolderIconForegroundBrush}"
-                                           Text="{Binding Converter={StaticResource IconConverter}}" />
+                                           Foreground="{StaticResource FolderIconForegroundBrush}">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Text" Value="📁" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsExpanded}" Value="True">
+                                                    <Setter Property="Text" Value="📂" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
                                 <TextBlock Text="{Binding Name}" />
                             </DockPanel>
                         </Border>
