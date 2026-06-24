@@ -106,7 +106,9 @@ public partial class FolderContentsViewModel : ObservableObject,
             {
                 bool canRead = operation != DiffOperation.Removed && browseService.CanReadFolderContents(fullPath);
                 bool hasChildren = canRead && browseService.GetChildren(fullPath).Any();
-                yield return new FolderViewModel(entry, fullPath, hasChildren, canRead, dispatcherService, selectedFolder)
+                bool isMonitored = folderSnapshotService.IsFolderAlreadyMonitored(fullPath);
+                yield return new FolderViewModel(entry, fullPath, hasChildren, canRead, isMonitored,
+                    dispatcherService, selectedFolder)
                     { DiffOperation = operation };
             }
             else

@@ -15,4 +15,6 @@ public abstract class BaseEntryViewModel(FileSystemEntryBase entry, string fullP
     public DiffOperation DiffOperation { get; init; }
 
     public abstract bool IsFolder { get; }
+
+    public abstract string Icon { get; }
 }
