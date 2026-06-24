@@ -8,15 +8,10 @@
         xmlns:controls="clr-namespace:Olivercode.WPFastr.Controls;assembly=Olivercode.WPFastr"
         xmlns:viewModels="clr-namespace:ServerFolderWatch.Desktop.ViewModels;assembly=ServerFolderWatch.Desktop"
         xmlns:items="clr-namespace:ServerFolderWatch.Desktop.ViewModels.Items;assembly=ServerFolderWatch.Desktop"
-        xmlns:converters="clr-namespace:ServerFolderWatch.Windows.Converters"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance viewModels:BrowseViewModel}"
         DataContext="{local:Service ServiceType={x:Type viewModels:BrowseViewModel}}"
         Title="MainWindow" Height="450" Width="800">
-    <Window.Resources>
-        <converters:FileSystemEntryToIconConverter x:Key="IconConverter" />
-    </Window.Resources>
-    
     <Grid Margin="8">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" MinWidth="160" />
@@ -49,19 +44,20 @@
                             <DockPanel>
                                 <TextBlock DockPanel.Dock="Left"
                                            Margin="0,0,16,0"
-                                           Foreground="{StaticResource FolderIconForegroundBrush}">
+                                           Foreground="{StaticResource FolderIconForegroundBrush}"
+                                           Text="{Binding Icon}">
+                                </TextBlock>
+                                <TextBlock Text="{Binding Name}">
                                     <TextBlock.Style>
                                         <Style TargetType="TextBlock">
-                                            <Setter Property="Text" Value="📁" />
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsExpanded}" Value="True">
-                                                    <Setter Property="Text" Value="📂" />
+                                                <DataTrigger Binding="{Binding IsMonitored}" Value="True">
+                                                    <Setter Property="FontWeight" Value="Bold" />
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
                                     </TextBlock.Style>
                                 </TextBlock>
-                                <TextBlock Text="{Binding Name}" />
                             </DockPanel>
                         </Border>
                     </HierarchicalDataTemplate>
@@ -95,7 +91,18 @@
                                 <Button Content="{Binding Name}"
                                         Command="{Binding DataContext.OpenEntryCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                         CommandParameter="{Binding}"
-                                        Padding="8,4" />
+                                        Padding="8,4">
+                                    <Button.Style>
+                                        <Style TargetType="Button"
+                                               BasedOn="{StaticResource {x:Type Button}}">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsMonitored}" Value="True">
+                                                    <Setter Property="FontWeight" Value="Bold" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
                                 <TextBlock Text="›" Margin="4,0" VerticalAlignment="Center" />
                             </StackPanel>
                         </DataTemplate>
@@ -121,7 +128,7 @@
                                 <RowDefinition Height="3*" />
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
-                            <TextBlock Text="{Binding Converter={StaticResource IconConverter}}"
+                            <TextBlock Text="{Binding Icon}"
                                        Opacity="0.75"
                                        HorizontalAlignment="Center"
                                        VerticalAlignment="Center"

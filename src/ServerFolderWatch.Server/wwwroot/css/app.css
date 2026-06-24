@@ -68,6 +68,28 @@ body {
     }
 }
 
+#browser .breadcrumbs {
+    padding: 0.5em 1em;
+    
+    a, a:visited {
+        color: #EEE;
+        text-decoration: none;
+        margin-right: 1em;
+    }
+    
+    a.monitored {
+        font-weight: bold;
+    }
+}
+
+#browser .folder-name {
+    font-weight: normal;
+}
+
+#browser .folder-name.monitored {
+    font-weight: bold;
+}
+
 .error-page {
     margin: 0;
     background-color: blue;

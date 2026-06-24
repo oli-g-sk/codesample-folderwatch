@@ -44,6 +44,27 @@ public class BrowsePageModel(
         return GetBrowseUrl(GetParentPath());
     }
 
+    public IEnumerable<BreadcrumbViewModel> GetBreadcrumbs()
+    {
+        if (string.IsNullOrWhiteSpace(currentFolder))
+            yield break;
+
+        var path = string.Empty;
+
+        foreach (string segment in currentFolder.Split('/', StringSplitOptions.RemoveEmptyEntries))
+        {
+            path = string.IsNullOrWhiteSpace(path)
+                ? segment
+                : $"{path}/{segment}";
+
+            yield return new BreadcrumbViewModel(
+                segment,
+                GetBrowseUrl(path),
+                "📂",
+                folderSnapshotService.IsFolderAlreadyMonitored(path));
+        }
+    }
+
     public IDictionary<FileSystemEntryBase, DiffOperation> GetDiffEntries()
     {
         var contents = folderSnapshotService.GetCurrentContents(currentFolder ?? string.Empty);
@@ -55,11 +76,19 @@ public class BrowsePageModel(
 
     public string GetFolderUrl(Folder childFolder)
     {
-        var childPath = string.IsNullOrWhiteSpace(currentFolder)
-            ? childFolder.Name
-            : $"{currentFolder}/{childFolder.Name}";
+        return GetBrowseUrl(GetFolderPath(childFolder));
+    }
 
-        return GetBrowseUrl(childPath);
+    public string GetFolderIcon(Folder childFolder)
+    {
+        return GetFolderPath(childFolder).Equals(currentFolder, StringComparison.OrdinalIgnoreCase)
+            ? "📂"
+            : "📁";
+    }
+
+    public bool IsFolderMonitored(Folder childFolder)
+    {
+        return folderSnapshotService.IsFolderAlreadyMonitored(GetFolderPath(childFolder));
     }
 
     public bool CanGoToParent()
@@ -73,5 +102,12 @@ public class BrowsePageModel(
             return "/browse";
 
         return $"/browse?folder={Uri.EscapeDataString(folderPath)}";
+    }
+
+    private string GetFolderPath(Folder childFolder)
+    {
+        return string.IsNullOrWhiteSpace(currentFolder)
+            ? childFolder.Name
+            : $"{currentFolder}/{childFolder.Name}";
     }
 }
